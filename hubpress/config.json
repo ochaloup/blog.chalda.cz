@@ -1,7 +1,8 @@
 {
   "meta": {
-    "username": "put your username here",
-    "repositoryName": "put your repository name here",
+    "username": "ochaloup",
+    "repositoryName": "blog.chalda.cz",
+    "cname": "blog.chalda.cz",
     "branch": "gh-pages"
   },
   "theme": {
