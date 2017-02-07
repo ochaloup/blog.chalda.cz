@@ -2,10 +2,15 @@
   "meta": {
     "username": "ochaloup",
     "repositoryName": "blog.chalda.cz",
-    "cname": "blog.chalda.cz",
-    "branch": "gh-pages"
+    "branch": "gh-pages",
+    "cname": "blog.chalda.cz"
   },
+  "site": {
+    "title": "Chalda's blog",
+    "description": "Notes for not being forgotten"
+  },
+  "socialnetwork": {},
   "theme": {
-    "name": "Casper"
+    "name": "casper"
   }
 }
