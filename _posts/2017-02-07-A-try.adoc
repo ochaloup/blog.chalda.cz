@@ -1,0 +1,11 @@
+= A try
+:hp-tags: nothing
+:toc: macro
+:release: 1.0
+:published_at: 2017-02-07
+
+toc::[]
+
+== Simple article to do something
+
+... and what I can write here
