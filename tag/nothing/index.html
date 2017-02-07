@@ -12,8 +12,8 @@
 
     <link rel="shortcut icon" href="http://blog.chalda.cz/favicon.ico">
 
-    <link rel="stylesheet" type="text/css" href="//blog.chalda.cz/themes/casper/assets/css/screen.css?v=1486495924755" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:400,700,400italic,700italic|Open+Sans:400italic,700italic,700,400">
+    <link rel="stylesheet" type="text/css" href="//blog.chalda.cz/themes/roon/assets/css/screen.css?v=1486497665709" />
 
     <link rel="canonical" href="http://blog.chalda.cz/http://blog.chalda.cz/tag/nothing/" />
     <meta name="referrer" content="origin" />
@@ -33,67 +33,86 @@ null
     <meta name="generator" content="HubPress" />
     <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog" href="http://blog.chalda.cz/rss/" />
 </head>
-<body class="tag-template tag-nothing nav-closed">
+<body class="tag-template tag-nothing user ">
 
     
-
-    <div class="site-wrapper">
-
-        
-<header class="main-header tag-head no-cover">
-    <nav class="main-nav overlay clearfix">
-        
-    </nav>
-    <div class="vertical">
-        <div class="main-header-content inner">
-            <h1 class="page-title">nothing</h1>
-            <h2 class="page-description">
-                    A 1-post collection
-            </h2>
-        </div>
+<header role="banner">
+    <div class="wrap">
+        <h1><a href="http://blog.chalda.cz">Tag: nothing</a></h1>
+        <hr>
     </div>
 </header>
 
-<main class="content" role="main">
 
-    <div class="extra-pagination inner">
-        <nav class="pagination" role="navigation">
-        <span class="page-number">Page 1 of 1</span>
-    </nav>
-    
-    </div>
-    
-    <article class="post tag-nothing">
-        <header class="post-header">
-            <h2 class="post-title"><a href="http://blog.chalda.cz/2017/02/07/A-try.html">A try</a></h2>
-        </header>
-        <section class="post-excerpt">
-            <p>Table of Contents Simple article to do something Simple article to do something and what I can write here <a class="read-more" href="http://blog.chalda.cz/2017/02/07/A-try.html">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            <img class="author-thumb" src="https://avatars.githubusercontent.com/u/1104559?v&#x3D;3" alt="chalda" nopin="nopin" />
-            <a href="http://blog.chalda.cz/author/ochaloup/">chalda</a>
-             on <a href="http://blog.chalda.cz/tag/nothing/">nothing</a>
-            <time class="post-date" datetime="2017-02-07">07 February 2017</time>
-        </footer>
-    </article>
-    
-    <nav class="pagination" role="navigation">
-        <span class="page-number">Page 1 of 1</span>
-    </nav>
-    
-
-</main>
+<article class="post tag-nothing ">
 
 
-        <footer class="site-footer clearfix">
-            <section class="copyright"><a href="http://blog.chalda.cz">Chalda&#x27;s blog</a> &copy; 2017</section>
-            <section class="poweredby">Proudly published with <a href="http://hubpress.io">HubPress</a></section>
-        </footer>
-
+    <div class="meta">
+        <time datetime="2017-02-07"><a href="http://blog.chalda.cz/2017/02/07/A-try.html">February 07, 2017</a></time>
     </div>
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <header>
+        <h1><a href="http://blog.chalda.cz/2017/02/07/A-try.html">A try</a></h1>
+    </header>
+
+    <div class="text">
+        <p>Table of Contents Simple article to do something Simple article to do something and what I can write here</p>
+        <a href="http://blog.chalda.cz/2017/02/07/A-try.html" class="readmore">Continue Reading</a>
+    </div>
+</article>
+
+<nav class="pagination" role="navigation">
+    <span class="page-number">Page 1 of 1</span>
+</nav>
+
+
+<footer role="contentinfo">
+    <div class="inner">
+        <div class="vcard">
+            <a href="http://blog.chalda.cz/rss" id="btn_feed" class="btn" title="Feed" target="_blank">
+                <span aria-hidden="true" data-icon=")"></span>
+                <strong>Feed</strong>
+            </a>
+
+
+            <div class="details">
+                <h4><a href="http://blog.chalda.cz" class="url n">Chalda&#x27;s blog</a></h4>
+                <a href="http://blog.chalda.cz" class="js-remove-domain-schema">http://blog.chalda.cz</a><br>
+                <span>Published with <a href="http://hubpress.io">HubPress</a></span>
+            </div>
+        </div>
+        <div id="user_bio">
+            <div class="inner">
+                Notes for not being forgotten
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+    <script>
+
+
+        function no_schema_links () {
+            var links = document.querySelectorAll('.js-remove-domain-schema');
+            if (links) {
+                for (i = 0; i < links.length; ++i) {
+                    var link = links[i],
+                        text = link.innerHTML,
+                        no_schema = text.replace(/.*?:\/\//g, "");
+                    link.innerHTML = no_schema;
+                }
+            }
+        }
+
+        window.onload = function () {
+            no_schema_links();
+
+        }
+    </script>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js?v="></script> 
       <script type="text/javascript">
         jQuery( document ).ready(function() {
@@ -107,8 +126,8 @@ null
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script type="text/javascript" src="//blog.chalda.cz/themes/casper/assets/js/jquery.fitvids.js?v=1486495924755"></script>
-    <script type="text/javascript" src="//blog.chalda.cz/themes/casper/assets/js/index.js?v=1486495924755"></script>
+
+
 
 </body>
 </html>
