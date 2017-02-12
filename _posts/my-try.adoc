@@ -1,0 +1,11 @@
+= This is a try on locally added
+:hp-tags: try
+:toc: macro
+:release: 1.0
+:published_at: 2016-12-31
+
+toc::[]
+
+== This is good to know!
+
+... WTF!?
