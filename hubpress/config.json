@@ -3,13 +3,14 @@
     "username": "ochaloup",
     "repositoryName": "blog.chalda.cz",
     "branch": "gh-pages",
-    "cname": "blog.chalda.cz"
+    "cname": "blog.chalda.cz",
+    "delay": "2000"
   },
   "site": {
     "title": "Chalda's blog",
     "description": "Notes for not being forgotten",
-    "logo": "/img/helmet.jpg",
-    "cover": "/img/cover.jpg",
+    "logo": "/images/helmet.jpg",
+    "cover": "/images/cover.jpg",
     "googleAnalytics": "UA-91848308-1",
     "disqus": "chalda"
   },
