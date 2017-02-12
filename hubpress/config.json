@@ -7,10 +7,14 @@
   },
   "site": {
     "title": "Chalda's blog",
-    "description": "Notes for not being forgotten"
+    "description": "Notes for not being forgotten",
+    "logo": "/img/helmet.jpg",
+    "cover": "/img/cover.jpg",
+    "googleAnalytics": "UA-91848308-1",
+    "disqus": "chalda"
   },
   "socialnetwork": {},
   "theme": {
-    "name": "saga"
+    "name": "ghostium"
   }
 }
