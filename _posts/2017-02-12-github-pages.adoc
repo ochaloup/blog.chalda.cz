@@ -11,7 +11,7 @@ toc::[]
 == Github pages
 
 When setting a blog on GitHub pages I found a bit hard for me to understand
-what should be set for DNS to run it on my domain.
+what should be set for DNS to run it on my custom domain.
 
 There is quite good introductory for the process in
 https://help.github.com/articles/using-a-custom-domain-with-github-pages/[documentation]

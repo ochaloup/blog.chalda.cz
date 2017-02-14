@@ -1,0 +1,43 @@
+= HubPress.io - how to install
+:hp-tags: nothing
+:toc: macro
+:release: 1.0
+:published_at: 2017-02-12
+:icons: font
+
+toc::[]
+
+
+= Installation of HubPress.io
+
+Writing blogposts is a proof-of-concept for me having them as a knowledgebase.
+For a some time when writing any note I use http://asciidoctor.org[AsciiDoc(tor)] format.
+Thus I started to search for option that allows me to write blog-notes that way too.
+
+I could see that many people host blogs at http://github.io I decided to try that way too.
+I started by looking for a tool to generate static webpages with http://asciidoctor.org/docs/asciidoc-asciidoctor-diffs[AsciiDoc] support.
+There is the mostly used `Jekyll` - written in ruby, generating a webpage from template
+on your local machine. There is https://github.com/asciidoctor/jekyll-asciidoc[plugin for AsciiDoc].
+Other tool that I was evaluating was http://awestruct.org[:awestruct].
+
+Then I found http://hubpress.io[HubPress.io] that has a concept of a webapp whole written in javascript
+which generates static website directly in your browser sending it then to GitHub repo. Merit of this approach
+is a nice admin console in your browser. Flaw is a little bit longer waiting time to get post being published.
+The other could be current
+http://blog.hubpress.io/2016/10/11/We-Arent-Dead-Yet-Hub-Press-Roadmap.html[stall in the development process].
+
+So far so good. I decided to give it a try.
+
+Process of installation is quite simple - you https://github.com/HubPress/hubpress.io[fork repo],
+https://github.com/HubPress/hubpress.io/blob/master/hubpress/config.json[change config file]
+and you can start to write a blog posts inside of the administration console.
+
+Nevertheless first check nice https://hubpress.gitbooks.io/hubpress-knowledgebase[knowledgebase to HubPress]
+and https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc[documentation on GitHub].
+
+...or if you plan to run `HubPress.io` blog against your custom domain these steps could be helpful for you
+
+. Fork repo
+** Fork https://github.com/HubPress/hubpress.io[github repository] and set `gh-pages`
+https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc#use-a-custom-domain-or-github-page-domain-already-in-use[as default one].
+** 
