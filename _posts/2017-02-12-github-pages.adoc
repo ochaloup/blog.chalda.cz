@@ -1,5 +1,5 @@
 = DNS setting for GitHub pages
-:hp-tags: nothing
+:hp-tags: github, dns
 :toc: macro
 :release: 1.0
 :published_at: 2017-02-12

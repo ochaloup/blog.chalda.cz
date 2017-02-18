@@ -1,5 +1,5 @@
 = HubPress.io - how to install
-:hp-tags: nothing
+:hp-tags: hubpress.io, blog
 :toc: macro
 :release: 1.0
 :published_at: 2017-02-12
@@ -40,4 +40,4 @@ and https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc[docume
 . Fork repo
 ** Fork https://github.com/HubPress/hubpress.io[github repository] and set `gh-pages`
 https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc#use-a-custom-domain-or-github-page-domain-already-in-use[as default one].
-** 
+**

@@ -1,0 +1,34 @@
+= About the blog
+:hp-tags: blog
+:toc: macro
+:release: 1.0
+:published_at: 2017-01-01
+:icons: font
+
+What is this about?
+
+...just another blog where you can find notes from somebody's programming life.
+
+Yes, it's so.
+
+
+There is still a motivation for that for sure - few reasons, solely selfish icon:smile-o[]
+
+First one is showing that I like what I'm doing and this passion could potentialy help somebody.
+The kick of for me thinking about such thing was
+https://vimeo.com/99516367[presentation Jurgen Appelo at GeeCon 2014]. I watched several
+other presentations from Jurgen afterwards but this one somehow influenced my thinking.
+
+The second is my infinite fight with recording knowledge. I read something and
+I forget what that thing was about after few weeks. Normally it happens to anybody
+you don't use then you forget. I found out that if I put what I did
+to notes written in my own words then returning back to them after time helps
+me nicely to remind what was the thing about.
+
+Yeap, the only trouble is that writing such notes take quite a good amount of time.
+But mostly I think it's worthy.
+
+The other thing I would like to where I can put down references to articles
+that seem to me nice and I can check them out when I need them in future.
+
+Then writing in English. Hmm... Could that be readable? I still hope so.
