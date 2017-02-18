@@ -32,7 +32,7 @@ Process of installation is quite simple - you https://github.com/HubPress/hubpre
 https://github.com/HubPress/hubpress.io/blob/master/hubpress/config.json[change config file]
 and you can start to write a blog posts inside of the administration console.
 
-Nevertheless first check nice https://hubpress.gitbooks.io/hubpress-knowledgebase[knowledgebase to HubPress]
+Nevertheless check https://hubpress.gitbooks.io/hubpress-knowledgebase[knowledgebase to HubPress]
 and https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc[documentation on GitHub].
 
 ...or if you plan to run `HubPress.io` blog against your custom domain these steps could be helpful for you
@@ -40,4 +40,50 @@ and https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc[docume
 . Fork repo
 ** Fork https://github.com/HubPress/hubpress.io[github repository] and set `gh-pages`
 https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc#use-a-custom-domain-or-github-page-domain-already-in-use[as default one].
-**
+** set the `custom domain` field to name of your domain
+
+[NOTE]
+====
+Having set the `custom domain` will cause creation of `CNAME` file under root
+of your github repository.
+
+The content of the file is just the name of your custom domain - thus what you
+put to the field.
+====
+
+image::hubpressio/githubpages.jpg[]
+
+. change `hubpress/config.json` file to contain (meta)data
+** username
+** repositoryName
+** branch
+** cname
+in my case it was like this
+
+```
+
+{
+  "meta": {
+    "username": "ochaloup",
+    "repositoryName": "blog.chalda.cz",
+    "branch": "gh-pages",
+    "cname": "blog.chalda.cz",
+}, ...
+```
+
+[NOTE]
+====
+`config.json` file serves to HubPress.io as a configuration file so all settings
+that you will set in administration interface will be saved here
+====
+
+. When all is set fine you can now go to `HubPress.io` admin page which is
+hidden under subaddress `hubpress`. In my case it's at path http://blog.chalda.cz/hubpress.
+You need to log in with credentials which you use to login to GitHub. HubPress.io calls
+directly the GitHub identification service to confirm that you are the owner of the repo.
+
+. Afte the first login you can see empty screen. That will be
+
+. For https://disqus.com[Disqus] you need short name for your site to be set in HubPress.io.
+You will find it when already having page under Discusq when you go `Admin` -> `Settings`
+-> choose page -> `General` -> `Shortname`
