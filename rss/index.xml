@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 13:33:20 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 13:38:08 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>List of links that seems to me being somehow interesting</p>
@@ -53,7 +53,161 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 </li>
 </ul>
 </div>
-</div>]]></description><link>http://blog.chalda.cz/2017/05/05/Blog-posts-history.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Blog-posts-history.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[About the blog]]></title><description><![CDATA[<div class="paragraph">
+</div>]]></description><link>http://blog.chalda.cz/2017/05/05/Blog-posts-history.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Blog-posts-history.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[HubPress.io - how to install]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div id="toc" class="toc">
+<div id="toctitle" class="title">Table of Contents</div>
+<ul class="sectlevel0">
+<li><a href="#_installation_of_hubpress_io">Installation of HubPress.io</a></li>
+</ul>
+</div>
+</div>
+</div>
+<h1 id="_installation_of_hubpress_io" class="sect0">Installation of HubPress.io</h1>
+<div class="paragraph">
+<p>Writing blogposts is a proof-of-concept for me having them as a knowledgebase.
+For a some time when writing any note I use <a href="http://asciidoctor.org">AsciiDoc(tor)</a> format.
+Thus I started to search for option that allows me to write blog-notes that way too.</p>
+</div>
+<div class="paragraph">
+<p>I could see that many people host blogs at <a href="http://github.io" class="bare">http://github.io</a> I decided to try that way too.
+I started by looking for a tool to generate static webpages with <a href="http://asciidoctor.org/docs/asciidoc-asciidoctor-diffs">AsciiDoc</a> support.
+There is the mostly used <code>Jekyll</code> - written in ruby, generating a webpage from template
+on your local machine. There is <a href="https://github.com/asciidoctor/jekyll-asciidoc">plugin for AsciiDoc</a>.
+Other tool that I was evaluating was <a href="http://awestruct.org">:awestruct</a>.</p>
+</div>
+<div class="paragraph">
+<p>Then I found <a href="http://hubpress.io">HubPress.io</a> that has a concept of a webapp whole written in javascript
+which generates static website directly in your browser sending it then to GitHub repo. Merit of this approach
+is a nice admin console in your browser. Flaw is a little bit longer waiting time to get post being published.
+The other could be current
+<a href="http://blog.hubpress.io/2016/10/11/We-Arent-Dead-Yet-Hub-Press-Roadmap.html">stall in the development process</a>.</p>
+</div>
+<div class="paragraph">
+<p>So far so good. I decided to give it a try.</p>
+</div>
+<div class="paragraph">
+<p>Process of installation is quite simple - you <a href="https://github.com/HubPress/hubpress.io">fork repo</a>,
+<a href="https://github.com/HubPress/hubpress.io/blob/master/hubpress/config.json">change config file</a>
+and you can start to write a blog posts inside of the administration console.</p>
+</div>
+<div class="paragraph">
+<p>Nevertheless check <a href="https://hubpress.gitbooks.io/hubpress-knowledgebase">knowledgebase to HubPress</a>
+and <a href="https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc">documentation on GitHub</a>.</p>
+</div>
+<div class="paragraph">
+<p>&#8230;&#8203;or if you plan to run <code>HubPress.io</code> blog against your custom domain these steps could be helpful for you</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Fork repo</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fork <a href="https://github.com/HubPress/hubpress.io">github repository</a> and set <code>gh-pages</code>
+<a href="https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc#use-a-custom-domain-or-github-page-domain-already-in-use">as default one</a>.</p>
+</li>
+<li>
+<p>set the <code>custom domain</code> field to name of your domain</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Having set the <code>custom domain</code> will cause creation of <code>CNAME</code> file under root
+of your github repository.</p>
+</div>
+<div class="paragraph">
+<p>The content of the file is just the name of your custom domain - thus what you
+put to the field.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/hubpressio/githubpages.jpg" alt="githubpages.jpg">
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>change <code>hubpress/config.json</code> file to contain (meta)data</p>
+<div class="ulist">
+<ul>
+<li>
+<p>username</p>
+</li>
+<li>
+<p>repositoryName</p>
+</li>
+<li>
+<p>branch</p>
+</li>
+<li>
+<p>cname
+in my case it was like this</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  "meta": {
+    "username": "ochaloup",
+    "repositoryName": "blog.chalda.cz",
+    "branch": "gh-pages",
+    "cname": "blog.chalda.cz",
+}, ...</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>config.json</code> file serves to HubPress.io as a configuration file so all settings
+that you will set in administration interface will be saved here</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>When all is set fine you can now go to <code>HubPress.io</code> admin page which is
+hidden under subaddress <code>hubpress</code>. In my case it&#8217;s at path <a href="http://blog.chalda.cz/hubpress" class="bare">http://blog.chalda.cz/hubpress</a>.
+You need to log in with credentials which you use to login to GitHub. HubPress.io calls
+directly the GitHub identification service to confirm that you are the owner of the repo.</p>
+</li>
+<li>
+<p>Afte the first login you can see empty screen. That will be</p>
+</li>
+<li>
+<p>For <a href="https://disqus.com">Disqus</a> you need short name for your site to be set in HubPress.io.
+You will find it when already having page under Discusq when you go <code>Admin</code> &#8594; <code>Settings</code>
+&#8594; choose page &#8594; <code>General</code> &#8594; <code>Shortname</code></p>
+</li>
+</ol>
+</div>]]></description><link>http://blog.chalda.cz/2017/02/17/hubpress-io.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/02/17/hubpress-io.html</guid><category><![CDATA[hubpress.io]]></category><category><![CDATA[ blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 17 Feb 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[About the blog]]></title><description><![CDATA[<div class="paragraph">
 <p>What is this about?</p>
 </div>
 <div class="paragraph">
