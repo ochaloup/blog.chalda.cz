@@ -1,11 +1,15 @@
-= Java links
+= Links
 :hp-tags: blog
 :toc: macro
 :release: 1.0
-:published_at: 2017-02-01
+:published_at: 2017-05-05
 :icons: font
 
-https://www.ibm.com/developerworks/library/j-nativememory-linux[Thanks for the memory, Linux]:
-awsome article about Java memory management in Linux and mainly on topic of native memory
-issues. There is another article talking about the topic
+List of links that seems to me being somehow interesting
+
+== Java
+
+https://www.ibm.com/developerworks/library/j-nativememory-linux[Thanks for the memory, Linux]::
+awsome article about Java memory management in Linux and mainly on topic of native memory issues.
+There is another article talking about the topic
 https://www.ibm.com/developerworks/java/library/j-nativememory-aix/[on AIX too].
