@@ -1,3 +1,7 @@
 = Blog posts history
 :published_at: 2017-05-05
 :hp-tags: blog
+:icons: font
+
+* [2017-05-05] http://blog.chalda.cz/2017/05/05/Links.html
+* [2017-05-05] http://blog.chalda.cz/2017/01/01/About-the-blog.html
