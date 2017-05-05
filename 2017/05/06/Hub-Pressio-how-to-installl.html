@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>HubPress.io - how to installl</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="HubPress.io - how to installl">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="HubPress.io - how to installl">
+    <meta property="og:description" content="">
+
+    <!-- <meta name="twitter:site" content="">
+
+<meta name="twitter:creator" content="">
+
+<meta name="google-site-verification" content="">
+
+<meta property="fb:admins" content="">
+ -->
+
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link href="//fonts.googleapis.com/" rel="dns-prefetch">
+    <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
+
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1493995655577"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1493995655577"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1493995655577"/>
+
+
+
+
+    <script type="text/javascript">
+      var ga_ua = 'UA-XXXXX-X';
+      
+      var disqus_shortname = 'example';
+      
+      var enable_pjax = true;
+
+      // Pace Options
+      // ==============
+      window.paceOptions = {
+        catchupTime: 100,
+        minTime: 100,
+        elements: false,
+        restartOnRequestAfter: 500,
+        startOnPageLoad: false
+      }
+
+      // Ghostium Globals
+      // ==============
+      window.GHOSTIUM = {};
+      GHOSTIUM.haveGA = typeof ga_ua !== 'undefined' && ga_ua !== 'UA-XXXXX-X';
+      GHOSTIUM.haveDisqus = typeof disqus_shortname !== 'undefined' && disqus_shortname !== 'example';
+      GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
+    </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1493995655577"></script>
+
+    <link rel="canonical" href="http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html" />
+    <meta name="referrer" content="origin" />
+    
+    <meta property="og:site_name" content="Chalda&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="HubPress.io - how to installl" />
+    <meta property="og:description" content="Installation of HubPress.io Writing blogposts is a proof-of-concept for me having them as a knowledgebase. For a some time when writing any note I use AsciiDoc(tor) format. Thus I started to search for option that allows me to write blog-notes that way too. I could see that many" />
+    <meta property="og:url" content="http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html" />
+    <meta property="article:published_time" content="2017-05-06T00:00:00.000Z" />
+    <meta property="article:tag" content="hubpress.io" />
+    <meta property="article:tag" content="blog" />
+    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="HubPress.io - how to installl" />
+    <meta name="twitter:description" content="Installation of HubPress.io Writing blogposts is a proof-of-concept for me having them as a knowledgebase. For a some time when writing any note I use AsciiDoc(tor) format. Thus I started to search for option that allows me to write blog-notes that way too. I could see that many" />
+    <meta name="twitter:url" content="http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "publisher": "Chalda's blog",
+    "author": {
+        "@type": "Person",
+        "name": "chalda",
+        "image": "https://avatars1.githubusercontent.com/u/1104559?v=3",
+        "url": "http://blog.chalda.cz/author/ochaloup/"
+    },
+    "headline": "HubPress.io - how to installl",
+    "url": "http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html",
+    "datePublished": "2017-05-06T00:00:00.000Z",
+    "keywords": "hubpress.io, blog",
+    "description": "Installation of HubPress.io Writing blogposts is a proof-of-concept for me having them as a knowledgebase. For a some time when writing any note I use AsciiDoc(tor) format. Thus I started to search for option that allows me to write blog-notes that way too. I could see that many"
+}
+    </script>
+
+    <meta name="generator" content="HubPress" />
+    <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog" href="http://blog.chalda.cz/rss/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/atom-one-dark.min.css">
+  </head>
+  <body class="post-template tag-hubpressio tag-blog">
+
+    <button data-action="open-drawer" id="drawer-button" class="drawer-button"><i class="fa fa-bars"></i></button>
+    <nav tabindex="-1" class="drawer">
+      <div class="drawer-container">
+        <!--.drawer-search(role="search")-->
+        <ul role="navigation" class="drawer-list">
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" data-pjax>
+              <i class="fa fa-home"></i>Home
+            </a>
+          </li>
+          <!-- <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" title="Chalda&#x27;s blog" data-pjax>
+              <i class="fa fa-list-alt"></i>All posts
+            </a>
+          </li> -->
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/rss/">
+              <i class="fa fa-rss"></i>Subscribe to Feed
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-divider"></li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/01/01/About-the-blog.html" data-pjax>
+              <i class="fa fa-rocket"></i>About the blog
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Blog-posts-history.html" data-pjax>
+              <i class="fa fa-bolt"></i>Blog history
+            </a>
+          </li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Links.html" data-pjax>
+              <i class="fa fa-navicon"></i>Links
+            </a>
+          </li>
+          
+          <!--
+          <li class="drawer-list-divider"></li>
+          <li class="drawer-list-item drawer-list-title">
+            Follow me
+          </li> -->
+          
+          
+        </ul>
+      </div>
+    </nav>
+
+    <div class="drawer-overlay"></div>
+    <main id="container" role="main" class="container">
+      <div class="surface">
+        <div class="surface-container">
+          <div data-pjax-container class="content">
+            
+<section class="wrapper wrapper-post">
+  <div class="wrapper-container">
+    <article itemscope itemtype="http://schema.org/BlogPosting" role="article" class="post post tag-hubpressio tag-blog">
+        <section class="post-container">
+          <header class="post-header">
+            <ul class="post-meta-list">
+              <li class="post-meta-item">
+                <time datetime="2017-05-06" itemprop="datePublished">
+                  in 7 hours
+                </time>
+              </li>
+                <li class="post-meta-item">
+                  <span class="tags"><i class="fa fa-tags"></i>
+                      <span>
+                      <a href="http://blog.chalda.cz/tag/hubpressio/">hubpress.io</a>, <a href="http://blog.chalda.cz/tag/blog/">blog</a></span>
+                  </span>
+                </li>
+              <li class="post-meta-item">
+                <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
+              </li>
+            </ul>
+            <h1 itemprop="name headline" class="post-title"><a href="http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html" itemprop="url" data-pjax title="HubPress.io - how to installl">HubPress.io - how to installl</a></h1>
+            <!--h2 itemprop="about" class="post-subtitle"></h2-->
+          </header>
+          <aside class="post-side">
+            <div class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img src="https://avatars1.githubusercontent.com/u/1104559?v&#x3D;3" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <a href="http://blog.chalda.cz" class="post-author-name">
+                  chalda
+                </a>
+                <p class="post-author-bio"></p>
+              </div>
+            </div>
+          </aside>
+          <div itemprop="articleBody" class="post-body">
+            <h1 id="_installation_of_hubpress_io" class="sect0">Installation of HubPress.io</h1>
+<div class="paragraph">
+<p>Writing blogposts is a proof-of-concept for me having them as a knowledgebase.
+For a some time when writing any note I use <a href="http://asciidoctor.org">AsciiDoc(tor)</a> format.
+Thus I started to search for option that allows me to write blog-notes that way too.</p>
+</div>
+<div class="paragraph">
+<p>I could see that many people host blogs at <a href="http://github.io" class="bare">http://github.io</a> I decided to try that way too.
+I started by looking for a tool to generate static webpages with <a href="http://asciidoctor.org/docs/asciidoc-asciidoctor-diffs">AsciiDoc</a> support.
+There is the mostly used <code>Jekyll</code> - written in ruby, generating a webpage from template
+on your local machine. There is <a href="https://github.com/asciidoctor/jekyll-asciidoc">plugin for AsciiDoc</a>.
+Other tool that I was evaluating was <a href="http://awestruct.org">:awestruct</a>.</p>
+</div>
+<div class="paragraph">
+<p>Then I found <a href="http://hubpress.io">HubPress.io</a> that has a concept of a webapp whole written in javascript
+which generates static website directly in your browser sending it then to GitHub repo. Merit of this approach
+is a nice admin console in your browser. Flaw is a little bit longer waiting time to get post being published.
+The other could be current
+<a href="http://blog.hubpress.io/2016/10/11/We-Arent-Dead-Yet-Hub-Press-Roadmap.html">stall in the development process</a>. But it seems not be fully true as there is new versions coming (see
+<a href="https://github.com/HubPress/hubpress.io/commit/ceaca97655fd3a49e4bc057201f0eb7109ad2d4a">0.8.0</a>).</p>
+</div>
+<div class="paragraph">
+<p>So far so good. I decided to give it a try.</p>
+</div>
+<div class="paragraph">
+<p>Process of installation is quite simple - you <a href="https://github.com/HubPress/hubpress.io">fork repo</a>,
+<a href="https://github.com/HubPress/hubpress.io/blob/master/hubpress/config.json">change config file</a>
+and you can start to write a blog posts inside of the administration console.</p>
+</div>
+<div class="paragraph">
+<p>Nevertheless check <a href="https://hubpress.gitbooks.io/hubpress-knowledgebase">knowledgebase to HubPress</a>
+and <a href="https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc">documentation on GitHub</a>.</p>
+</div>
+<div class="paragraph">
+<p>&#8230;&#8203;or if you plan to run <code>HubPress.io</code> blog against your custom domain these steps could be helpful for you</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Fork repo</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Fork <a href="https://github.com/HubPress/hubpress.io">github repository</a> and set <code>gh-pages</code>
+<a href="https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc#use-a-custom-domain-or-github-page-domain-already-in-use">as default one</a>.</p>
+</li>
+<li>
+<p>set the <code>custom domain</code> field to name of your domain</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Having set the <code>custom domain</code> will cause creation of <code>CNAME</code> file under root
+of your github repository.</p>
+</div>
+<div class="paragraph">
+<p>The content of the file is just the name of your custom domain - thus what you
+put to the field.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/hubpressio/githubpages.jpg" alt="githubpages.jpg">
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>change <code>hubpress/config.json</code> file to contain (meta)data</p>
+<div class="ulist">
+<ul>
+<li>
+<p>username</p>
+</li>
+<li>
+<p>repositoryName</p>
+</li>
+<li>
+<p>branch</p>
+</li>
+<li>
+<p>cname
+in my case it was like this</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  "meta": {
+    "username": "ochaloup",
+    "repositoryName": "blog.chalda.cz",
+    "branch": "gh-pages",
+    "cname": "blog.chalda.cz",
+}, ...</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>config.json</code> file serves to HubPress.io as a configuration file so all settings
+that you will set in administration interface will be saved here</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>When all is set fine you can now go to <code>HubPress.io</code> admin page which is
+hidden under subaddress <code>hubpress</code>. In my case it&#8217;s at path <a href="http://blog.chalda.cz/hubpress" class="bare">http://blog.chalda.cz/hubpress</a>.
+You need to log in with credentials which you use to login to GitHub. HubPress.io calls
+directly the GitHub identification service to confirm that you are the owner of the repo.</p>
+</li>
+<li>
+<p>Afte the first login you can see empty screen. That&#8217;s ok and just create a new article.<br>
+[Updated] for version <code>0.8.0</code> it seems that there is already shown information that you have 0 posts so it&#8217;s not misleading already.</p>
+</li>
+<li>
+<p>For <a href="https://disqus.com">Disqus</a> you need short name for your site to be set in HubPress.io.
+You will find it when already having page under Discusq when you go <code>Admin</code> &#8594; <code>Settings</code>
+&#8594; choose page &#8594; <code>General</code> &#8594; <code>Shortname</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>That&#8217;s more or less it. Now it&#8217;s time to write and experiment.</p>
+</div>
+<div class="sect2">
+<h3 id="_troubleshooting">Troubleshooting</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>it happens to me time to time that I&#8217;m not able to save or publish an article. It seems to happen when I want to change the publish tag of the article (which is probably not directly expected but it&#8217;s not obvious. I get</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>Requestable.js:50 Uncaught (in promise) Error: 401 error making request GET https://api.github.com/repos/ochaloup/blog.chalda.cz/git/refs/heads/gh-pages: "Unauthorized"
+    at new t (Requestable.js:50)
+    at Requestable.js:385
+    at &lt;anonymous&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>My workaround is to copy text to some text editor on my computer, remove the post completely and re-add it again.</p>
+</div>
+</div>
+          </div>
+          <footer class="post-footer">
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person" class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img itemprop="image" src="https://avatars1.githubusercontent.com/u/1104559?v&#x3D;3" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <h4 class="post-footer-heading">Written By</h4>
+                <a href="http://blog.chalda.cz" itemprop="url" class="post-author-name">
+                  <span itemprop="name">chalda</span>
+                </a>
+                <p itemprop="description" class="post-author-bio"></p>
+                <p class="post-info">
+                  <b class="post-info-title">Published on</b>
+                  <time class="post-date">May 06, 2017</time>
+                </p>
+              </div>
+            </div>
+            <div class="post-social">
+              <h4 class="post-footer-heading">Spread the word</h4>
+              <a href="#" data-action="share-twitter"><i class="fa fa-fw fa-lg fa-twitter"></i></a>
+              <a href="#" data-action="share-facebook"><i class="fa fa-fw fa-lg fa-facebook"></i></a>
+              <a href="#" data-action="share-gplus"><i class="fa fa-fw fa-lg fa-google-plus"></i></a>
+            </div>
+          </footer>
+        </section>
+      <section itemprop="comment" class="post-comments">
+        <div id="disqus_thread"></div>
+      </section>
+    </article>
+
+    <footer role="contentinfo" class="footer">
+      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2017. All Rights Reserved.</small></p>
+      <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
+      <p><small>Adapted by <a href="https://twitter.com/mgreau">Maxime Gréau</a></small></p>
+      <p><small>Published with <a href="http://hubpress.io">HubPress</a></small></p>
+    </footer>
+  </div>
+</section>
+
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+  var disqus_shortname = 'blog-chalda-cz'; // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js?v="></script> 
+      <script type="text/javascript">
+        jQuery( document ).ready(function() {
+          // change date with ago
+          jQuery('ago.ago').each(function(){
+            var element = jQuery(this).parent();
+            element.html( moment(element.text()).fromNow());
+          });
+        });
+
+        hljs.initHighlightingOnLoad();
+      </script>
+       
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1493995655577"></script>
+
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-91848308-1', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+
+  </body>
+</html>
