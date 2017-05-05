@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 12:57:27 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 13:11:33 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>List of links that seems to me being somehow interesting</p>
@@ -28,6 +28,15 @@ There is another article talking about the topic
 <dt class="hdlist1"><a href="https://www.youtube.com/watch?v=5ZjhNTM8XU8">Transactions: myths, surprises and opportunities</a></dt>
 <dd>
 <p>presentation by Martin Kleppmann for Strange Loop 2015. He summarizes what is transaction, what ACID means, how disstributed world changed the perception.</p>
+</dd>
+<dt class="hdlist1"><a href="https://www.infoq.com/minibooks/JTDS">Java Transaction Design Strategies, ebook</a></dt>
+<dd>
+<p>perfect introduction to transaction in Java. You will learn what is local
+transaction, global transaction, two-phase commit, what you can expect from JTA and most of the examples are for Java EE and Spring too.</p>
+</dd>
+<dt class="hdlist1"><a href="https://www.microsoft.com/en-us/research/publication/replicated-data-consistency-explained-through-baseball/">Replicated Data Consistency Explained Through Baseball</a></dt>
+<dd>
+<p>eventual consistency explained on the example of the baseball game. I find it really comprehensible and nicely written.</p>
 </dd>
 </dl>
 </div>
