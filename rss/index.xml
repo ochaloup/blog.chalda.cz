@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 13:14:27 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 13:15:45 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>List of links that seems to me being somehow interesting</p>
@@ -41,7 +41,9 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 </dl>
 </div>
 </div>
-</div>]]></description><link>http://blog.chalda.cz/2017/05/05/Links.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Links.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Blog posts history]]></title><description><![CDATA[<div class="ulist">
+</div>]]></description><link>http://blog.chalda.cz/2017/05/05/Links.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Links.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Blog posts history]]></title><description><![CDATA[<div class="sect2">
+<h3 id="_2017">2017</h3>
+<div class="ulist">
 <ul>
 <li>
 <p>[2017-05-05] <a href="http://blog.chalda.cz/2017/05/05/Links.html" class="bare">http://blog.chalda.cz/2017/05/05/Links.html</a></p>
@@ -50,6 +52,7 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 <p>[2017-05-05] <a href="http://blog.chalda.cz/2017/01/01/About-the-blog.html" class="bare">http://blog.chalda.cz/2017/01/01/About-the-blog.html</a></p>
 </li>
 </ul>
+</div>
 </div>]]></description><link>http://blog.chalda.cz/2017/05/05/Blog-posts-history.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Blog-posts-history.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[About the blog]]></title><description><![CDATA[<div class="paragraph">
 <p>What is this about?</p>
 </div>
