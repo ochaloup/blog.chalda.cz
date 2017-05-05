@@ -11,7 +11,7 @@ List of links that seems to me being somehow interesting
 
 https://www.ibm.com/developerworks/library/j-nativememory-linux[Thanks for the memory, Linux]::
 awsome article about Java memory management in Linux and mainly on topic of native memory issues.
-There is another article talking about the topic
+There is another article talking about this topic
 https://www.ibm.com/developerworks/java/library/j-nativememory-aix/[on AIX too].
 
 == Transactions
