@@ -7,7 +7,7 @@
 
 What is this about?
 
-...just another blog where you can find notes from somebody's work programming life.
+ ...just another blog where you can find notes from somebody's work programming life.
 
 And that's it.
 
