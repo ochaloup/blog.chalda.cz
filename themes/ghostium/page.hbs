@@ -13,12 +13,12 @@
           <aside class="post-side">
             <div class="post-author">
               {{#if author.image}}
-                <a href="{{author.website}}" class="post-author-avatar">
+                <a href="{{@blog.url}}" class="post-author-avatar">
                   <img src="{{author.image}}" alt="{{author.name}}">
                 </a>
               {{/if}}
               <div class="post-author-info">
-                <a href="{{author.website}}" class="post-author-name">
+                <a href="{{@blog.url}}" class="post-author-name">
                   {{author.name}}
                 </a>
                 <p class="post-author-bio">{{author.bio}}</p>
@@ -31,13 +31,13 @@
           <footer class="post-footer">
             <div itemprop="author" itemscope itemtype="http://schema.org/Person" class="post-author">
               {{#if author.image}}
-                <a href="{{author.website}}" class="post-author-avatar">
+                <a href="{{@blog.url}}" class="post-author-avatar">
                   <img itemprop="image" src="{{author.image}}" alt="{{author.name}}">
                 </a>
               {{/if}}
               <div class="post-author-info">
                 <h4 class="post-footer-heading">Written By</h4>
-                <a href="{{author.website}}" itemprop="url" class="post-author-name">
+                <a href="{{@blog.url}}" itemprop="url" class="post-author-name">
                   <span itemprop="name">{{author.name}}</span>
                 </a>
                 <p itemprop="description" class="post-author-bio">{{author.bio}}</p>
