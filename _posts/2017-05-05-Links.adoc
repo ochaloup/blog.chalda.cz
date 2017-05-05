@@ -13,3 +13,8 @@ https://www.ibm.com/developerworks/library/j-nativememory-linux[Thanks for the m
 awsome article about Java memory management in Linux and mainly on topic of native memory issues.
 There is another article talking about the topic
 https://www.ibm.com/developerworks/java/library/j-nativememory-aix/[on AIX too].
+
+== Transactions
+
+https://www.youtube.com/watch?v=5ZjhNTM8XU8[Transactions: myths, surprises and opportunities]::
+presentation by Martin Kleppmann for Strange Loop 2015. He summarizes what is transaction, what ACID means, how disstributed world change the
