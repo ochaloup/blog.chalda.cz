@@ -31,12 +31,12 @@
           <aside class="post-side">
             <div class="post-author">
               {{#if author.image}}
-                <a href="{{website}}" class="post-author-avatar">
+                <a href="{{@blog.url}}" class="post-author-avatar">
                   <img src="{{author.image}}" alt="{{author.name}}">
                 </a>
               {{/if}}
               <div class="post-author-info">
-                <a href="{{website}}" class="post-author-name">
+                <a href="{{@blog.url}}" class="post-author-name">
                   {{author.name}}
                 </a>
                 <p class="post-author-bio">{{author.bio}}</p>
