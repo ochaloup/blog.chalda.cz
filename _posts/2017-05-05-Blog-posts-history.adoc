@@ -5,5 +5,7 @@
 
 === 2017
 
+* [2017-05-06] http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html
+* [2017-05-06] ttp://blog.chalda.cz/2017/05/06/DNS-setting-for-Git-Hub-pages.html
 * [2017-05-05] http://blog.chalda.cz/2017/05/05/Links.html
 * [2017-05-05] http://blog.chalda.cz/2017/01/01/About-the-blog.html
