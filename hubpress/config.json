@@ -17,5 +17,21 @@
   "socialnetwork": {},
   "theme": {
     "name": "ghostium"
+  },
+  "urls": {
+    "site": "http://blog.chalda.cz",
+    "hubpress": "http://blog.chalda.cz",
+    "theme": "//blog.chalda.cz/themes/ghostium",
+    "images": "http://blog.chalda.cz/images"
+  },
+  "initialisationConfigComponent": {
+    "name": "initialise-configuration",
+    "computed": {},
+    "methods": {},
+    "staticRenderFns": [
+      null,
+      null,
+      null
+    ]
   }
 }
