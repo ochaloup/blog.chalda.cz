@@ -24,8 +24,7 @@ Then I found http://hubpress.io[HubPress.io] that has a concept of a webapp whol
 which generates static website directly in your browser sending it then to GitHub repo. Merit of this approach
 is a nice admin console in your browser. Flaw is a little bit longer waiting time to get post being published.
 The other could be current
-http://blog.hubpress.io/2016/10/11/We-Arent-Dead-Yet-Hub-Press-Roadmap.html[stall in the development process]
-but it seems that it's not so true as new versions are coming.
+http://blog.hubpress.io/2016/10/11/We-Arent-Dead-Yet-Hub-Press-Roadmap.html[stall in the development process].
 
 So far so good. I decided to give it a try.
 
@@ -83,14 +82,8 @@ hidden under subaddress `hubpress`. In my case it's at path http://blog.chalda.c
 You need to log in with credentials which you use to login to GitHub. HubPress.io calls
 directly the GitHub identification service to confirm that you are the owner of the repo.
 
-. After the first login you can see empty screen... +
-  oh, with version `0.8.0` the UI changed so there will be probably info that you
-  have 0 posts. But don't be surprised and just create a new article.
+. Afte the first login you can see empty screen. That will be
 
 . For https://disqus.com[Disqus] you need short name for your site to be set in HubPress.io.
 You will find it when already having page under Discusq when you go `Admin` -> `Settings`
 -> choose page -> `General` -> `Shortname`
-
-// TODO: How to add a new theme
-
-And that's mostly it. I'm now learning to work with it.
