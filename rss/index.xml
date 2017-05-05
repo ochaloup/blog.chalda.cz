@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 12:41:21 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 12:42:37 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>List of links that seems to me being somehow interesting</p>
@@ -19,39 +19,4 @@ There is another article talking about the topic
 </dl>
 </div>
 </div>
-</div>]]></description><link>http://blog.chalda.cz/2017/05/05/Links.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Links.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[About the blog]]></title><description><![CDATA[<div class="paragraph">
-<p>What is this about?</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>...just another blog where you can find notes from somebody's work programming life.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And that&#8217;s it.</p>
-</div>
-<div class="paragraph">
-<p>There is still a motivation for doing that, sure. Few reasons, solely selfish.</p>
-</div>
-<div class="paragraph">
-<p>First one is showing that I like what I&#8217;m doing and this passion could potentialy help somebody.
-The kick of for me thinking about such thing was
-<a href="https://vimeo.com/99516367">presentation Jurgen Appelo at GeeCon 2014</a>. I watched several
-other presentations from Jurgen afterwards but this one somehow influenced my thinking.</p>
-</div>
-<div class="paragraph">
-<p>The second is my infinite fight with recording knowledge. I usualy read something and
-I forget what that thing was about after few weeks. If not used in short period of time then
-it goes to <code>/dev/null</code> black hole.
-I found out that putting down few notes summarized in my own words helps me
-in this endeavour. Plus it works as kind of time machine to get back in time
-to understand what I was thinking to understand <span class="icon"><i class="fa fa-smile-o"></i></span>.</p>
-</div>
-<div class="paragraph">
-<p>Yeap, the only trouble is that writing such notes take a good amount of time.
-But mostly it&#8217;s worthy.</p>
-</div>
-<div class="paragraph">
-<p>Then writing in English to enhance my skills.<br>
-Hmm&#8230;&#8203; I still hope that it could be readable.</p>
-</div>]]></description><link>http://blog.chalda.cz/2017/01/01/About-the-blog.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/01/01/About-the-blog.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Sun, 01 Jan 2017 00:00:00 GMT</pubDate></item></channel></rss>
+</div>]]></description><link>http://blog.chalda.cz/2017/05/05/Links.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Links.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item></channel></rss>
