@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 12:29:02 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 05 May 2017 12:41:21 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Links]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>List of links that seems to me being somehow interesting</p>
@@ -22,8 +22,10 @@ There is another article talking about the topic
 </div>]]></description><link>http://blog.chalda.cz/2017/05/05/Links.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Links.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[About the blog]]></title><description><![CDATA[<div class="paragraph">
 <p>What is this about?</p>
 </div>
-<div class="paragraph">
-<p>&#8230;&#8203;just another blog where you can find notes from somebody&#8217;s work programming life.</p>
+<div class="literalblock">
+<div class="content">
+<pre>...just another blog where you can find notes from somebody's work programming life.</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>And that&#8217;s it.</p>
