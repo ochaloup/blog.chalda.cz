@@ -12,7 +12,7 @@ What is this about?
 And that's it.
 
 
-There is still a motivation for doing that, sure. Few reasons, solely selfish
+There is still a motivation for doing that, sure. Few reasons, solely selfish.
 
 First one is showing that I like what I'm doing and this passion could potentialy help somebody.
 The kick of for me thinking about such thing was
@@ -29,5 +29,5 @@ to understand what I was thinking to understand icon:smile-o[].
 Yeap, the only trouble is that writing such notes take a good amount of time.
 But mostly it's worthy.
 
-Then writing in English to enhance my skills.
-Hmm... I still hope that it could that be readable.
+Then writing in English to enhance my skills. +
+Hmm... I still hope that it could be readable.
