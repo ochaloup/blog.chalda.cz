@@ -92,13 +92,4 @@ You will find it when already having page under Discusq when you go `Admin` -> `
 
 That's more or less it. Now it's time to write and experiment.
 
-=== Troubleshooting
 
-* it happens to me time to time that I'm not able to save or publish an article. It seems to happen when I want to change the publish tag of the article (which is probably not directly expected but it's not obvious. I get
-```
-Requestable.js:50 Uncaught (in promise) Error: 401 error making request GET https://api.github.com/repos/ochaloup/blog.chalda.cz/git/refs/heads/gh-pages: "Unauthorized"
-    at new t (Requestable.js:50)
-    at Requestable.js:385
-    at <anonymous>
-```
-My workaround is to copy text to some text editor on my computer, remove the post completely and re-add it again.
