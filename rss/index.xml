@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 09 May 2017 07:37:30 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[HubPress.io - how to installl]]></title><description><![CDATA[<h1 id="_installation_of_hubpress_io" class="sect0">Installation of HubPress.io</h1>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 09 May 2017 07:38:40 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[HubPress.io - how to installl]]></title><description><![CDATA[<h1 id="_installation_of_hubpress_io" class="sect0">Installation of HubPress.io</h1>
 <div class="paragraph">
 <p>Writing blogposts is a proof-of-concept for me having them as a knowledgebase.
 For a some time when writing any note I use <a href="http://asciidoctor.org">AsciiDoc(tor)</a> format.
@@ -433,7 +433,7 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 <p>First one is showing that I like what I&#8217;m doing and this passion could potentialy help somebody.
 The kick of for me thinking about such thing was
 <a href="https://vimeo.com/99516367">presentation Jurgen Appelo at GeeCon 2014</a>. I watched several
-other presentations from Jurgen afterwards but this one somehow influenced my thinking.</p>
+other presentations from Jurgen afterwards but this one somehow influenced thinking of me.</p>
 </div>
 <div class="paragraph">
 <p>The second is my infinite fight with recording knowledge. I usualy read something and
