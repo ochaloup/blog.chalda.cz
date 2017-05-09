@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 09 May 2017 07:38:40 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[HubPress.io - how to installl]]></title><description><![CDATA[<h1 id="_installation_of_hubpress_io" class="sect0">Installation of HubPress.io</h1>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 09 May 2017 07:52:29 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[HubPress.io - how to installl]]></title><description><![CDATA[<h1 id="_installation_of_hubpress_io" class="sect0">Installation of HubPress.io</h1>
 <div class="paragraph">
 <p>Writing blogposts is a proof-of-concept for me having them as a knowledgebase.
 For a some time when writing any note I use <a href="http://asciidoctor.org">AsciiDoc(tor)</a> format.
@@ -147,27 +147,6 @@ You will find it when already having page under Discusq when you go <code>Admin<
 </div>
 <div class="paragraph">
 <p>That&#8217;s more or less it. Now it&#8217;s time to write and experiment.</p>
-</div>
-<div class="sect2">
-<h3 id="_troubleshooting">Troubleshooting</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>it happens to me time to time that I&#8217;m not able to save or publish an article. It seems to happen when I want to change the publish tag of the article (which is probably not directly expected but it&#8217;s not obvious. I get</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>Requestable.js:50 Uncaught (in promise) Error: 401 error making request GET https://api.github.com/repos/ochaloup/blog.chalda.cz/git/refs/heads/gh-pages: "Unauthorized"
-    at new t (Requestable.js:50)
-    at Requestable.js:385
-    at &lt;anonymous&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>My workaround is to copy text to some text editor on my computer, remove the post completely and re-add it again.</p>
-</div>
 </div>]]></description><link>http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html</guid><category><![CDATA[hubpress.io]]></category><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Sat, 06 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[DNS setting for GitHub pages]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div id="toc" class="toc">
