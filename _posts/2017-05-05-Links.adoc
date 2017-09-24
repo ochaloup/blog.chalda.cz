@@ -19,6 +19,9 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 https://www.microsoft.com/en-us/research/publication/replicated-data-consistency-explained-through-baseball/[Replicated Data Consistency Explained Through Baseball]::
 eventual consistency explained on the example of the baseball game. I find it really comprehensible and nicely written.
 
+https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying[The Log: What every software engineer should know about real-time data's unifying abstraction]::
+I find this (quite long) article perfect summary of what the event sourcing is about. This is look from stream processing side "point of view" but all that gives much sense. How the stream processing and event source differs or what they are in common is nicely taken by presentation by Martin Klepmann at https://www.youtube.com/watch?v=avi-TZI9t2I
+
 == Design
 
 https://www.youtube.com/watch?v=STKCRSUsyP0[The Many Meanings of Event-Driven Architecture]::
