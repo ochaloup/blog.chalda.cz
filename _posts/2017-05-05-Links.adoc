@@ -7,13 +7,6 @@
 
 List of links I found interesting
 
-== Java
-
-https://www.ibm.com/developerworks/library/j-nativememory-linux[Thanks for the memory, Linux]::
-awsome article about Java memory management in Linux and mainly on topic of native memory issues.
-There is another article talking about this topic
-https://www.ibm.com/developerworks/java/library/j-nativememory-aix/[on AIX too].
-
 == Transactions
 
 https://www.youtube.com/watch?v=5ZjhNTM8XU8[Transactions: myths, surprises and opportunities]::
@@ -25,5 +18,18 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 
 https://www.microsoft.com/en-us/research/publication/replicated-data-consistency-explained-through-baseball/[Replicated Data Consistency Explained Through Baseball]::
 eventual consistency explained on the example of the baseball game. I find it really comprehensible and nicely written.
+
+== Design
+
+https://www.youtube.com/watch?v=STKCRSUsyP0[The Many Meanings of Event-Driven Architecture]::
+nice summary of meening of terms that you hit when reading about event-driven design. I like how the presentation was informative but comperehensible.
+
+== Java
+
+https://www.ibm.com/developerworks/library/j-nativememory-linux[Thanks for the memory, Linux]::
+awsome article about Java memory management in Linux and mainly on topic of native memory issues.
+There is another article talking about this topic
+https://www.ibm.com/developerworks/java/library/j-nativememory-aix/[on AIX too].
+
 
 
