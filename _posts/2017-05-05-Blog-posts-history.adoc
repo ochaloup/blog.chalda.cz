@@ -5,6 +5,9 @@
 
 === 2017
 
+* [2017-08-25] https://developer.jboss.org/wiki/Three-phaseCommitProtocol
+* [2017-06-14] http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html
+* [2017-05-25] https://developer.jboss.org/wiki/TwoPhaseCommit2PC
 * [2017-05-06] http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html
 * [2017-05-06] http://blog.chalda.cz/2017/05/06/DNS-setting-for-Git-Hub-pages.html
 * [2017-05-05] http://blog.chalda.cz/2017/05/05/Links.html
