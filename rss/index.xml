@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 24 Sep 2017 09:48:49 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Asciidoctor]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 24 Sep 2017 09:50:57 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Asciidoctor]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -504,6 +504,15 @@ There is another article talking about this topic
 <h3 id="_2017">2017</h3>
 <div class="ulist">
 <ul>
+<li>
+<p>[2017-08-25] <a href="https://developer.jboss.org/wiki/Three-phaseCommitProtocol" class="bare">https://developer.jboss.org/wiki/Three-phaseCommitProtocol</a></p>
+</li>
+<li>
+<p>[2017-06-14] <a href="http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html" class="bare">http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html</a></p>
+</li>
+<li>
+<p>[2017-05-25] <a href="https://developer.jboss.org/wiki/TwoPhaseCommit2PC" class="bare">https://developer.jboss.org/wiki/TwoPhaseCommit2PC</a></p>
+</li>
 <li>
 <p>[2017-05-06] <a href="http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html" class="bare">http://blog.chalda.cz/2017/05/06/Hub-Pressio-how-to-installl.html</a></p>
 </li>
