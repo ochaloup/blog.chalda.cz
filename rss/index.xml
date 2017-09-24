@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 24 Sep 2017 09:27:49 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Asciidoctor]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 24 Sep 2017 09:42:47 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Asciidoctor]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -447,21 +447,6 @@ and choose <em>Tools &#8594; Clear cache</em> from drop down menu.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_java">Java</h2>
-<div class="sectionbody">
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><a href="https://www.ibm.com/developerworks/library/j-nativememory-linux">Thanks for the memory, Linux</a></dt>
-<dd>
-<p>awsome article about Java memory management in Linux and mainly on topic of native memory issues.
-There is another article talking about this topic
-<a href="https://www.ibm.com/developerworks/java/library/j-nativememory-aix/">on AIX too</a>.</p>
-</dd>
-</dl>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_transactions">Transactions</h2>
 <div class="sectionbody">
 <div class="dlist">
@@ -478,6 +463,34 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 <dt class="hdlist1"><a href="https://www.microsoft.com/en-us/research/publication/replicated-data-consistency-explained-through-baseball/">Replicated Data Consistency Explained Through Baseball</a></dt>
 <dd>
 <p>eventual consistency explained on the example of the baseball game. I find it really comprehensible and nicely written.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_design">Design</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><a href="https://www.youtube.com/watch?v=STKCRSUsyP0">The Many Meanings of Event-Driven Architecture</a></dt>
+<dd>
+<p>nice summary of meening of terms that you hit when reading about event-driven design. I like how the presentation was informative but comperehensible.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_java">Java</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><a href="https://www.ibm.com/developerworks/library/j-nativememory-linux">Thanks for the memory, Linux</a></dt>
+<dd>
+<p>awsome article about Java memory management in Linux and mainly on topic of native memory issues.
+There is another article talking about this topic
+<a href="https://www.ibm.com/developerworks/java/library/j-nativememory-aix/">on AIX too</a>.</p>
 </dd>
 </dl>
 </div>
