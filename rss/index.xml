@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 24 Sep 2017 09:46:36 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Asciidoctor]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes on programming for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 24 Sep 2017 09:48:49 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Asciidoctor]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -466,7 +466,8 @@ transaction, global transaction, two-phase commit, what you can expect from JTA 
 </dd>
 <dt class="hdlist1"><a href="https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying">The Log: What every software engineer should know about real-time data&#8217;s unifying abstraction</a></dt>
 <dd>
-<p>I find this (quite long) article perfect summary of what the event sourcing is about. This is look from stream processing side "point of view" but all that gives much sense. How the stream processing and event source differs or what they are in common is nicely taken by presentation by Martin Klepmann at <a href="https://www.youtube.com/watch?v=avi-TZI9t2I" class="bare">https://www.youtube.com/watch?v=avi-TZI9t2I</a></p>
+<p>I find this (quite long) article perfect summary of what the event sourcing is about. This is look from stream processing side "point of view" but all that gives much sense. How the stream processing and event source differs or what they are in common is nicely taken by presentation by Martin Klepmann at <a href="https://www.youtube.com/watch?v=avi-TZI9t2I">Event Sourcing and Stream Processing at Scale,
+Domain-Driven Design Europe 2016</a></p>
 </dd>
 </dl>
 </div>
