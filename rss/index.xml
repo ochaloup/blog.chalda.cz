@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Mon, 02 Oct 2017 23:26:05 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Info on WFLY domain configuration with Groovy]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Mon, 02 Oct 2017 23:27:13 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -114,7 +114,7 @@ hosts.each { host -&gt;
 </div>
 </div>
 </div>
-</div>]]></description><link>http://blog.chalda.cz/2017/09/30/Info-on-WFLY-domain-configuration-with-Groovy.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/09/30/Info-on-WFLY-domain-configuration-with-Groovy.html</guid><category><![CDATA[groovy]]></category><category><![CDATA[wildfly]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Sat, 30 Sep 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Augeas and XML]]></title><description><![CDATA[<div id="preamble">
+</div>]]></description><link>http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html</guid><category><![CDATA[groovy]]></category><category><![CDATA[wildfly]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Sat, 30 Sep 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Augeas and XML]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
