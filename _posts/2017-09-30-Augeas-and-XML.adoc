@@ -1,11 +1,11 @@
-= Augeas and XML configuration files
+= Augeas and XML
 :hp-tags: augeas, xml, configuration
 :toc: macro
 :release: 1.0
 :published_at: 2017-09-30
 :icons: font
 
-image::asciidoctor/twelve_labours.jpg[]
+image::articles/twelve_labours.jpg[]
 
 == Augeas... what?
 
