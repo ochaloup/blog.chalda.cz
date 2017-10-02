@@ -263,7 +263,7 @@ Now you are ready to run any of the commands mentioned above.
 If you have commands to be executed by the Augeas tooling you can let the Augeas
 to read it from a file (`-f` parameter) or pass it on the standard input.
 
-== My Augeas script to change WildFly logging of Narayana subsystem
+== My Augeas script to change WildFly logging
 
 ```
 #!/bin/bash
