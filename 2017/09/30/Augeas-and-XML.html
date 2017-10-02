@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1506984191142"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1506984191142"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1506984191142"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1506985147430"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1506985147430"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1506985147430"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1506984191142"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1506985147430"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/09/30/Augeas-and-XML.html" />
     <meta name="referrer" content="origin" />
@@ -231,8 +231,10 @@
 <div class="paragraph">
 <p>The name Augeas is based on greek legend about Herakles who has to clean stables
 of the king Augeas from dung as one of his twelve laubours that he has to fulfill as a punishment
-for killing his wife and children (for a justification he was driven mad by Hera).
-<a href="http://augeas.net">Augueas referenced here is a tool</a> for doing changes in textual configuration files.
+for killing his wife and children (for a justification he was driven mad by Hera).</p>
+</div>
+<div class="paragraph">
+<p><a href="http://augeas.net">Augueas referenced here is a tool</a> for doing changes in textual configuration files.
 It&#8217;s purpose came from fact that whole Linux configuration is based on text files.
 If you want to do some changes automatically by a script you are usually doomed
 to use <code>sed</code> or <code>awk</code>. Augeas is expected to do the task easier.
@@ -241,7 +243,7 @@ XSLT thus I was searching for some alternatives.
 This idea to use Augeas came to my mind from nice video presentation of usage JBoss with Docker.
 It was one part from series of Virtual JBoss User Group
 presentations (<a href="https://www.youtube.com/watch?v=4uQ6gR_xZhE">Docker and JBoss - the perfect combination</a>).
-The presentation was lead by Marek Goldmann(TODO:profile_link) who does have really nice post
+The presentation was lead by <a href="https://goldmann.pl/blog">Marek Goldmann</a> who does have really nice post
 about topic of automatic changes of JBoss configuration file at his blog
 - <a href="https://goldmann.pl/blog/2014/07/23/customizing-the-configuration-of-the-wildfly-docker-image" class="bare">https://goldmann.pl/blog/2014/07/23/customizing-the-configuration-of-the-wildfly-docker-image</a>.</p>
 </div>
@@ -263,8 +265,8 @@ or write your own <code>lens</code>.</p>
 <p>As I want to change XML file I needed to use <code>xml lens</code> for Augeas to know how to parse the file.
 This provided lens is a simple in way that it doesn&#8217;t take care about any schema or namespace.
 It just take the XML file as a text and separates tag (elements) from text and attributes.
-The data is structured(TODO) in a tree consisting nodes. Each node contains two strings <code>label</code> (a node name) and <code>value</code>.
-You can point(TODO) to each node with path expression which is a bit similar to <code>XPath</code>
+The data is structured in a tree consisting nodes. Each node contains two strings <code>label</code> (a node name) and <code>value</code>.
+You can point to each node with path expression similar to <code>XPath</code>
 (see <a href="https://github.com/hercules-team/augeas/wiki/Path-expressions" class="bare">https://github.com/hercules-team/augeas/wiki/Path-expressions</a> [Path Expressions in Augeas]).</p>
 </div>
 </div>
@@ -299,8 +301,8 @@ The Augeas wiki page <a href="https://github.com/hercules-team/augeas/wiki#Using
 These commands are used to get information about the structure of the Augeas tree.
 <strong>Print</strong> and <strong>match</strong> do mostly the same. The <strong>print</strong> scrawl, starting at the defined path,
 down by the tree and print all nodes (labels and values). <strong>Match</strong> do similar but you influencing
-what is printed by using subsitute characters as <code><strong></code> <a href="https://github.com/hercules-team/augeas/wiki/Path-expressions">similar to XPath queries</a>.
-Command *ls</strong> just shows node names (labels) residing under the defined path.</p>
+what is printed by using subsitute characters as <code>*</code> <a href="https://github.com/hercules-team/augeas/wiki/Path-expressions">similar to XPath queries</a>.
+Command *ls* just shows node names (labels) residing under the defined path.</p>
 </div>
 </div>
 </div>
@@ -866,7 +868,7 @@ of the variables to be processed by Augeas itself.</p>
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1506984191142"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1506985147430"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

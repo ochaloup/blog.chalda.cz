@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Mon, 02 Oct 2017 22:43:11 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Augeas and XML]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Mon, 02 Oct 2017 22:59:07 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Augeas and XML]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -13,8 +13,10 @@
 <div class="paragraph">
 <p>The name Augeas is based on greek legend about Herakles who has to clean stables
 of the king Augeas from dung as one of his twelve laubours that he has to fulfill as a punishment
-for killing his wife and children (for a justification he was driven mad by Hera).
-<a href="http://augeas.net">Augueas referenced here is a tool</a> for doing changes in textual configuration files.
+for killing his wife and children (for a justification he was driven mad by Hera).</p>
+</div>
+<div class="paragraph">
+<p><a href="http://augeas.net">Augueas referenced here is a tool</a> for doing changes in textual configuration files.
 It&#8217;s purpose came from fact that whole Linux configuration is based on text files.
 If you want to do some changes automatically by a script you are usually doomed
 to use <code>sed</code> or <code>awk</code>. Augeas is expected to do the task easier.
@@ -23,7 +25,7 @@ XSLT thus I was searching for some alternatives.
 This idea to use Augeas came to my mind from nice video presentation of usage JBoss with Docker.
 It was one part from series of Virtual JBoss User Group
 presentations (<a href="https://www.youtube.com/watch?v=4uQ6gR_xZhE">Docker and JBoss - the perfect combination</a>).
-The presentation was lead by Marek Goldmann(TODO:profile_link) who does have really nice post
+The presentation was lead by <a href="https://goldmann.pl/blog">Marek Goldmann</a> who does have really nice post
 about topic of automatic changes of JBoss configuration file at his blog
 - <a href="https://goldmann.pl/blog/2014/07/23/customizing-the-configuration-of-the-wildfly-docker-image" class="bare">https://goldmann.pl/blog/2014/07/23/customizing-the-configuration-of-the-wildfly-docker-image</a>.</p>
 </div>
@@ -45,8 +47,8 @@ or write your own <code>lens</code>.</p>
 <p>As I want to change XML file I needed to use <code>xml lens</code> for Augeas to know how to parse the file.
 This provided lens is a simple in way that it doesn&#8217;t take care about any schema or namespace.
 It just take the XML file as a text and separates tag (elements) from text and attributes.
-The data is structured(TODO) in a tree consisting nodes. Each node contains two strings <code>label</code> (a node name) and <code>value</code>.
-You can point(TODO) to each node with path expression which is a bit similar to <code>XPath</code>
+The data is structured in a tree consisting nodes. Each node contains two strings <code>label</code> (a node name) and <code>value</code>.
+You can point to each node with path expression similar to <code>XPath</code>
 (see <a href="https://github.com/hercules-team/augeas/wiki/Path-expressions" class="bare">https://github.com/hercules-team/augeas/wiki/Path-expressions</a> [Path Expressions in Augeas]).</p>
 </div>
 </div>
@@ -81,8 +83,8 @@ The Augeas wiki page <a href="https://github.com/hercules-team/augeas/wiki#Using
 These commands are used to get information about the structure of the Augeas tree.
 <strong>Print</strong> and <strong>match</strong> do mostly the same. The <strong>print</strong> scrawl, starting at the defined path,
 down by the tree and print all nodes (labels and values). <strong>Match</strong> do similar but you influencing
-what is printed by using subsitute characters as <code><strong></code> <a href="https://github.com/hercules-team/augeas/wiki/Path-expressions">similar to XPath queries</a>.
-Command *ls</strong> just shows node names (labels) residing under the defined path.</p>
+what is printed by using subsitute characters as <code>*</code> <a href="https://github.com/hercules-team/augeas/wiki/Path-expressions">similar to XPath queries</a>.
+Command *ls* just shows node names (labels) residing under the defined path.</p>
 </div>
 </div>
 </div>
