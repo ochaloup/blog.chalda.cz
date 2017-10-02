@@ -1,0 +1,419 @@
+= Augeas and XML configuration files
+:hp-tags: augeas, xml, configuration
+:toc: macro
+:release: 1.0
+:published_at: 2017-09-30
+:icons: font
+
+image::asciidoctor/twelve_labours.jpg[]
+
+== Augeas... what?
+
+The name Augeas is based on greek legend about Herakles who has to clean stables
+of the king Augeas from dung as one of his twelve laubours that he has to fulfill as a punishment
+for killing his wife and children (for a justification he was driven mad by Hera).
+http://augeas.net[Augueas referenced here is a tool] for doing changes in textual configuration files.
+It's purpose came from fact that whole Linux configuration is based on text files.
+If you want to do some changes automatically by a script you are usually doomed
+to use `sed` or `awk`. Augeas is expected to do the task easier.
+I was looking for a tool for doing changes of WildFly `standalone.xml` and I don't like
+XSLT thus I was searching for some alternatives.
+This idea to use Augeas came to my mind from nice video presentation of usage JBoss with Docker.
+It was one part from series of Virtual JBoss User Group
+presentations (https://www.youtube.com/watch?v=4uQ6gR_xZhE[Docker and JBoss - the perfect combination]).
+The presentation was lead by Marek Goldmann(TODO:profile_link) who does have really nice post
+about topic of automatic changes of JBoss configuration file at his blog
+- https://goldmann.pl/blog/2014/07/23/customizing-the-configuration-of-the-wildfly-docker-image.
+
+== How the Augeas works
+
+Augeas provides machinery but there has to be a 'recipy' which defines semantics of particular
+configuration files. This recipy is called `lens` in terms of Augeas tooling.
+`Lens` describes format of your configuration. By default Augeas provides `lenses` for standard files
+residing under `/etc` directory. If you want to work with some other file you need to find a lens for your one
+(see http://augeas.net/stock_lenses.html[Augeas built-in lenses]) or, when not provided,
+you have two options -use some generic `lens` and be more verbose when changing configuration,
+or write your own `lens`.
+
+As I want to change XML file I needed to use `xml lens` for Augeas to know how to parse the file.
+This provided lens is a simple in way that it doesn't take care about any schema or namespace.
+It just take the XML file as a text and separates tag (elements) from text and attributes.
+The data is structured(TODO) in a tree consisting nodes. Each node contains two strings `label` (a node name) and `value`.
+You can point(TODO) to each node with path expression which is a bit similar to `XPath`
+(see https://github.com/hercules-team/augeas/wiki/Path-expressions [Path Expressions in Augeas]).
+
+== Augeas usage
+
+For the work you will use command *augtool*.
+
+Augeas is part of the most Linux distributions. If it's not your case,
+you can install it from the package - in Fedora it's package named augeas (`dnf install augeas`) - or
+you can simply http://augeas.net/download.html[download it] and put the `augtool` command on the `PATH`.
+
+When you run *augtool* and you get an interactive shell where
+you can start typing Augeas commands. When it's run with some undefined parameter (e.g. `-h` is one of them icon:smile-o[])
+then you will get list of possible options to use.
+
+When I came to augeas tool first I was searching for a way to pass a set of rules (augeas commands)
+and define a file that the rules will be applied to. But Augeas does not work in this way. You need to understand
+the structure of Augeas tree and how it works with its nodes.
+The Augeas wiki page https://github.com/hercules-team/augeas/wiki#Using_Augeas is quite informative in this matter.
+
+Let's examine a bit the `augtool` here
+
+If you run the `augtool` there are tree base commands which are your friends icon:smile-o[] - *print*, *ls* and *match*.
+These commands are used to get information about the structure of the Augeas tree.
+*Print* and *match* do mostly the same. The *print* scrawl, starting at the defined path,
+down by the tree and print all nodes (labels and values). *Match* do similar but you influencing
+what is printed by using subsitute characters as `*` https://github.com/hercules-team/augeas/wiki/Path-expressions[similar to XPath queries].
+Command *ls* just shows node names (labels) residing under the defined path.
+
+== Augeas commands
+
+Good start is to run command:
+
+```
+augtool
+ls /
+```
+
+You can see that there are two base nodes - *augeas* and *files*.
+
+* Node *augeas* is where configuration is saved.
+* Node *files* is where all parsed data is saved.
+
+If you want to make some change you use command *set*. For example you can try to list the `/etc/fstab`
+file by
+
+```
+augtool
+match /files/etc/fstab/*[label() = '#comment']
+set /files/etc/fstab/#comment[1] "my strange comment"
+save
+```
+
+On this example we can see that Augeas works with a copy of the content and changes
+are write back to the filesystem when `save` command is called.
+
+That was about config files and lenses loaded by Augeas automatically.
+That is, there are defined lenses and files to be `autoloaded`.
+
+You can can observe the structure of the Augeas tree - lenses and files by running
+
+```
+print /augeas
+print /files
+```
+
+[WARNING]
+====
+Files don't poses the same placement in the Augeas tree as they have
+int the file system.
+====
+
+[NOTE]
+====
+if you want to see all the autoloaded files try
+```
+match /augeas/load/*/incl
+```
+if you want to see all the autoloaded lenses try
+```
+ls /augeas/load
+```
+====
+
+Because of all the autoloading the start of augtool could be a bit slower and if we know that
+we want to work just with one specific file we can use *--noload* and *--noautoload* parameters.
+In short run
+
+```
+augtool -LA
+```
+
+[TIP]
+====
+Try to run
+```
+augtool -LA
+print /
+```
+and you will see nothing.
+====
+
+[NOTE]
+====
+Helpful parameters
+
+* _-b_  (_--backup_) which says that original file will be backuped, before changes are saved,
+  this parameter creates file with the same name but suffixed with `.augsave`
+* _-e_  (_--echo_) which says that commands which are executed will be printed on stdout
+* _-r_  (_--root_) definition of a specific directory as root of the Augeas file system,
+  for example `-r .` says that the root will not be `/` but the current directory (still referenced under `/files/`)
+====
+
+With usage of `-LA` nothing is preloaded and we have to define ourselves what to work with.
+Let's define a file to work with and lens for parsing it. When we change such _settings_
+the `load` command has to be used to get activated (or reload the agutool iself).
+We have to define type of file to work with by adding element under augeas load node. That could be arbitrary name but let's say _xml_ as we will work with xml.
+As adding the xml node we define what is lens which defines rules for parsing.
+This will be predefined name of the lens *Xml.lns* (see https://github.com/hercules-team/augeas/wiki/Loading-specific-files)
+
+```
+set /augeas/load/xml/lens Xml.lns
+```
+
+Now for definition what file to work with use absolute path to a file and put it under _xml_ element under node incl.
+
+```
+set /augeas/load/xml/incl /opt/jboss/standalone/configuration/standalone.xml
+```
+
+If there should be more files to load you can use the path expression
+
+```
+set /augeas/load/xml/incl /opt/jboss/standalone/configuration/*.xml
+```
+
+Or if you want to specify more files by your hand, you will need to use some of the technics
+mentioned under https://github.com/hercules-team/augeas/wiki/Adding-nodes-to-the-tree. AS an example
+
+```
+set /augeas/load/xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
+set /augeas/load/xml/incl[2] /opt/jboss/standalone/configuration/standalone-full.xml
+```
+
+And finally we need to load the data inside to augeas
+
+```
+load
+```
+
+[TIP]
+====
+If you don't use option `-LA` then xml lens is loaded under /augeas/load/Xml. You can then add there some file as
+```
+set /augeas/load/Xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
+load
+```
+This has an 'advantage' that you are free from specifying lens definition at the start.
+====
+
+Now came the work with Augeas tree itself. As it was said the loaded files are under root node /files.
+Let's define a variable to reuse it afterwards. We are going to work with the `standalone.xml` loaded here.
+And the variable is _logging_ and will contain the Augeas tree of the logging subsystem
+
+```
+defvar logging /files/home/ochaloup/tmp/augeas/standalone.xml/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]
+```
+
+...redefining logging level
+
+```
+set $logging/console-handler/level/#attribute/name "DEBUG"
+set $logging/root-logger/level/#attribute/name "DEBUG"
+```
+
+...at the end save changes into the original file
+
+```
+save
+```
+
+...as final step it's good to check whether we are error free
+
+```
+print /augeas//error
+```
+
+If you want to work with some specific node and you don't know whether it's already existing
+use command _defnode_. I wanted to define trace logging level for jca subsystem so I did following.
+
+```
+defnode logger_jca $logging/logger[#attribute/category='org.jboss.jca']
+set $logger_jca/#attribute/category "org.jboss.jca"
+defnode logger_jca_level $logger_jca/level
+set $logger_jca_level/#attribute/name "TRACE"
+```
+
+Few final notes on working with xml converted to Augeas tree
+
+* tags (xml elements) are converted to augeas nodes
+* the attributes and text could be found under `#attribute` and `#text` node under the particular tag name
+* when traversing the tree you can use `\*` as a definition of any value or you can use `//`
+  to expect whatever number of nodes between current and the defined one.
+  Try `//*[#attribute/xmlns=~regexp('.*logging.*')]`.
+* check section https://github.com/hercules-team/augeas/wiki/Path-expressions#user-content-Tips_amp_Tricks[Tips and Trics in Augeas manual page].
+
+== Running augtool non-interactive way
+
+How to use `augtool` to define lenses and work files in an one step?
+
+```
+augtool -r . --noautoload --transform 'Xml.lns incl /standalone.xml'
+```
+
+This command says that you define root of the augtool to current directory.
+There is automatically loaded no default lenses.
+There is no default rules for loading any file.
+Then you are defining to load `standalone.xml` (expected from the current directory)
+and this file will be transformed by lens `Xml.lns`.
+Now you are ready to run any of the commands mentioned above.
+
+If you have commands to be executed by the Augeas tooling you can let the Augeas
+to read it from a file (`-f` parameter) or pass it on the standard input.
+
+== My Augeas script to change WildFly logging
+
+```
+#!/bin/bash
+
+# ------------------------------------------------------
+# This scripts aim to run Augeas tool (command augtool)
+# to change content of specific xml file
+# ------------------------------------------------------
+
+# -------------------------------------------
+# ---------------- FUNCTIONS ----------------
+# -------------------------------------------
+function usage() {
+cat << EOF
+Usage:
+`basename $0` path_to_augeas_rules path_to_xml [file_with_bash_variables] [OPTIONS]
+  path_to_augeas_rules       path to files with augeas rules but without loading file and setting xml lenses
+                             the loading and saving are done at the end of this script
+                             please, be sure to escape Augeas variables otherwise it will be expanded as bash variables
+  path_to_xml                file that will be changed by the augeas processing(rules)
+  file_with_bash_variables   file with variables that will be expanded to path_to_augeas_rules
+ Options:
+  -h Show help options.
+  -Dvariable_name=value  Define variable that is used for replacement of data in xml file.
+                         This variable will override a value from bash variable file if defined.
+ WARNING: if you run this script against some Augeas script then be sure to escape augeas variables (defvar) by backslash
+          not slashed variables will be handled as bash variables and will be expanded
+EOF
+}
+
+# Parsing variables defined as script options
+function parseVariables() {
+  PARSED_VARIABLES=0
+  while [ $# -gt 0 ] && [[ "$1" =~ ^-D([^=]+)=(.*) ]]; do
+    [ "$DEBUG" = true ] || [ "$debug" = true ] && echo "parsing $1"
+    VAR_NAME=`echo ${BASH_REMATCH[1]} | sed 's/\./_/g'`
+    VAR_VALUE="${BASH_REMATCH[2]}"
+    eval "${VAR_NAME}=${VAR_VALUE}"
+    shift
+    PARSED_VARIABLES=$(($PARSED_VARIABLES+1))
+  done
+}
+
+# Loading file with augeas rules and running evaluation over the file
+# to inject values of bash variables defined by script or script parameters
+function evalAugeas() {
+  [ "x$1" = "x" ] && echo "No argument of filename specified" && return
+  local LINE
+  # flag -r tells read not to treat backslashes as escape char
+  while read -r LINE; do
+    local EVALUATED_LINE=`eval "echo \"${LINE}\""`
+    # comment line (btw. quoting regexp:  http://stackoverflow.com/questions/218156/bash-regex-with-quotes)
+    [[ "$EVALUATED_LINE" =~ `echo "^[ ]*[#]"` ]] && continue
+    # including different file
+    if [[ "$EVALUATED_LINE" =~ `echo "^[ ]*\binclude\b[ ]+(.*)"` ]]; then
+      local MATCH="${BASH_REMATCH[1]}"
+      # possibly looking relatively from directory where this script is placed in
+      [ ! -f "$MATCH" ] && MATCH="$(dirname $([ -L $0 ] && readlink -f $0 || echo $0))/${MATCH}"
+      [ -f "$MATCH" ] && evalAugeas "$MATCH" || >&2 echo "Can't include '$MATCH' as not a file in ruleset '$1'"
+      continue
+    fi
+    # printf is needed to get new lines added on \n
+    printf -v TEMPLATE "${TEMPLATE}${EVALUATED_LINE}\n"
+  done < "$1"
+}
+
+
+# -----------------------------------------------
+# ---------------- SCRIPT ITSELF ----------------
+# -----------------------------------------------
+[ "$DEBUG" = true ] || [ "$debug" = true ] && echo "Calling: $0 $@"
+# Taking off variables defined right after the script name
+# variable means '-Dname=value'
+parseVariables "$@"
+shift $PARSED_VARIABLES
+
+# Printing help
+[[ "$*" =~ -[-]{0,1}(h|help)( |$) ]] && usage && exit
+[ $# -eq 0 ] && usage && echo " -> No arguments defined" && exit
+[[ "$1" =~ ^- ]] || [ "$2" = "" ] || [[ "$2" =~ ^- ]] && usage \
+   && echo " -> First two arguments are obligatory to be paths to files" && exit
+! [ -f "$1" ] && usage && echo " -> Can't find file '$1' that should contain augeas rules" && exit
+
+
+AUGEASFILE="$1"
+shift
+# If we are able to touch the file in second argumetn (which is xml to transform)
+# changing it to an absolute path. If not leaving it as it is as. Asterisk notation
+# could be used (e.g. /abs/path/configuration/standalone*.xml)
+[ -f "$1" ] && XMLFILE=`readlink -f "$1"` || XMLFILE="$1"
+[[ ! "$XMLFILE" =~ ^/ ]] && echo "Please define the XML file(s) descriptor '$1' as absolute path" && exit
+shift
+VARIABLESFILE=
+[ -f "$1" ] && VARIABLESFILE="$1" && shift
+
+# Injecting the variables from file in the third argument
+# If variables contains '.' then it's changed for underscore '_'
+if [ -f "$VARIABLESFILE" ]; then
+  VARS=`cat "$VARIABLESFILE" | sed 's/\./_/g'`
+  eval "$VARS"
+fi
+
+# Parsing variables defined as script options
+# variable means '-Dname=value'
+parseVariables "$@"
+shift $PARSED_VARIABLES
+
+# Injecting data from augeas rule file to TEMPLATE var
+# simple way: TEMPLATE=`eval "echo \"$(cat \"$AUGEASFILE\")\""`
+TEMPLATE=
+evalAugeas "$AUGEASFILE"
+[ "$DEBUG" = true ] || [ "$debug" = true ] && echo "$TEMPLATE"
+
+
+# -- And now let's rock'n'roll with Augeas itself --
+augtool -Aeb -t "Xml.lns incl $XMLFILE" <<EOF
+defvar file "/files${XMLFILE}"
+$TEMPLATE
+save
+print /augeas//error
+EOF
+
+
+# Cleaning the output XML file by tidyp if available
+tidyp -v > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+  for I in $XMLFILE; do
+    tidyp -xml -i -q < "$I" > "$I".tmp
+    mv "$I".tmp "$I"
+  done
+fi
+```
+
+I name the script as `augeas` and run it with parameter of what is the logging category to change
+and adding the Augeas commands to be executed.
+
+```
+augeas -Dcategory=com.arjuna ~/scripts/augeasconf/logging.aug
+```
+
+The `logging.aug` looks
+
+```
+defvar logging \$file/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]
+defnode logger \$logging/logger[#attribute/category='${category:-com.arjuna}']
+set \$logger/#attribute/category "$category"
+defnode logger_level \$logger/level
+set \$logger_level/#attribute/name "${level:-TRACE}"
+```
+
+There is a little bit magic of escaping with `\` as bash and `augtool` uses character `$` for similar
+approach (variable definition) and I need to replace some of the values by bash variables and some
+of the variables to be processed by Augeas itself.
