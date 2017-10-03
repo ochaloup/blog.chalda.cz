@@ -73,7 +73,7 @@ Command *ls* just shows node names (labels) residing under the defined path.
 
 Good start is to run command:
 
-```
+```bash
 augtool
 ls /
 ```
@@ -86,7 +86,7 @@ You can see that there are two base nodes - *augeas* and *files*.
 If you want to make some change you use command *set*. For example you can try to list the `/etc/fstab`
 file by
 
-```
+```bash
 augtool
 match /files/etc/fstab/*[label() = '#comment']
 set /files/etc/fstab/#comment[1] "my strange comment"
@@ -101,7 +101,7 @@ That is, there are defined lenses and files to be `autoloaded`.
 
 You can can observe the structure of the Augeas tree - lenses and files by running
 
-```
+```bash
 print /augeas
 print /files
 ```
@@ -115,11 +115,11 @@ int the file system.
 [NOTE]
 ====
 if you want to see all the autoloaded files try
-```
+```bash
 match /augeas/load/*/incl
 ```
 if you want to see all the autoloaded lenses try
-```
+```bash
 ls /augeas/load
 ```
 ====
@@ -128,14 +128,14 @@ Because of all the autoloading the start of augtool could be a bit slower and if
 we want to work just with one specific file we can use *--noload* and *--noautoload* parameters.
 In short run
 
-```
+```bash
 augtool -LA
 ```
 
 [TIP]
 ====
 Try to run
-```
+```bash
 augtool -LA
 print /
 ```
@@ -160,40 +160,40 @@ We have to define type of file to work with by adding element under augeas load 
 As adding the xml node we define what is lens which defines rules for parsing.
 This will be predefined name of the lens *Xml.lns* (see https://github.com/hercules-team/augeas/wiki/Loading-specific-files)
 
-```
+```bash
 set /augeas/load/xml/lens Xml.lns
 ```
 
 Now for definition what file to work with use absolute path to a file and put it under _xml_ element under node incl.
 
-```
+```bash
 set /augeas/load/xml/incl /opt/jboss/standalone/configuration/standalone.xml
 ```
 
 If there should be more files to load you can use the path expression
 
-```
+```bash
 set /augeas/load/xml/incl /opt/jboss/standalone/configuration/*.xml
 ```
 
 Or if you want to specify more files by your hand, you will need to use some of the technics
 mentioned under https://github.com/hercules-team/augeas/wiki/Adding-nodes-to-the-tree. AS an example
 
-```
+```bash
 set /augeas/load/xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
 set /augeas/load/xml/incl[2] /opt/jboss/standalone/configuration/standalone-full.xml
 ```
 
 And finally we need to load the data inside to augeas
 
-```
+```bash
 load
 ```
 
 [TIP]
 ====
 If you don't use option `-LA` then xml lens is loaded under /augeas/load/Xml. You can then add there some file as
-```
+```bash
 set /augeas/load/Xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
 load
 ```
@@ -204,33 +204,33 @@ Now came the work with Augeas tree itself. As it was said the loaded files are u
 Let's define a variable to reuse it afterwards. We are going to work with the `standalone.xml` loaded here.
 And the variable is _logging_ and will contain the Augeas tree of the logging subsystem
 
-```
+```bash
 defvar logging /files/home/ochaloup/tmp/augeas/standalone.xml/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]
 ```
 
 ...redefining logging level
 
-```
+```bash
 set $logging/console-handler/level/#attribute/name "DEBUG"
 set $logging/root-logger/level/#attribute/name "DEBUG"
 ```
 
 ...at the end save changes into the original file
 
-```
+```bash
 save
 ```
 
 ...as final step it's good to check whether we are error free
 
-```
+```bash
 print /augeas//error
 ```
 
 If you want to work with some specific node and you don't know whether it's already existing
 use command _defnode_. I wanted to define trace logging level for jca subsystem so I did following.
 
-```
+```bash
 defnode logger_jca $logging/logger[#attribute/category='org.jboss.jca']
 set $logger_jca/#attribute/category "org.jboss.jca"
 defnode logger_jca_level $logger_jca/level
@@ -250,7 +250,7 @@ Few final notes on working with xml converted to Augeas tree
 
 How to use `augtool` to define lenses and work files in an one step?
 
-```
+```bash
 augtool -r . --noautoload --transform 'Xml.lns incl /standalone.xml'
 ```
 
@@ -401,13 +401,13 @@ fi
 I name the script as `augeas` and run it with parameter of what is the logging category to change
 and adding the Augeas commands to be executed.
 
-```
+```bash
 augeas -Dcategory=com.arjuna ~/scripts/augeasconf/logging.aug
 ```
 
 The `logging.aug` looks
 
-```
+```bash
 defvar logging \$file/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]
 defnode logger \$logging/logger[#attribute/category='${category:-com.arjuna}']
 set \$logger/#attribute/category "$category"
