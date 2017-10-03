@@ -2,7 +2,7 @@
 :hp-tags: groovy, wildfly
 :toc: macro
 :release: 1.0
-:published_at: 2017-09-30
+:published_at: 2017-10-02
 :icons: font
 
 // image::articles/.png[]
