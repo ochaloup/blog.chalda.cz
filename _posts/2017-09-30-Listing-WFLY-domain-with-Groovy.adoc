@@ -7,12 +7,8 @@
 
 image::articles/wildfly_groovy.png[]
 
-For more extensive information about WildFly groovy scripting see
 
-* https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc
-* http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell
-
-== Connecting with WFLY cli
+== Groovy connects with WFLY cli
 
 Starting `groovysh` with `jboss cli jar` on classpath could be done in the following way
 
@@ -34,6 +30,13 @@ System.setSecurityManager(null)
 cli = CLI.newInstance()
 cli.connect("remote", "localhost", 9999, null, null)
 ```
+
+=== Links
+
+For more extensive information about WildFly groovy scripting see
+
+* https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc
+* http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell
 
 == Utility methods
 
