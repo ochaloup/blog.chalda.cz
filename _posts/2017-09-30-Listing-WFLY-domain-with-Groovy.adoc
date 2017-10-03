@@ -55,7 +55,8 @@ groups = getResponseAsStringList(cli.cmd(':read-children-names(child-type=server
 profiles = getResponseAsStringList(cli.cmd(':read-children-names(child-type=profile)'))
 
 groups.each { group ->
-  profile = cli.cmd("/server-group=$group:read-attribute(name=profile, include-defaults=true)").getResponse().get("result").asString()
+  profile = cli.cmd("/server-group=$group:read-attribute(name=profile, include-defaults=true)")
+    .getResponse().get("result").asString()
   groupProfile[group] = profile
 }
 
@@ -69,10 +70,13 @@ hosts.each { host ->
  servers = getResponseAsStringList(resultServers)
  serverProfile = [:]
  servers.each { server ->
-   status = cli.cmd("/host=$host/server-config=$server:read-attribute(name=status, include-defaults=true)").getResponse().get("result").asString()
-   group = cli.cmd("/host=$host/server-config=$server:read-attribute(name=group, include-defaults=true)").getResponse().get("result").asString()
+   status = cli.cmd("/host=$host/server-config=$server:read-attribute(name=status, include-defaults=true)")
+     .getResponse().get("result").asString()
+   group = cli.cmd("/host=$host/server-config=$server:read-attribute(name=group, include-defaults=true)")
+     .getResponse().get("result").asString()
    // when disabled profile is not filled
-   // profile = cli.cmd("/host=$host/server=$server:read-attribute(name=profile-name, include-defaults=true)").getResponse().get("result").asString()
+   // profile = cli.cmd("/host=$host/server=$server:read-attribute(name=profile-name, include-defaults=true)")
+     .getResponse().get("result").asString()
    profile = groupProfile[group]
    serverProfile[server] = [status, group, profile]
    // if (profileServer[profile] == null)  profileServer[profile] = []
