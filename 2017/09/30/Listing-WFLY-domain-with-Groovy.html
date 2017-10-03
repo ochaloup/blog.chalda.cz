@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1506986962085"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1506986962085"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1506986962085"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1507006496311"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1507006496311"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1507006496311"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1506986962085"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1507006496311"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html" />
     <meta name="referrer" content="origin" />
@@ -268,7 +268,7 @@ Anoth option is to use call <code>System.setSecurityManager(null)</code> which s
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>import org.jboss.as.cli.scriptsupport.*
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">import org.jboss.as.cli.scriptsupport.*
 System.setSecurityManager(null)
 cli = CLI.newInstance()
 cli.connect("remote", "localhost", 9999, null, null)</code></pre>
@@ -281,7 +281,7 @@ cli.connect("remote", "localhost", 9999, null, null)</code></pre>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>def getResponseAsStringList(def result) {
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">def getResponseAsStringList(def result) {
   list = []
   result.getResponse().get("result").asList().each {list &lt;&lt; it.asString()}
   return list
@@ -298,7 +298,7 @@ cli.connect("remote", "localhost", 9999, null, null)</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>groupProfile = [:]
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">groupProfile = [:]
 groups = getResponseAsStringList(cli.cmd(':read-children-names(child-type=server-group)'))
 profiles = getResponseAsStringList(cli.cmd(':read-children-names(child-type=profile)'))
 
@@ -407,7 +407,7 @@ hosts.each { host -&gt;
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1506986962085"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1507006496311"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

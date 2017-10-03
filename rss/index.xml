@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 04:52:33 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 04:54:56 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -51,7 +51,7 @@ Anoth option is to use call <code>System.setSecurityManager(null)</code> which s
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>import org.jboss.as.cli.scriptsupport.*
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">import org.jboss.as.cli.scriptsupport.*
 System.setSecurityManager(null)
 cli = CLI.newInstance()
 cli.connect("remote", "localhost", 9999, null, null)</code></pre>
@@ -64,7 +64,7 @@ cli.connect("remote", "localhost", 9999, null, null)</code></pre>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>def getResponseAsStringList(def result) {
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">def getResponseAsStringList(def result) {
   list = []
   result.getResponse().get("result").asList().each {list &lt;&lt; it.asString()}
   return list
@@ -81,7 +81,7 @@ cli.connect("remote", "localhost", 9999, null, null)</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>groupProfile = [:]
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">groupProfile = [:]
 groups = getResponseAsStringList(cli.cmd(':read-children-names(child-type=server-group)'))
 profiles = getResponseAsStringList(cli.cmd(':read-children-names(child-type=profile)'))
 
