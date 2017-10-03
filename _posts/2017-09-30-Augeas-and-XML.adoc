@@ -266,7 +266,7 @@ to read it from a file (`-f` parameter) or pass it on the standard input.
 
 == My Augeas script to change WildFly logging
 
-```
+```bash
 #!/bin/bash
 
 # ------------------------------------------------------
