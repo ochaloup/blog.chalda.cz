@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1507007001653"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1507007001653"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1507007001653"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1507007079632"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1507007079632"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1507007079632"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1507007001653"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1507007079632"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html" />
     <meta name="referrer" content="origin" />
@@ -78,7 +78,7 @@
     <meta property="og:site_name" content="Chalda&#x27;s blog" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Listing WFLY domain with Groovy" />
-    <meta property="og:description" content="For more extensive information about WildFly groovy scripting see https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell Connecting with WFLY cli Starting groovysh with jboss cli jar on classpath could be done in the following way expor" />
+    <meta property="og:description" content="Groovy connects with WFLY cli Starting groovysh with jboss cli jar on classpath could be done in the following way export JBOSS_HOME&#x3D;$PWD groovysh -cp $JBOSS_HOME/bin/client/jboss-cli-client.jar To connect with CLI you need import scriptsupport package disable security manager as there is some flaw in" />
     <meta property="og:url" content="http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html" />
     <meta property="article:published_time" content="2017-09-30T00:00:00.000Z" />
     <meta property="article:tag" content="groovy" />
@@ -86,7 +86,7 @@
     
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Listing WFLY domain with Groovy" />
-    <meta name="twitter:description" content="For more extensive information about WildFly groovy scripting see https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell Connecting with WFLY cli Starting groovysh with jboss cli jar on classpath could be done in the following way expor" />
+    <meta name="twitter:description" content="Groovy connects with WFLY cli Starting groovysh with jboss cli jar on classpath could be done in the following way export JBOSS_HOME&#x3D;$PWD groovysh -cp $JBOSS_HOME/bin/client/jboss-cli-client.jar To connect with CLI you need import scriptsupport package disable security manager as there is some flaw in" />
     <meta name="twitter:url" content="http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html" />
     
     <script type="application/ld+json">
@@ -104,7 +104,7 @@
     "url": "http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html",
     "datePublished": "2017-09-30T00:00:00.000Z",
     "keywords": "groovy, wildfly",
-    "description": "For more extensive information about WildFly groovy scripting see https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell Connecting with WFLY cli Starting groovysh with jboss cli jar on classpath could be done in the following way expor"
+    "description": "Groovy connects with WFLY cli Starting groovysh with jboss cli jar on classpath could be done in the following way export JBOSS_HOME&#x3D;$PWD groovysh -cp $JBOSS_HOME/bin/client/jboss-cli-client.jar To connect with CLI you need import scriptsupport package disable security manager as there is some flaw in"
 }
     </script>
 
@@ -222,23 +222,10 @@
 <img src="http://blog.chalda.cz/images/articles/wildfly_groovy.png" alt="wildfly groovy.png">
 </div>
 </div>
-<div class="paragraph">
-<p>For more extensive information about WildFly groovy scripting see</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc" class="bare">https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc</a></p>
-</li>
-<li>
-<p><a href="http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell" class="bare">http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell</a></p>
-</li>
-</ul>
-</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_connecting_with_wfly_cli">Connecting with WFLY cli</h2>
+<h2 id="_groovy_connects_with_wfly_cli">Groovy connects with WFLY cli</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Starting <code>groovysh</code> with <code>jboss cli jar</code> on classpath could be done in the following way</p>
@@ -272,6 +259,22 @@ Anoth option is to use call <code>System.setSecurityManager(null)</code> which s
 System.setSecurityManager(null)
 cli = CLI.newInstance()
 cli.connect("remote", "localhost", 9999, null, null)</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_links">Links</h3>
+<div class="paragraph">
+<p>For more extensive information about WildFly groovy scripting see</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc" class="bare">https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc</a></p>
+</li>
+<li>
+<p><a href="http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell" class="bare">http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -411,7 +414,7 @@ hosts.each { host -&gt;
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1507007001653"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1507007079632"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

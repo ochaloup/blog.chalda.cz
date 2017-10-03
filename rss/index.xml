@@ -1,27 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 05:03:21 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 05:04:39 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
 <img src="http://blog.chalda.cz/images/articles/wildfly_groovy.png" alt="wildfly groovy.png">
 </div>
 </div>
-<div class="paragraph">
-<p>For more extensive information about WildFly groovy scripting see</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc" class="bare">https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc</a></p>
-</li>
-<li>
-<p><a href="http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell" class="bare">http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell</a></p>
-</li>
-</ul>
-</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_connecting_with_wfly_cli">Connecting with WFLY cli</h2>
+<h2 id="_groovy_connects_with_wfly_cli">Groovy connects with WFLY cli</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Starting <code>groovysh</code> with <code>jboss cli jar</code> on classpath could be done in the following way</p>
@@ -55,6 +42,22 @@ Anoth option is to use call <code>System.setSecurityManager(null)</code> which s
 System.setSecurityManager(null)
 cli = CLI.newInstance()
 cli.connect("remote", "localhost", 9999, null, null)</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_links">Links</h3>
+<div class="paragraph">
+<p>For more extensive information about WildFly groovy scripting see</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc" class="bare">https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc</a></p>
+</li>
+<li>
+<p><a href="http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell" class="bare">http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
