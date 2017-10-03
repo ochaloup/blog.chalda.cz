@@ -59,8 +59,7 @@ image::hubpressio/githubpages.jpg[]
 ** cname
 in my case it was like this
 
-```
-
+```json
 {
   "meta": {
     "username": "ochaloup",
