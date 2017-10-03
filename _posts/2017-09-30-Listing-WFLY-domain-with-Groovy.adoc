@@ -16,7 +16,7 @@ For more extensive information about WildFly groovy scripting see
 
 Starting `groovysh` with `jboss cli jar` on classpath could be done in the following way
 
-```
+```bash
 export JBOSS_HOME=$PWD
 groovysh -cp $JBOSS_HOME/bin/client/jboss-cli-client.jar
 ```
