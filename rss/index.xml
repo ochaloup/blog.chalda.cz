@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 04:49:30 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 04:52:33 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -212,7 +212,7 @@ Command *ls* just shows node names (labels) residing under the defined path.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>augtool
+<pre class="highlight"><code class="language-bash" data-lang="bash">augtool
 ls /</code></pre>
 </div>
 </div>
@@ -235,7 +235,7 @@ file by</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>augtool
+<pre class="highlight"><code class="language-bash" data-lang="bash">augtool
 match /files/etc/fstab/*[label() = '#comment']
 set /files/etc/fstab/#comment[1] "my strange comment"
 save</code></pre>
@@ -254,7 +254,7 @@ That is, there are defined lenses and files to be <code>autoloaded</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>print /augeas
+<pre class="highlight"><code class="language-bash" data-lang="bash">print /augeas
 print /files</code></pre>
 </div>
 </div>
@@ -285,7 +285,7 @@ int the file system.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>match /augeas/load/*/incl</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">match /augeas/load/*/incl</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -293,7 +293,7 @@ int the file system.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>ls /augeas/load</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">ls /augeas/load</code></pre>
 </div>
 </div>
 </td>
@@ -307,7 +307,7 @@ In short run</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>augtool -LA</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">augtool -LA</code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -322,7 +322,7 @@ In short run</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>augtool -LA
+<pre class="highlight"><code class="language-bash" data-lang="bash">augtool -LA
 print /</code></pre>
 </div>
 </div>
@@ -372,7 +372,7 @@ This will be predefined name of the lens <strong>Xml.lns</strong> (see <a href="
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>set /augeas/load/xml/lens Xml.lns</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">set /augeas/load/xml/lens Xml.lns</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -380,7 +380,7 @@ This will be predefined name of the lens <strong>Xml.lns</strong> (see <a href="
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>set /augeas/load/xml/incl /opt/jboss/standalone/configuration/standalone.xml</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">set /augeas/load/xml/incl /opt/jboss/standalone/configuration/standalone.xml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -388,7 +388,7 @@ This will be predefined name of the lens <strong>Xml.lns</strong> (see <a href="
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>set /augeas/load/xml/incl /opt/jboss/standalone/configuration/*.xml</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">set /augeas/load/xml/incl /opt/jboss/standalone/configuration/*.xml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -397,7 +397,7 @@ mentioned under <a href="https://github.com/hercules-team/augeas/wiki/Adding-nod
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>set /augeas/load/xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
+<pre class="highlight"><code class="language-bash" data-lang="bash">set /augeas/load/xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
 set /augeas/load/xml/incl[2] /opt/jboss/standalone/configuration/standalone-full.xml</code></pre>
 </div>
 </div>
@@ -406,7 +406,7 @@ set /augeas/load/xml/incl[2] /opt/jboss/standalone/configuration/standalone-full
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>load</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">load</code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -421,7 +421,7 @@ set /augeas/load/xml/incl[2] /opt/jboss/standalone/configuration/standalone-full
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>set /augeas/load/Xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
+<pre class="highlight"><code class="language-bash" data-lang="bash">set /augeas/load/Xml/incl[1] /opt/jboss/standalone/configuration/standalone.xml
 load</code></pre>
 </div>
 </div>
@@ -439,7 +439,7 @@ And the variable is <em>logging</em> and will contain the Augeas tree of the log
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>defvar logging /files/home/ochaloup/tmp/augeas/standalone.xml/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">defvar logging /files/home/ochaloup/tmp/augeas/standalone.xml/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -447,7 +447,7 @@ And the variable is <em>logging</em> and will contain the Augeas tree of the log
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>set $logging/console-handler/level/#attribute/name "DEBUG"
+<pre class="highlight"><code class="language-bash" data-lang="bash">set $logging/console-handler/level/#attribute/name "DEBUG"
 set $logging/root-logger/level/#attribute/name "DEBUG"</code></pre>
 </div>
 </div>
@@ -456,7 +456,7 @@ set $logging/root-logger/level/#attribute/name "DEBUG"</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>save</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">save</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -464,7 +464,7 @@ set $logging/root-logger/level/#attribute/name "DEBUG"</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>print /augeas//error</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">print /augeas//error</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -473,7 +473,7 @@ use command <em>defnode</em>. I wanted to define trace logging level for jca sub
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>defnode logger_jca $logging/logger[#attribute/category='org.jboss.jca']
+<pre class="highlight"><code class="language-bash" data-lang="bash">defnode logger_jca $logging/logger[#attribute/category='org.jboss.jca']
 set $logger_jca/#attribute/category "org.jboss.jca"
 defnode logger_jca_level $logger_jca/level
 set $logger_jca_level/#attribute/name "TRACE"</code></pre>
@@ -510,7 +510,7 @@ Try <code>//*[#attribute/xmlns=~regexp('.<strong>logging.</strong>')]</code>.</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>augtool -r . --noautoload --transform 'Xml.lns incl /standalone.xml'</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">augtool -r . --noautoload --transform 'Xml.lns incl /standalone.xml'</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -669,7 +669,7 @@ and adding the Augeas commands to be executed.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>augeas -Dcategory=com.arjuna ~/scripts/augeasconf/logging.aug</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">augeas -Dcategory=com.arjuna ~/scripts/augeasconf/logging.aug</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -677,7 +677,7 @@ and adding the Augeas commands to be executed.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>defvar logging \$file/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]
+<pre class="highlight"><code class="language-bash" data-lang="bash">defvar logging \$file/server/profile/subsystem[#attribute/xmlns=~regexp('.*logging.*')]
 defnode logger \$logging/logger[#attribute/category='${category:-com.arjuna}']
 set \$logger/#attribute/category "$category"
 defnode logger_level \$logger/level
