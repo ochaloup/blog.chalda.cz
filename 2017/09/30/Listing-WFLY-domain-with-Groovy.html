@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1507006789737"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1507006789737"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1507006789737"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1507007001653"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1507007001653"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1507007001653"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1507006789737"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1507007001653"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/09/30/Listing-WFLY-domain-with-Groovy.html" />
     <meta name="referrer" content="origin" />
@@ -303,7 +303,8 @@ groups = getResponseAsStringList(cli.cmd(':read-children-names(child-type=server
 profiles = getResponseAsStringList(cli.cmd(':read-children-names(child-type=profile)'))
 
 groups.each { group -&gt;
-  profile = cli.cmd("/server-group=$group:read-attribute(name=profile, include-defaults=true)").getResponse().get("result").asString()
+  profile = cli.cmd("/server-group=$group:read-attribute(name=profile, include-defaults=true)")
+    .getResponse().get("result").asString()
   groupProfile[group] = profile
 }
 
@@ -317,10 +318,13 @@ hosts.each { host -&gt;
  servers = getResponseAsStringList(resultServers)
  serverProfile = [:]
  servers.each { server -&gt;
-   status = cli.cmd("/host=$host/server-config=$server:read-attribute(name=status, include-defaults=true)").getResponse().get("result").asString()
-   group = cli.cmd("/host=$host/server-config=$server:read-attribute(name=group, include-defaults=true)").getResponse().get("result").asString()
+   status = cli.cmd("/host=$host/server-config=$server:read-attribute(name=status, include-defaults=true)")
+     .getResponse().get("result").asString()
+   group = cli.cmd("/host=$host/server-config=$server:read-attribute(name=group, include-defaults=true)")
+     .getResponse().get("result").asString()
    // when disabled profile is not filled
-   // profile = cli.cmd("/host=$host/server=$server:read-attribute(name=profile-name, include-defaults=true)").getResponse().get("result").asString()
+   // profile = cli.cmd("/host=$host/server=$server:read-attribute(name=profile-name, include-defaults=true)")
+     .getResponse().get("result").asString()
    profile = groupProfile[group]
    serverProfile[server] = [status, group, profile]
    // if (profileServer[profile] == null)  profileServer[profile] = []
@@ -407,7 +411,7 @@ hosts.each { host -&gt;
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1507006789737"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1507007001653"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

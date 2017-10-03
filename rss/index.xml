@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 05:01:54 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 05:03:21 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -86,7 +86,8 @@ groups = getResponseAsStringList(cli.cmd(':read-children-names(child-type=server
 profiles = getResponseAsStringList(cli.cmd(':read-children-names(child-type=profile)'))
 
 groups.each { group -&gt;
-  profile = cli.cmd("/server-group=$group:read-attribute(name=profile, include-defaults=true)").getResponse().get("result").asString()
+  profile = cli.cmd("/server-group=$group:read-attribute(name=profile, include-defaults=true)")
+    .getResponse().get("result").asString()
   groupProfile[group] = profile
 }
 
@@ -100,10 +101,13 @@ hosts.each { host -&gt;
  servers = getResponseAsStringList(resultServers)
  serverProfile = [:]
  servers.each { server -&gt;
-   status = cli.cmd("/host=$host/server-config=$server:read-attribute(name=status, include-defaults=true)").getResponse().get("result").asString()
-   group = cli.cmd("/host=$host/server-config=$server:read-attribute(name=group, include-defaults=true)").getResponse().get("result").asString()
+   status = cli.cmd("/host=$host/server-config=$server:read-attribute(name=status, include-defaults=true)")
+     .getResponse().get("result").asString()
+   group = cli.cmd("/host=$host/server-config=$server:read-attribute(name=group, include-defaults=true)")
+     .getResponse().get("result").asString()
    // when disabled profile is not filled
-   // profile = cli.cmd("/host=$host/server=$server:read-attribute(name=profile-name, include-defaults=true)").getResponse().get("result").asString()
+   // profile = cli.cmd("/host=$host/server=$server:read-attribute(name=profile-name, include-defaults=true)")
+     .getResponse().get("result").asString()
    profile = groupProfile[group]
    serverProfile[server] = [status, group, profile]
    // if (profileServer[profile] == null)  profileServer[profile] = []
