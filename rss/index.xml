@@ -1,4 +1,442 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 03 Oct 2017 05:04:39 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 06 Oct 2017 07:51:28 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Groovy and XML]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/groovy_straw.png" alt="groovy straw.png">
+</div>
+</div>
+<div class="paragraph">
+<p>Manipulating with XML in some easy way is part of my journey to get an easy way to change WildFly <code>standalone.xml</code>. Use of the Groovy and its tools came to me with tool <a href="https://github.com/wildfly-extras/creaper">Creaper</a> which I use in testsuites I work on. (Creaper came from hands of my collegue <a href="https://twitter.com/_Ladicek">Láďa Thon</a>). The Creaper tool let you make changes of the configuration either through <a href="https://docs.jboss.org/author/display/WFLY/Command+Line+Interface">CLI commands</a> or with use of Groovy XML modification.</p>
+</div>
+<div class="paragraph">
+<p>Here I would like to sum up so of my observation of using XML with Groovy. Mostly similar to nice article at <a href="http://www.vogella.com/tutorials/Groovy/article.html#examples_xml" class="bare">http://www.vogella.com/tutorials/Groovy/article.html#examples_xml</a></p>
+</div>
+<div class="paragraph">
+<p>WARN: DISCLAIMER. I&#8217;m not fully sure with accuracy of all the terms used below. I recommend to check the net. And let me know about issues here.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_xml_manipulation_in_groovy_in_brief">XML manipulation in Groovy in brief</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are two common <a href="http://groovy-lang.org/processing-xml.html">approaches in Groovy to work with xml</a>.</p>
+</div>
+<div class="paragraph">
+<p>One is <code>XMLParser</code> (<code>GPath</code> expressions could be used, <code>GPath</code> is <a href="http://groovy-lang.org/processing-xml.html#_gpath">a path expression language</a>) and here is an example</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">def scopeNode = asNode().depthFirst().find {
+  println it.name().getQualifiedName()
+  it.name().getQualifiedName() == 'scope'
+}
+scopeNode.setValue('compile')</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+the method <code>find</code> is method of the Groovy object <code>Object</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <code>XmlSlurper</code> allows to parse an XML document and returns an <code>GPathResult</code> object. You can use <code>GPath</code> expressions.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_xmlslurper_in_more_details">XMLSlurper in more details</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As the Creaper <a href="https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/java/org/wildfly/extras/creaper/commands/foundation/offline/xml/GroovyXmlTransform.java#L123">uses XMLSlurper</a> I played more with it.</p>
+</div>
+<div class="paragraph">
+<p>My point here is show some Groovy language picks that wasn&#8217;t obvious for me as I&#8217;m quite a nebiew in.</p>
+</div>
+<div class="paragraph">
+<p>To start work with the <code>XMLSlurper</code> I use <a href="http://groovy-lang.org/groovyconsole.html">groovyConsole</a> - just start it and copy&amp;paste.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">import java.io.StringWriter
+import groovy.xml.XmlUtil
+
+xml =
+'''&lt;server xmlns="urn:jboss:domain:4.0"&gt;
+  &lt;profile&gt;
+    &lt;subsystem xmlns="urn:jboss:domain:iiop-openjdk:1.0"&gt;
+      &lt;initializers transactions="spec" security="identity"/&gt;
+      &lt;properties&gt;
+         &lt;property name="propname" value="propvalue" /&gt;
+    &lt;/subsystem&gt;
+  &lt;/profile&gt;
+&lt;/server&gt;'''
+
+// to get the variable printed to see the content
+print xml
+
+def root = new XmlSlurper().parseText(xml)
+
+// get back the xml processed with XMLSlurper as a string
+def writer = new StringWriter()
+XmlUtil.serialize(root, writer);
+print writer.toString()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now the root contains the xml tree that could be navigated as <code>groovy.util.slurpersupport.GPathResult</code>
+(<a href="http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/GPathResult.html" class="bare">http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/GPathResult.html</a>)
+attributes with <code>dot notation</code> (<code>.</code>).
+The root itself is type of <code>groovy.util.slurpersupport.NodeChildren</code>
+(<a href="http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/NodeChildren.html" class="bare">http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/NodeChildren.html</a>)
+which is defined as <em>lazy evaluated representation of child nodes</em> and it&#8217;s a child of the <code>GPathResult</code> class itself.</p>
+</div>
+<div class="paragraph">
+<p>When using dot notation it&#8217;s easy to work with existing xml emlements</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">// having a subtree variable for further use
+iiop = root.profile.subsystem
+// changing existing attribute
+iiop.initializers.@security = 'who needs security?'
+// adding non-existing attribute to an existing node
+iiop.initializers.'@my.attribute' = 'chalda'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To check documentaiton on types you work with see</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attributes.html" class="bare">http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attributes.html</a></p>
+</li>
+<li>
+<p><a href="http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attribute.html" class="bare">http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attribute.html</a></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">assert groovy.util.slurpersupport.Attributes ==
+  iiop.initializers.@security.getClass()
+assert groovy.util.slurpersupport.Attribute ==
+  iiop.initializers.@security.iterator().next().getClass()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For saving a value of an attribute (attribute of a xml element) you can use method <code>text()</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">assert 'identity' == iiop.initializers.@security.text()
+assert '' == iiop.initializers.@'non-existent'.text()
+
+def m = [:]
+println iiop.initializers*.attributes()
+  .collectMany { it.entrySet() }
+  .each { m.put(it.key, it.value) }
+assert m == [security:'identity', transactions:'spec']
+
+m = [:]
+iiop.properties.property.iterator().each {
+  list &lt;&lt; it.@name
+  m &lt;&lt; [(it.@name.text()): it.@value.text()]
+}
+assert m == ['propname':'propvalue']</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When constructing the <code>GPathResult</code> definition you can use <a href="http://mrhaki.blogspot.cz/2009/08/groovy-goodness-string-strings-strings.html">GString expressions</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>def t = 'transactions'
+assert 'spec' == iiop.initializers."@${t}".text()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Having chance to remove an attribute there is need to touch actual <code>groovy.util.slurpersupport.Node</code> (<a href="http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/Node.html" class="bare">http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/Node.html</a>) or
+<code>groovy.util.slurpersupport.NodeChild</code> (<a href="http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/NodeChild.html" class="bare">http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/NodeChild.html</a>).</p>
+</div>
+<div class="paragraph">
+<p>When you get the <em>node</em> you can start working with its <code>name</code> or <code>attributes</code> as you need.
+To get a <em>node</em> I got used to call one of methods which returns <code>Iterator</code>. There is a method <code>iterator()</code> which provides <code>NodeChild</code> or there is a method <code>nodeIterator()</code> which provides <code>Node</code>. For sure there are plenty other ways to get <em>nodes</em> as for example method <code>findAll()</code> and others.</p>
+</div>
+<div class="paragraph">
+<p>Another way is usage of
+<a href="http://docs.groovy-lang.org/latest/html/documentation/index.html#Collections-Gettingefficientwiththestar-dotoperator"><code>star-dot operator</code></a>
+(a shortcut operator allowing you to call a method on all elements of a collection).</p>
+</div>
+<div class="paragraph">
+<p>To iterate over all nodes at the current level - here it means iterating over all <code>initializers</code> nodes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">// -&gt; class groovy.util.slurpersupport.NodeChild
+iiop.initializers.iterator().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -&gt; class groovy.util.slurpersupport.Node
+iiop.initializers.nodeIterator().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -&gt; class groovy.util.slurpersupport.NodeChild
+iiop.initializers.findAll({true}).each {
+  println it.getClass()
+  println it.name()
+}
+
+// -&gt; class groovy.util.slurpersupport.NodeChild
+println iiop.initializers*.getClass()</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_node_iteration">Node iteration</h3>
+<div class="paragraph">
+<p>Iterating over child nodes of the current level of nodes, use method <code>childNodes()</code> or <code>children()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">// -&gt; class groovy.util.slurpersupport.Node
+iiop.childNodes().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -&gt; class groovy.util.slurpersupport.NodeChild
+iiop.children().each {
+  println it.getClass()
+  println it.name()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For iteration over all nodes in the xml tree (traversing recursively) you need to use <code>GPath</code> methods <code>breadthFirst</code> or <code>depthFirst</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-goovy" data-lang="goovy">root.breadthFirst().each { println it.name() }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_removing_attributes">Removing attributes</h3>
+<div class="paragraph">
+<p>Removing an attribute is then piece of cake. Of course it could be done in multiple ways.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">iiop.initializers.nodeIterator().each {
+  it.attributes().remove('transactions')
+}
+iiop.initializers*.attributes().each {it.remove('transactions')}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Obviously you can use  a <code>find</code> method to get single (first matching) result
+in this case it will be a type <code>NodeChild</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">assert 1 == iiop.initializers.find {it.'@transactions' == 'spec'}.size()</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_removing_nodes">Removing nodes</h3>
+<div class="paragraph">
+<p>What about removing a node? It&#8217;s done by one of method <code>replaceNode</code> (if the current node itself is involved) or <code>replaceBody</code> (if content of the current node is involved). Methods accept a closure as parameter. The closure represents a new structure of the node. When the closure is empty then the node is removed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">iiop.initializers.replaceNode {}
+iiop.replaceBody {}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_appending_nodes">Appending nodes</h3>
+<div class="paragraph">
+<p>The other method which works with closure as representation of a node structure is <code>appendNode</code>.</p>
+</div>
+<div class="paragraph">
+<p>Both methods works with the fact that call of the closure is
+<a href="http://groovy-lang.org/closures.html#_delegation_strategy">delegated</a>. Delegation references
+a special handling of unknown method calls which are part of the closure definition. Any unknown
+method call is then considered as definition of a new xml element and it&#8217;s method parameters
+as attributes. You can then define a closure which is in fact definition of xml structure.
+That one could be passed to a <code>appendNode</code> method.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">// -- node append
+iiop.appendNode {
+  'as-context' ('caller-propagation': 'supported')
+}
+
+// -- closure definition which is added as node later on
+// properties to add definition
+def myprops = ['goodone':'Frodo', 'evilone':'Saruman']
+def props = {
+  // unknown method 'properties' called with argument closure
+     which defines an child xml element
+  properties {
+    // any call of 'property' defines an xml element where
+       named arguments defines attributes
+    for(itemkey in myprops.keySet()) property('name': itemkey, 'value': myprops.get(itemkey))
+    // or add a new element named 'property-def' with attributes
+       being defined by map 'myprops'
+    'property-def'(myprops)
+  }
+}
+iiop.appendNode props</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There is one shortcut as operator <code>&lt;&lt;</code> (<code>leftShift</code>) is overloaded and could be used instead of
+method <code>appendNode</code>.</p>
+</div>
+<div class="paragraph">
+<p>There could be a different ways for adding a node to an element</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">// first getAt returns 'NodeChild', the second getAt returns 'Node'
+iiop.initializers.getAt(0).getAt(0).addChild({ good() })
+iiop.initializers.nodeIterator().next().addChild({ 'really-good'() })</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Groovy does not require using brackets to pass parameters to a method call. E.g.
+
+`iiop &lt;&lt; { 'as-context' ('caller-propagation': 'supported') }`
+
+has the same effect as
+
+`iiop &lt;&lt; { 'as-context' 'caller-propagation': 'supported' }`
+
+But when you want to pass a parameters as a map, then this
+
+`iiop &lt;&lt; { 'as-context' ['caller-propagation': 'supported'] }`
+
+doesn't work and you have to use parenthesis as this is a special case.</pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_additional_notes">Additional notes</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><code>iiop &lt;&lt; { test }</code> does nothing as expression <code>test</code> itself is not a method call</p>
+</li>
+<li>
+<p><code>iiop &lt;&lt; { test() }</code> produces <code>&lt;test/&gt;</code> as <code>test()</code> is a method call</p>
+</li>
+<li>
+<p><code>iiop &lt;&lt; { test(){} }</code> produces <code>&lt;test/&gt; as `test(){}</code> is a method call with a parameter of empty closure</p>
+</li>
+<li>
+<p><code>iiop &lt;&lt; { test{} }</code> produces <code>&lt;test/&gt;</code> as <code>test {}</code> is a method call with
+one parameter which is an empty closure (Groovy does not require parenthesis
+to separate method arguments definition <code>test {}</code> is the same as <code>test ({})</code>)</p>
+</li>
+<li>
+<p>one unnamed parameter defines a text which is added to the xml element
+<code>iiop &lt;&lt; { test ('mytext') }</code> generates <code>&lt;test&gt;mytext&lt;/test&gt;</code>.</p>
+</li>
+<li>
+<p>extending the previous point <code>iiop &lt;&lt; { test 'mytext' }</code> generates the same element with text <code>&lt;test&gt;mytext&lt;/test&gt;</code></p>
+</li>
+<li>
+<p>for multiple method parameters only the last one is considered
+<code>iiop &lt;&lt; { test('mytext', 'mytext2') }</code> produces <code>&lt;test&gt;mytext2&lt;/test&gt;</code></p>
+</li>
+<li>
+<p>as it depends on order the content of closure could be ignored as well
+<code>iiop &lt;&lt; { test({innerelement()}, 'mytext') }</code> produces element with text
+<code>&lt;test&gt;mytext&lt;/test&gt;</code>. I haven&#8217;t found a way how to add a text for element and
+a new child element at the same time.</p>
+</li>
+<li>
+<p>named parameters are not considered when element receives as argument a map.
+ Both definition generates the same <code>&lt;test mapid="mapvalue"/&gt;</code>:
+<code>def mymap = ['mapid': 'mapvalue']; iiop &lt;&lt; {test('param1': 'value1', mymap)}</code> versus
+<code>def mymap = ['mapid': 'mapvalue']; iiop &lt;&lt; {test(mymap, 'param1': 'value1')}</code></p>
+</li>
+<li>
+<p>when needed to add <em>a nothing</em> then use <code>null</code>
+<code>def isTest = false; iiop &lt;&lt; { isTest ? 'test'() : null }</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you want to check for existence of a node you are stick with checking size
+of the result set.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">assert iiop.'non-existing-element'.isEmpty()
+assert 0 == iiop.'non-existing-element'.size()
+assert 0 == iiop.initializers.'@non-existing-attribute'.size()
+assert 1 == iiop.initializers.'@transactions'.size()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For sure there is a chance to add <a href="http://mrhaki.blogspot.cz/2009/12/groovy-goodness-implementing-metaclass.html">a new method</a> to write shorter more comprehensible code.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">groovy.util.slurpersupport.GPathResult.metaClass.exists = {-&gt;
+    return delegate.size() &gt; 0
+}
+groovy.util.slurpersupport.GPathResult.metaClass.notExists = {-&gt;
+    return delegate.size() &lt;= 0
+}
+
+assert iiop.'non-existing-element'.notExists()
+assert iiop.initializers.exists()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On checking and appending nodes there is a one trap. At least in my eyes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">if(iiop.'as-context'.isEmpty()) iiop.appendNode {
+  'as-context' ('caller-propagation': 'supported')
+}
+assert iiop.'as-context'.isEmpty() // true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I haven&#8217;t found any good solution yet outside to count with this and not trying to write a code which do so.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creaper_offline_command_ofr_datasource_manipulation">Creaper offline command ofr datasource manipulation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>And <a href="https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/resources/org/wildfly/extras/creaper/commands/datasources/AddDataSource.groovy">this is a result of my effort to change WildFly datasource subsystem</a> with <a href="https://github.com/wildfly-extras/creaper#offline">Creaper offline command</a>.</p>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2017/10/02/Groovy-and-XML.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/10/02/Groovy-and-XML.html</guid><category><![CDATA[groovy]]></category><category><![CDATA[wildfly]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Mon, 02 Oct 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
