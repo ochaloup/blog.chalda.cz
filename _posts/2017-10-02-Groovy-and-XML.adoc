@@ -120,7 +120,7 @@ assert m == ['propname':'propvalue']
 
 When constructing the `GPathResult` definition you can use http://mrhaki.blogspot.cz/2009/08/groovy-goodness-string-strings-strings.html[GString expressions]
 
-```
+```groovy
 def t = 'transactions'
 assert 'spec' == iiop.initializers."@${t}".text()
 ```
