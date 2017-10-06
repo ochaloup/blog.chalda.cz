@@ -5,13 +5,16 @@
 :published_at: 2017-10-02
 :icons: font
 
-// image::articles/.png[]
+image::articles/groovy_straw.png[]
 
-There was a journey to find 
+Manipulating with XML in some easy way is part of my journey to get an easy way to change WildFly `standalone.xml`. Use of the Groovy and its tools came to me with tool https://github.com/wildfly-extras/creaper[Creaper] which I use in testsuites I work on. (Creaper came from hands of my collegue https://twitter.com/_Ladicek[Láďa Thon]). The Creaper tool let you make changes of the configuration either through https://docs.jboss.org/author/display/WFLY/Command+Line+Interface[CLI commands] or with use of Groovy XML modification.
+
+Here I would like to sum up so of my observation of using XML with Groovy. Mostly similar to nice article at http://www.vogella.com/tutorials/Groovy/article.html#examples_xml
+
+WARN: DISCLAIMER. I'm not fully sure with accuracy of all the terms used below. I recommend to check the net. And let me know about issues here.
 
 == XML manipulation and usage of XMLSlurper
 
-Check info at: http://www.vogella.com/tutorials/Groovy/article.html#examples_xml
 
 [NOTE]
 ====
