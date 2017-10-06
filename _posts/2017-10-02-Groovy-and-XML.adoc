@@ -36,9 +36,11 @@ The `XmlSlurper` allows to parse an XML document and returns an `GPathResult` ob
 
 As the Creaper https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/java/org/wildfly/extras/creaper/commands/foundation/offline/xml/GroovyXmlTransform.java#L123[uses XMLSlurper] I played more with it.
 
-To start work with the `XMLSlurper` I use http://groovy-lang.org/groovyconsole.html[groovyConsole].
+My point here is show some Groovy language picks that wasn't obvious for me as I'm quite a nebiew in.
 
-```
+To start work with the `XMLSlurper` I use http://groovy-lang.org/groovyconsole.html[groovyConsole] - just start it and copy&paste.
+
+```groovy
 import java.io.StringWriter
 import groovy.xml.XmlUtil
 
@@ -53,7 +55,7 @@ xml =
   </profile>
 </server>'''
 
-// print xml
+print xml
 
 def root = new XmlSlurper().parseText(xml)
 
@@ -67,12 +69,11 @@ Now the root contains the xml tree that could be navigated as `groovy.util.slurp
 attributes with `dot notation` (`.`).
 The root itself is type of `groovy.util.slurpersupport.NodeChildren`
 (http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/NodeChildren.html)
-which is defined as _lazy evaluated representation of child nodes._ and is a child
-of the `GPathResult` class itself.
+which is defined as _lazy evaluated representation of child nodes_ and it's a child of the `GPathResult` class itself.
 
 When using dot notation it's easy to work with existing xml emlements
 
-```
+```groovy
 // having a subtree variable for further use
 iiop = root.profile.subsystem
 // changing existing attribute
@@ -81,13 +82,16 @@ iiop.initializers.@security = 'who needs security?'
 iiop.initializers.'@my.attribute' = 'chalda'
 ```
 
-To document types that you work with. See
-http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attributes.html
-and http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attribute.html
+To check documentaiton on types you work with see
 
-```
-assert groovy.util.slurpersupport.Attributes ==  iiop.initializers.@security.getClass()
-assert groovy.util.slurpersupport.Attribute == iiop.initializers.@security.iterator().next().getClass()
+* http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attributes.html
+* http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attribute.html
+
+```groovy
+assert groovy.util.slurpersupport.Attributes ==
+  iiop.initializers.@security.getClass()
+assert groovy.util.slurpersupport.Attribute ==
+  iiop.initializers.@security.iterator().next().getClass()
 ```
 
 For saving value of attribute to some variable you can use method `text()`
