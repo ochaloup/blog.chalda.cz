@@ -13,24 +13,30 @@ Here I would like to sum up so of my observation of using XML with Groovy. Mostl
 
 WARN: DISCLAIMER. I'm not fully sure with accuracy of all the terms used below. I recommend to check the net. And let me know about issues here.
 
-== XML manipulation and usage of XMLSlurper
 
+== XML manipulation in Groovy in brief
 
-[NOTE]
-====
-prace s XML a `XmlParser` (snad je to znacene jako `GPath`)
-```
-def scopeNode = asNode().depthFirst().find { println it.name().getQualifiedName(); it.name().getQualifiedName() == 'scope' }
+There are two common http://groovy-lang.org/processing-xml.html[approaches in Groovy to work with xml].
+
+One is `XMLParser` (`GPath` expressions could be used, `GPath` is http://groovy-lang.org/processing-xml.html#_gpath[a path expression language]) and here is an example
+
+```groovy
+def scopeNode = asNode().depthFirst().find {
+  println it.name().getQualifiedName()
+  it.name().getQualifiedName() == 'scope'
+}
 scopeNode.setValue('compile')
 ```
-pozn. metoda `find` je metodou Groovy objektu `Object`
-====
 
-`XmlSlurper` allows to parse an XML document and returns an `GPathResult` object.
-You can use `GPath` expressions to access nodes in the XML tree.
+NOTE: the method `find` is method of the Groovy object `Object`.
 
-Basic program to start playing with `XMLSlurper` could be (I got used to copy&paste
-the code directly to `groovyConsole` to test)
+The `XmlSlurper` allows to parse an XML document and returns an `GPathResult` object. You can use `GPath` expressions.
+
+== XMLSlurper in more details
+
+As the Creaper https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/java/org/wildfly/extras/creaper/commands/foundation/offline/xml/GroovyXmlTransform.java#L123[uses XMLSlurper] I played more with it.
+
+To start work with the `XMLSlurper` I use http://groovy-lang.org/groovyconsole.html[groovyConsole].
 
 ```
 import java.io.StringWriter
