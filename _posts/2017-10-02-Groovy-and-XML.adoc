@@ -142,6 +142,7 @@ http://docs.groovy-lang.org/latest/html/documentation/index.html#Collections-Get
 To iterate over all nodes at the current level - here it means iterating over all `initializers` nodes.
 
 ```groovy
+
 // -> class groovy.util.slurpersupport.NodeChild
 iiop.initializers.iterator().each {
   println it.getClass()
@@ -169,6 +170,7 @@ println iiop.initializers*.getClass()
 Iterating over child nodes of the current level of nodes, use method `childNodes()` or `children()`.
 
 ```groovy
+
 // -> class groovy.util.slurpersupport.Node
 iiop.childNodes().each {
   println it.getClass()
