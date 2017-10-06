@@ -94,47 +94,66 @@ assert groovy.util.slurpersupport.Attribute ==
   iiop.initializers.@security.iterator().next().getClass()
 ```
 
-For saving value of attribute to some variable you can use method `text()`
+For saving a value of an attribute (attribute of a xml element) you can use method `text()`
 
-```
+```groovy
 assert 'identity' == iiop.initializers.@security.text()
 assert '' == iiop.initializers.@'non-existent'.text()
 
 def m = [:]
-println iiop.initializers*.attributes().collectMany {it.entrySet()}.each {m.put(it.key, it.value)}
+println iiop.initializers*.attributes()
+  .collectMany { it.entrySet() }
+  .each { m.put(it.key, it.value) }
 assert m == [security:'identity', transactions:'spec']
 
 m = [:]
-iiop.properties.property.iterator().each {list << it.@name; m << [(it.@name.text()): it.@value.text()] }
+iiop.properties.property.iterator().each {
+  list << it.@name
+  m << [(it.@name.text()): it.@value.text()]
+}
 assert m == ['propname':'propvalue']
 ```
 
-When constructing the `GPathResult` definition you can use `GString` expressions
+When constructing the `GPathResult` definition you can use http://mrhaki.blogspot.cz/2009/08/groovy-goodness-string-strings-strings.html[GString expressions]
 
 ```
 def t = 'transactions'
 assert 'spec' == iiop.initializers."@${t}".text()
 ```
 
-Having chance to remove an attribute there is need to touch actual `groovy.util.slurpersupport.Node`
-(http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/Node.html) or
+Having chance to remove an attribute there is need to touch actual `groovy.util.slurpersupport.Node` (http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/Node.html) or
 `groovy.util.slurpersupport.NodeChild` (http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/NodeChild.html).
-Getting a _node_ let you work with `name` or `attributes` as you need. To get a _node_ I got used
-to call one of methods which returns `Iterator`. They're method `iterator()` which provides
-`NodeChild` or method `nodeIterator()` which provides `Node`. For sure there are plenty other ways
-to get _nodes_ as for example method `findAll()` and others.
+
+When you get the _node_ you can start working with its `name` or `attributes` as you need.
+To get a _node_ I got used to call one of methods which returns `Iterator`. There is a method `iterator()` which provides `NodeChild` or there is a method `nodeIterator()` which provides `Node`. For sure there are plenty other ways to get _nodes_ as for example method `findAll()` and others.
+
 Another way is usage of
 http://docs.groovy-lang.org/latest/html/documentation/index.html#Collections-Gettingefficientwiththestar-dotoperator[`star-dot operator`]
 (a shortcut operator allowing you to call a method on all elements of a collection).
 
-To iterate over all nodes at the current level - here it means iterating over all
-`initializers` nodes.
+To iterate over all nodes at the current level - here it means iterating over all `initializers` nodes.
 
-```
-iiop.initializers.iterator().each {println it.getClass(); println it.name()} // -> class groovy.util.slurpersupport.NodeChild
-iiop.initializers.nodeIterator().each {println it.getClass(); println it.name()} // -> class groovy.util.slurpersupport.Node
-iiop.initializers.findAll({true}).each {println it.getClass(); println it.name()} // -> class groovy.util.slurpersupport.NodeChild
-println iiop.initializers*.getClass() // -> [class groovy.util.slurpersupport.NodeChild
+```groovy
+// -> class groovy.util.slurpersupport.NodeChild
+iiop.initializers.iterator().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -> class groovy.util.slurpersupport.Node
+iiop.initializers.nodeIterator().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -> class groovy.util.slurpersupport.NodeChild
+iiop.initializers.findAll({true}).each {
+  println it.getClass()
+  println it.name()
+} 
+
+// -> class groovy.util.slurpersupport.NodeChild
+println iiop.initializers*.getClass() 
 ```
 
 Iterating over child nodes of current level nodes use method `childNodes()` or `children()`.
