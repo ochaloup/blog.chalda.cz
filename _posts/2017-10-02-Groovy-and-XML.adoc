@@ -55,10 +55,12 @@ xml =
   </profile>
 </server>'''
 
+// to get the variable printed to see the content
 print xml
 
 def root = new XmlSlurper().parseText(xml)
 
+// get back the xml processed with XMLSlurper as a string
 def writer = new StringWriter()
 XmlUtil.serialize(root, writer);
 print writer.toString()
@@ -156,57 +158,69 @@ iiop.initializers.findAll({true}).each {
 println iiop.initializers*.getClass() 
 ```
 
-Iterating over child nodes of current level nodes use method `childNodes()` or `children()`.
+=== Node iteration
 
-```
-iiop.childNodes().each {println it.getClass(); println it.name()} // -> class groovy.util.slurpersupport.Node
-iiop.children().each {println it.getClass(); println it.name()} // -> class groovy.util.slurpersupport.NodeChild
+Iterating over child nodes of the current level of nodes, use method `childNodes()` or `children()`.
+
+```groovy
+// -> class groovy.util.slurpersupport.Node
+iiop.childNodes().each {
+  println it.getClass()
+  println it.name()
+} 
+
+// -> class groovy.util.slurpersupport.NodeChild
+iiop.children().each {
+  println it.getClass()
+  println it.name()
+} 
 ```
 
-For iteration over all nodes in the xml tree (traversing recursively) you need to use
-`GPath` methods `breadthFirst` or `depthFirst`.
+For iteration over all nodes in the xml tree (traversing recursively) you need to use `GPath` methods `breadthFirst` or `depthFirst`.
 
-```
+```goovy
 root.breadthFirst().each { println it.name() }
 ```
 
-Removing an attribute is then piece of cake. Of course it could be done multiple ways.
+=== Removing attributes
 
-```
-iiop.initializers.nodeIterator().each {it.attributes().remove('transactions')}
+Removing an attribute is then piece of cake. Of course it could be done in multiple ways.
+
+```groovy
+iiop.initializers.nodeIterator().each {
+  it.attributes().remove('transactions')
+}
 iiop.initializers*.attributes().each {it.remove('transactions')}
 ```
 
-When us
-
-Obviously you can use for example a `find` method to get single (first matching) result
+Obviously you can use  a `find` method to get single (first matching) result
 in this case it will be a type `NodeChild`.
 
-```
+```groovy
 assert 1 == iiop.initializers.find {it.'@transactions' == 'spec'}.size()
 ```
 
-Or if you need to test existence of an element
+=== Removing nodes
 
-What about removing a node? It's done by one of method `replaceNode` (if the current
-node itself is involved) or `replaceBody` (if content - all children - of the current
-node is involved). Methods accept a closure as parameter. The closure represents
-a new structure of the node. When the closure is empty then the node is removed.
+What about removing a node? It's done by one of method `replaceNode` (if the current node itself is involved) or `replaceBody` (if content of the current node is involved). Methods accept a closure as parameter. The closure represents a new structure of the node. When the closure is empty then the node is removed.
 
-```
+```groovy
 iiop.initializers.replaceNode {}
 iiop.replaceBody {}
 ```
 
-The other method which works with closure as representation of a node structure is
-`appendNode`. Both methods works with the fact that call of the closure is
+=== Appending nodes
+
+The other method which works with closure as representation of a node structure is `appendNode`.
+
+Both methods works with the fact that call of the closure is
 http://groovy-lang.org/closures.html#_delegation_strategy[delegated]. Delegation references
 a special handling of unknown method calls which are part of the closure definition. Any unknown
 method call is then considered as definition of a new xml element and it's method parameters
 as attributes. You can then define a closure which is in fact definition of xml structure.
 That one could be passed to a `appendNode` method.
 
-```
+```groovy
 // -- node append
 iiop.appendNode {
   'as-context' ('caller-propagation': 'supported')
@@ -216,50 +230,59 @@ iiop.appendNode {
 // properties to add definition
 def myprops = ['goodone':'Frodo', 'evilone':'Saruman']
 def props = {
-  // unknown method 'properties' called with argument closure which defines an child xml element
+  // unknown method 'properties' called with argument closure
+     which defines an child xml element
   properties {
-    // any call of 'property' defines an xml element where named arguments defines attributes
+    // any call of 'property' defines an xml element where
+       named arguments defines attributes
     for(itemkey in myprops.keySet()) property('name': itemkey, 'value': myprops.get(itemkey))
-    // or add a new element named 'property-def' with attributes being defined by map 'myprops'
+    // or add a new element named 'property-def' with attributes
+       being defined by map 'myprops'
     'property-def'(myprops)
   }
 }
 iiop.appendNode props
 ```
 
-There is one shortcut where operator `<<` (`leftShift`) is overloaded and could be used instead of
+There is one shortcut as operator `<<` (`leftShift`) is overloaded and could be used instead of
 method `appendNode`.
 
 There could be a different ways for adding a node to an element
 
-```
+```groovy
 // first getAt returns 'NodeChild', the second getAt returns 'Node'
 iiop.initializers.getAt(0).getAt(0).addChild({ good() })
 iiop.initializers.nodeIterator().next().addChild({ 'really-good'() })
 ```
 
-NOTE
+[NOTE]
 ----
-Groovy does not require parenthesis for attributes of a method call. E.g.
-`iiop << { 'as-context' ('caller-propagation': 'supported')` } has the same effect as
-`iiop << { 'as-context' 'caller-propagation': 'supported' }`.
-But `iiop << { 'as-context' ['caller-propagation': 'supported'] }` doesn't work
-and you have to use parenthesis as this is a special case.
+Groovy does not require using brackets to pass parameters to a method call. E.g.
+
+`iiop << { 'as-context' ('caller-propagation': 'supported') }`
+
+has the same effect as
+
+`iiop << { 'as-context' 'caller-propagation': 'supported' }`
+
+But when you want to pass a parameters as a map, then this
+
+`iiop << { 'as-context' ['caller-propagation': 'supported'] }`
+
+doesn't work and you have to use parenthesis as this is a special case.
 ----
 
-Few additional notes
+==== Additional notes
 
 * `iiop << { test }` does nothing as expression `test` itself is not a method call
 * `iiop << { test() }` produces `<test/>` as `test()` is a method call
-* `iiop << { test(){} }` produces `<test/> as `test(){}` is a method call with
-  a parameter of empty closure
-* `iiop << { test{} }` produces `<test/>` as `test {}` is a method call with one
-  parameter which is an empty closure (Groovy does not require parenthesis to separate
-  method arguments definition `test {}` is the same as `test ({})`)
+* `iiop << { test(){} }` produces `<test/> as `test(){}` is a method call with a parameter of empty closure
+* `iiop << { test{} }` produces `<test/>` as `test {}` is a method call with 
+one parameter which is an empty closure (Groovy does not require parenthesis 
+to separate method arguments definition `test {}` is the same as `test ({})`)
 * one unnamed parameter defines a text which is added to the xml element
   `iiop << { test ('mytext') }` generates `<test>mytext</test>`.
-* extending the previous point `iiop << { test 'mytext' }` generates the same element
-  with text `<test>mytext</test>`
+* extending the previous point `iiop << { test 'mytext' }` generates the same element with text `<test>mytext</test>`
 * for multiple method parameters only the last one is considered
   `iiop << { test('mytext', 'mytext2') }` produces `<test>mytext2</test>`
 * as it depends on order the content of closure could be ignored as well
@@ -276,17 +299,16 @@ Few additional notes
 If you want to check for existence of a node you are stick with checking size
 of the result set.
 
-```
+```groovy
 assert iiop.'non-existing-element'.isEmpty()
 assert 0 == iiop.'non-existing-element'.size()
 assert 0 == iiop.initializers.'@non-existing-attribute'.size()
 assert 1 == iiop.initializers.'@transactions'.size()
 ```
 
-For sure there is a chance to add a new method for this being comprehensible
-what we want to test.
+For sure there is a chance to add http://mrhaki.blogspot.cz/2009/12/groovy-goodness-implementing-metaclass.html[a new method] to write shorter more comprehensible code.
 
-```
+```groovy
 groovy.util.slurpersupport.GPathResult.metaClass.exists = {->
     return delegate.size() > 0
 }
@@ -300,13 +322,16 @@ assert iiop.initializers.exists()
 
 On checking and appending nodes there is a one trap. At least in my eyes.
 
-```
+```groovy
 if(iiop.'as-context'.isEmpty()) iiop.appendNode {
   'as-context' ('caller-propagation': 'supported')
 }
 assert iiop.'as-context'.isEmpty() // true
 ```
 
-I haven't found any good solution yet outside to count with this and not trying
-to write a code which do so.
+I haven't found any good solution yet outside to count with this and not trying to write a code which do so.
+
+== Creaper offline command ofr datasource manipulation
+
+And https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/resources/org/wildfly/extras/creaper/commands/datasources/AddDataSource.groovy[this is a result of my effort to change WildFly datasource subsystem] with https://github.com/wildfly-extras/creaper#offline[Creaper offline command].
 
