@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 06 Oct 2017 07:51:28 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Groovy and XML]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 06 Oct 2017 07:59:30 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Groovy and XML]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -6,7 +6,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>Manipulating with XML in some easy way is part of my journey to get an easy way to change WildFly <code>standalone.xml</code>. Use of the Groovy and its tools came to me with tool <a href="https://github.com/wildfly-extras/creaper">Creaper</a> which I use in testsuites I work on. (Creaper came from hands of my collegue <a href="https://twitter.com/_Ladicek">Láďa Thon</a>). The Creaper tool let you make changes of the configuration either through <a href="https://docs.jboss.org/author/display/WFLY/Command+Line+Interface">CLI commands</a> or with use of Groovy XML modification.</p>
+<p>Manipulating with XML in some easy way is part of my journey to get an easy way to change WildFly <code>standalone.xml</code>. Use of the Groovy and its tools came to me with tool <a href="https://github.com/wildfly-extras/creaper">Creaper</a> which I use in testsuites I work on. (Creaper came from hands of my collegue <a href="https://twitter.com/_Ladicek">Láďa Thon</a>). The Creaper tool let you make changes of the configuration either through <a href="https://docs.jboss.org/author/display/WFLY/Command+Line+Interface">CLI commands</a> or with use of <a href="https://github.com/wildfly-extras/creaper#use">Groovy XML modification</a>.</p>
 </div>
 <div class="paragraph">
 <p>Here I would like to sum up so of my observation of using XML with Groovy. Mostly similar to nice article at <a href="http://www.vogella.com/tutorials/Groovy/article.html#examples_xml" class="bare">http://www.vogella.com/tutorials/Groovy/article.html#examples_xml</a></p>
@@ -132,6 +132,8 @@ assert groovy.util.slurpersupport.Attribute ==
   iiop.initializers.@security.iterator().next().getClass()</code></pre>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_chaning_attributes">Chaning attributes</h3>
 <div class="paragraph">
 <p>For saving a value of an attribute (attribute of a xml element) you can use method <code>text()</code></p>
 </div>
@@ -163,6 +165,9 @@ assert m == ['propname':'propvalue']</code></pre>
 assert 'spec' == iiop.initializers."@${t}".text()</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_removing_attributes">Removing attributes</h3>
 <div class="paragraph">
 <p>Having chance to remove an attribute there is need to touch actual <code>groovy.util.slurpersupport.Node</code> (<a href="http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/Node.html" class="bare">http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/Node.html</a>) or
 <code>groovy.util.slurpersupport.NodeChild</code> (<a href="http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/NodeChild.html" class="bare">http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/NodeChild.html</a>).</p>
@@ -176,6 +181,9 @@ To get a <em>node</em> I got used to call one of methods which returns <code>Ite
 <a href="http://docs.groovy-lang.org/latest/html/documentation/index.html#Collections-Gettingefficientwiththestar-dotoperator"><code>star-dot operator</code></a>
 (a shortcut operator allowing you to call a method on all elements of a collection).</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_node_iteration">Node iteration</h3>
 <div class="paragraph">
 <p>To iterate over all nodes at the current level - here it means iterating over all <code>initializers</code> nodes.</p>
 </div>
@@ -203,8 +211,9 @@ iiop.initializers.findAll({true}).each {
 println iiop.initializers*.getClass()</code></pre>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_node_iteration">Node iteration</h3>
+<h3 id="_child_nodes_iteration">Child nodes iteration</h3>
 <div class="paragraph">
 <p>Iterating over child nodes of the current level of nodes, use method <code>childNodes()</code> or <code>children()</code>.</p>
 </div>
@@ -233,7 +242,7 @@ iiop.children().each {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_removing_attributes">Removing attributes</h3>
+<h3 id="_more_on_removing_attributes">More on removing attributes</h3>
 <div class="paragraph">
 <p>Removing an attribute is then piece of cake. Of course it could be done in multiple ways.</p>
 </div>
@@ -319,22 +328,37 @@ iiop.initializers.getAt(0).getAt(0).addChild({ good() })
 iiop.initializers.nodeIterator().next().addChild({ 'really-good'() })</code></pre>
 </div>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre>Groovy does not require using brackets to pass parameters to a method call. E.g.
-
-`iiop &lt;&lt; { 'as-context' ('caller-propagation': 'supported') }`
-
-has the same effect as
-
-`iiop &lt;&lt; { 'as-context' 'caller-propagation': 'supported' }`
-
-But when you want to pass a parameters as a map, then this
-
-`iiop &lt;&lt; { 'as-context' ['caller-propagation': 'supported'] }`
-
-doesn't work and you have to use parenthesis as this is a special case.</pre>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Groovy does not require using brackets to pass parameters to a method call. E.g.</p>
 </div>
+<div class="paragraph">
+<p><code>iiop &lt;&lt; { 'as-context' ('caller-propagation': 'supported') }</code></p>
+</div>
+<div class="paragraph">
+<p>has the same effect as</p>
+</div>
+<div class="paragraph">
+<p><code>iiop &lt;&lt; { 'as-context' 'caller-propagation': 'supported' }</code></p>
+</div>
+<div class="paragraph">
+<p>But when you want to pass a parameters as a map, then this</p>
+</div>
+<div class="paragraph">
+<p><code>iiop &lt;&lt; { 'as-context' ['caller-propagation': 'supported'] }</code></p>
+</div>
+<div class="paragraph">
+<p>doesn&#8217;t work and you have to use parenthesis as this is a special case.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_additional_notes">Additional notes</h4>
@@ -430,10 +454,10 @@ assert iiop.'as-context'.isEmpty() // true</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_creaper_offline_command_ofr_datasource_manipulation">Creaper offline command ofr datasource manipulation</h2>
+<h2 id="_creaper_offline_command_for_datasource_manipulation">Creaper offline command for datasource manipulation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>And <a href="https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/resources/org/wildfly/extras/creaper/commands/datasources/AddDataSource.groovy">this is a result of my effort to change WildFly datasource subsystem</a> with <a href="https://github.com/wildfly-extras/creaper#offline">Creaper offline command</a>.</p>
+<p>And this is (<a href="https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/resources/org/wildfly/extras/creaper/commands/datasources/AddDataSource.groovy" class="bare">https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/resources/org/wildfly/extras/creaper/commands/datasources/AddDataSource.groovy</a>) this is a result of my effort to change WildFly datasource subsystem with <a href="https://github.com/wildfly-extras/creaper#offline">Creaper offline command</a>.</p>
 </div>
 </div>
 </div>]]></description><link>http://blog.chalda.cz/2017/10/02/Groovy-and-XML.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/10/02/Groovy-and-XML.html</guid><category><![CDATA[groovy]]></category><category><![CDATA[wildfly]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Mon, 02 Oct 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Listing WFLY domain with Groovy]]></title><description><![CDATA[<div id="preamble">
