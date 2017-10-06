@@ -263,7 +263,7 @@ iiop.initializers.nodeIterator().next().addChild({ 'really-good'() })
 
 [NOTE]
 ====
-Groovy does not require using brackets to pass parameters to a method call. E.g.
+Groovy does not require using brackets to pass parameters to a method call - e.g.
 
 `iiop << { 'as-context' ('caller-propagation': 'supported') }`
 
