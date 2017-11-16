@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 16 Nov 2017 14:44:46 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Set up HAProxy for HTTP header balancing]]></title><description><![CDATA[<div class="imageblock">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 16 Nov 2017 14:50:31 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Set up HAProxy for HTTP header balancing]]></title><description><![CDATA[<div class="imageblock">
 <div class="content">
-<img src="http://blog.chalda.cz/images/articles/groovy_straw.png" alt="groovy straw.png">
+<img src="http://blog.chalda.cz/images/articles/haproxy_logo.png" alt="haproxy logo.png">
 </div>
 </div>
 <div class="paragraph">
@@ -1813,6 +1813,12 @@ There is another article talking about this topic
 <h3 id="_2017">2017</h3>
 <div class="ulist">
 <ul>
+<li>
+<p>[2017-11-16] <a href="http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-for-HTTP-header-balancing.html" class="bare">http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-for-HTTP-header-balancing.html</a></p>
+</li>
+<li>
+<p>[2017-10-01] <a href="https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift" class="bare">https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift</a></p>
+</li>
 <li>
 <p>[2017-09-30] <a href="http://blog.chalda.cz/2017/09/30/Augeas-and-XML.html" class="bare">http://blog.chalda.cz/2017/09/30/Augeas-and-XML.html</a></p>
 </li>
