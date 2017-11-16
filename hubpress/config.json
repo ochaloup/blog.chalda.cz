@@ -12,9 +12,22 @@
     "logo": "/images/helmet.jpg",
     "cover": "/images/cover.jpg",
     "googleAnalytics": "UA-91848308-1",
-    "disqus": "blog-chalda-cz"
+    "disqus": "blog-chalda-cz",
+    "delay": "2000",
+    "postsPerPage": ""
   },
-  "socialnetwork": {},
+  "socialnetwork": {
+    "email": "",
+    "github": "github.com/ochaloup/",
+    "twitter": "https://twitter.com/_chalda",
+    "facebook": "",
+    "googleplus": "",
+    "instagram": "",
+    "pinterest": "",
+    "flickr": "",
+    "linkedin": "",
+    "stackoverflow": ""
+  },
   "theme": {
     "name": "ghostium"
   },
