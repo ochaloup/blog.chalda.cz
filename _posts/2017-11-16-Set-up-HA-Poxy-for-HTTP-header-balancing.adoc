@@ -5,7 +5,7 @@
 :published_at: 2017-11-16
 :icons: font
 
-image::articles/groovy_straw.png[]
+image::articles/haproxy_logo.png[]
 
 I started to experiment with https://www.haproxy.org/[HAProxy] where these are few notes on how to start with.
 
