@@ -83,6 +83,41 @@ curl -i -X GET localhost:8000/servlet-test/host?foo=one
 curl -i -X GET localhost:8000/servlet-test/host?foo=thousands
 ```
 
+The algorithm for hashing the `foo` value could be changed to spread the load as expected http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance .
+
+As the last resort let's balance by HTTP header. Create a new cfg file (I just copied it from the `test-url-hash.cfg`, it's not tuned in any way)
+
+```
+global
+	maxconn 100
+	log		127.0.0.1 local0
+
+listen  vip1
+	log		global
+	option		httplog
+    bind		:8000
+    mode		http
+    maxconn		100
+    timeout	client  5000
+	timeout	connect 5000
+	timeout	server  5000
+	balance		hdr(long-running-action)
+	server		srv1 127.0.0.1:8080
+	server		srv2 127.0.0.1:8180
+
+	# control activity this way
+	stats		uri /stat
+```
+
+And now run the `curl` and check what instance serves the requests.
+
+```bash
+./haproxy -- tests/test-httpheader-hash.cfg
+
+curl -i -X GET -H 'long-running-action: 1' localhost:8000/servlet-test/host
+curl -i -X GET -H 'long-running-action: 2' localhost:8000/servlet-test/host
+```
+
 
 
 
