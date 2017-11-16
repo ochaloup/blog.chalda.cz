@@ -20,7 +20,7 @@
   },
   "urls": {
     "site": "http://blog.chalda.cz",
-    "hubpress": "https://blog.chalda.cz",
+    "hubpress": "http://blog.chalda.cz",
     "theme": "//blog.chalda.cz/themes/ghostium",
     "images": "http://blog.chalda.cz/images"
   },
