@@ -1,0 +1,27 @@
+= Set up HAProxy for HTTP header balancing
+:hp-tags: load.balance, haproxy, admin
+:toc: macro
+:release: 1.0
+:published_at: 2017-11-16
+:icons: font
+
+image::articles/groovy_straw.png[]
+
+I started to experiment with https://www.haproxy.org/[HAProxy] where these are few notes on how to start with.
+
+I wanted to have HAProxy as a standalone program and not installed into my Linux machine with package system. Thus
+
+* download HAProxy from https://www.haproxy.org, I used downloading _bz2_ archive from column _Latest version_.
+* `tar xfz haproxy-*.tar.gz`
+* `cd haproxy-*/`
+* `make TARGET=generic`
+
+At this time the HAProxy is built and could be run. For the start it's `./haproxy -- config-file.cfg`. (start with ones situated at folder `tests`).
+
+For experimenting I downloaded WildFly 11 (http://wildfly.org/downloads), started in two instances and deployed a simple servlet showing simple message of what instance handled the request.
+
+```
+curl http://download.jboss.org/wildfly/11.0.0.Final/wildfly-11.0.0.Final.zip -o wfly.zip
+unzip wfly.zip -d w1
+unzip wfly.zip -d w2
+```
