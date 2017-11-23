@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Set up HAProxy to balance by HTTP header balancing</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Set up HAProxy to balance by HTTP header balancing">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Set up HAProxy to balance by HTTP header balancing">
+    <meta property="og:description" content="">
+
+    <!-- <meta name="twitter:site" content="">
+
+<meta name="twitter:creator" content="">
+
+<meta name="google-site-verification" content="">
+
+<meta property="fb:admins" content="">
+ -->
+
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link href="//fonts.googleapis.com/" rel="dns-prefetch">
+    <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
+
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1511453919844"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1511453919844"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1511453919844"/>
+
+
+
+
+    <script type="text/javascript">
+      var ga_ua = 'UA-XXXXX-X';
+      
+      var disqus_shortname = 'example';
+      
+      var enable_pjax = true;
+
+      // Pace Options
+      // ==============
+      window.paceOptions = {
+        catchupTime: 100,
+        minTime: 100,
+        elements: false,
+        restartOnRequestAfter: 500,
+        startOnPageLoad: false
+      }
+
+      // Ghostium Globals
+      // ==============
+      window.GHOSTIUM = {};
+      GHOSTIUM.haveGA = typeof ga_ua !== 'undefined' && ga_ua !== 'UA-XXXXX-X';
+      GHOSTIUM.haveDisqus = typeof disqus_shortname !== 'undefined' && disqus_shortname !== 'example';
+      GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
+    </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1511453919844"></script>
+
+    <link rel="canonical" href="http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html" />
+    <meta name="referrer" content="origin" />
+    
+    <meta property="og:site_name" content="Chalda&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Set up HAProxy to balance by HTTP header balancing" />
+    <meta property="og:description" content="I started to experiment with HAProxy where these are few notes on how to start with. I wanted to have HAProxy as a standalone program and not installed into my Linux machine with package system. Thus download HAProxy from https://www.haproxy.org, I used downloading bz2 archive from column" />
+    <meta property="og:url" content="http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html" />
+    <meta property="article:published_time" content="2017-11-16T00:00:00.000Z" />
+    <meta property="article:tag" content="load.balance" />
+    <meta property="article:tag" content="haproxy" />
+    <meta property="article:tag" content="admin" />
+    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Set up HAProxy to balance by HTTP header balancing" />
+    <meta name="twitter:description" content="I started to experiment with HAProxy where these are few notes on how to start with. I wanted to have HAProxy as a standalone program and not installed into my Linux machine with package system. Thus download HAProxy from https://www.haproxy.org, I used downloading bz2 archive from column" />
+    <meta name="twitter:url" content="http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "publisher": "Chalda's blog",
+    "author": {
+        "@type": "Person",
+        "name": "chalda",
+        "image": "https://avatars2.githubusercontent.com/u/1104559?v=4",
+        "url": "http://blog.chalda.cz/author/ochaloup/"
+    },
+    "headline": "Set up HAProxy to balance by HTTP header balancing",
+    "url": "http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html",
+    "datePublished": "2017-11-16T00:00:00.000Z",
+    "keywords": "load.balance, haproxy, admin",
+    "description": "I started to experiment with HAProxy where these are few notes on how to start with. I wanted to have HAProxy as a standalone program and not installed into my Linux machine with package system. Thus download HAProxy from https://www.haproxy.org, I used downloading bz2 archive from column"
+}
+    </script>
+
+    <meta name="generator" content="HubPress" />
+    <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog" href="http://blog.chalda.cz/rss/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/atom-one-dark.min.css">
+    
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </head>
+  <body class="post-template tag-loadbalance tag-haproxy tag-admin">
+
+    <button data-action="open-drawer" id="drawer-button" class="drawer-button"><i class="fa fa-bars"></i></button>
+    <nav tabindex="-1" class="drawer">
+      <div class="drawer-container">
+        <!--.drawer-search(role="search")-->
+        <ul role="navigation" class="drawer-list">
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" data-pjax>
+              <i class="fa fa-home"></i>Home
+            </a>
+          </li>
+          <!-- <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" title="Chalda&#x27;s blog" data-pjax>
+              <i class="fa fa-list-alt"></i>All posts
+            </a>
+          </li> -->
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/rss/">
+              <i class="fa fa-rss"></i>Subscribe to Feed
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-divider"></li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/01/01/About-the-blog.html" data-pjax>
+              <i class="fa fa-rocket"></i>About the blog
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Blog-posts-history.html" data-pjax>
+              <i class="fa fa-bolt"></i>Blog history
+            </a>
+          </li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Links.html" data-pjax>
+              <i class="fa fa-navicon"></i>Links
+            </a>
+          </li>
+          
+          <!--
+          <li class="drawer-list-divider"></li>
+          <li class="drawer-list-item drawer-list-title">
+            Follow me
+          </li> -->
+          
+          
+          <li class="drawer-list-item">
+            <a href="https://twitter.com/_chalda" title="Twitter" target="_blank">
+              <i class="fa fa-twitter"></i>Twitter
+            </a>
+          </li>
+          <li class="drawer-list-item">
+            <a href="github.com/ochaloup/" title="Github" target="_blank">
+              <i class="fa fa-github"></i>Github
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="drawer-overlay"></div>
+    <main id="container" role="main" class="container">
+      <div class="surface">
+        <div class="surface-container">
+          <div data-pjax-container class="content">
+            
+<section class="wrapper wrapper-post">
+  <div class="wrapper-container">
+    <article itemscope itemtype="http://schema.org/BlogPosting" role="article" class="post post tag-loadbalance tag-haproxy tag-admin">
+        <section class="post-container">
+          <header class="post-header">
+            <ul class="post-meta-list">
+              <li class="post-meta-item">
+                <time datetime="2017-11-16" itemprop="datePublished">
+                  8 days ago
+                </time>
+              </li>
+                <li class="post-meta-item">
+                  <span class="tags"><i class="fa fa-tags"></i>
+                      <span>
+                      <a href="http://blog.chalda.cz/tag/loadbalance/">load.balance</a>, <a href="http://blog.chalda.cz/tag/haproxy/">haproxy</a>, <a href="http://blog.chalda.cz/tag/admin/">admin</a></span>
+                  </span>
+                </li>
+              <li class="post-meta-item">
+                <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
+              </li>
+            </ul>
+            <h1 itemprop="name headline" class="post-title"><a href="http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html" itemprop="url" data-pjax title="Set up HAProxy to balance by HTTP header balancing">Set up HAProxy to balance by HTTP header balancing</a></h1>
+            <!--h2 itemprop="about" class="post-subtitle"></h2-->
+          </header>
+          <aside class="post-side">
+            <div class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <a href="http://blog.chalda.cz" class="post-author-name">
+                  chalda
+                </a>
+                <p class="post-author-bio"></p>
+              </div>
+            </div>
+          </aside>
+          <div itemprop="articleBody" class="post-body">
+            <div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/haproxy_logo.png" alt="haproxy logo.png">
+</div>
+</div>
+<div class="paragraph">
+<p>I started to experiment with <a href="https://www.haproxy.org/">HAProxy</a> where these are few notes on how to start with.</p>
+</div>
+<div class="paragraph">
+<p>I wanted to have HAProxy as a standalone program and not installed into my Linux machine with package system. Thus</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>download HAProxy from <a href="https://www.haproxy.org" class="bare">https://www.haproxy.org</a>, I used downloading <em>bz2</em> archive from column <em>Latest version</em>.</p>
+</li>
+<li>
+<p><code>tar xfz haproxy-*.tar.gz</code></p>
+</li>
+<li>
+<p><code>cd haproxy-*/</code></p>
+</li>
+<li>
+<p><code>make TARGET=generic</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>At this time the HAProxy is built and could be run. For the start it&#8217;s <code>./haproxy&#8201;&#8212;&#8201;config-file.cfg</code>. (start with ones situated at folder <code>tests</code>).</p>
+</div>
+<div class="paragraph">
+<p>For experimenting I downloaded WildFly 11 (<a href="http://wildfly.org/downloads" class="bare">http://wildfly.org/downloads</a>), started in two instances and deployed a simple servlet showing simple message of what instance handled the request.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl http://download.jboss.org/wildfly/11.0.0.Final/wildfly-11.0.0.Final.zip -o wfly.zip
+unzip wfly.zip &amp;&amp; mv wildfly-11.0.0.Final w1
+unzip wfly.zip &amp;&amp; mv wildfly-11.0.0.Final w2
+
+# running in two different consoles
+cd w1 &amp;&amp; ./bin/standalone.sh -Did=w1
+cd w2 &amp;&amp; ./bin/standalone.sh -Did=w2 -Djboss.socket.binding.port-offset=100
+
+# in the third console
+git clone https://github.com/ochaloup/servlet-test.git
+cd servlet-test &amp;&amp; mvn package
+cp target/servlet-test.war ${HOME}/w1/standalone/deployments/
+cp target/servlet-test.war ${HOME}/w2/standalone/deployments/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we have two instances of WildFly application servers running at <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> and <code><a href="http://localhost:8180" class="bare">http://localhost:8180</a></code>. You can check if the servlet deployed sucessfully</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -i -X GET http://localhost:8080/servlet-test/host</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should get response containing header and text</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>X-processed-by: w1
+...
+url: http://localhost:8080/servlet-test/host at localhost:8080, 10.0.0.7, &lt;hostname&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s run the haproxy and check roundrobin loadbalancing. Go to the HAProxy installation directory and open <code>tests/test-connection.cfg</code>. Add to the <code>server</code> directive one more with port <code>8181</code>. You will have something similar to.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>listen httpclose
+	option	httpclose
+	bind	:8001
+	server	srv 127.0.0.1:8080
+	server	srv2 127.0.0.1:8180
+	reqadd	X-request:\ mode=httpclose
+	rspadd	X-response:\ mode=httpclose</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s start the HAProxy and check with <code>curl</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>./haproxy -- tests/test-connection.cfg</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and check with <code>curl</code>. Run several times and check how the header <code>X-processed-by</code> is changing plus you can see WildFly console log in the particular console window.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>curl -i -X GET  http://localhost:8001/servlet-test/host</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now let&#8217;s balance by url parameter. You need to redefine file <code>tests/test-url-hash.cfg</code> to contain the localhost and both ports where WildFly is running. Then you can run <code>curl</code> and alter the foo parameter and see what is the WildFly instance handling the requests.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./haproxy -- tests/test-url-hash.cfg
+
+curl -i -X GET localhost:8000/servlet-test/host?foo=one
+curl -i -X GET localhost:8000/servlet-test/host?foo=thousands</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The algorithm for hashing the <code>foo</code> value could be changed to spread the load as expected <a href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance" class="bare">http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance</a> .</p>
+</div>
+<div class="paragraph">
+<p>As the last resort let&#8217;s balance by HTTP header. Create a new cfg file (I just copied it from the <code>test-url-hash.cfg</code>, it&#8217;s not tuned in any way)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>global
+	maxconn 100
+	log		127.0.0.1 local0
+
+listen  vip1
+	log		global
+	option		httplog
+    bind		:8000
+    mode		http
+    maxconn		100
+    timeout	client  5000
+	timeout	connect 5000
+	timeout	server  5000
+	balance		hdr(long-running-action)
+	server		srv1 127.0.0.1:8080
+	server		srv2 127.0.0.1:8180
+
+	# control activity this way
+	stats		uri /stat</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And now run the <code>curl</code> and check what instance serves the requests.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./haproxy -- tests/test-httpheader-hash.cfg
+
+curl -i -X GET -H 'long-running-action: 1' localhost:8000/servlet-test/host
+curl -i -X GET -H 'long-running-action: 2' localhost:8000/servlet-test/host</code></pre>
+</div>
+</div>
+          </div>
+          <footer class="post-footer">
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person" class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img itemprop="image" src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <h4 class="post-footer-heading">Written By</h4>
+                <a href="http://blog.chalda.cz" itemprop="url" class="post-author-name">
+                  <span itemprop="name">chalda</span>
+                </a>
+                <p itemprop="description" class="post-author-bio"></p>
+                <p class="post-info">
+                  <b class="post-info-title">Published on</b>
+                  <time class="post-date">November 16, 2017</time>
+                </p>
+              </div>
+            </div>
+            <div class="post-social">
+              <h4 class="post-footer-heading">Spread the word</h4>
+              <a href="#" data-action="share-twitter"><i class="fa fa-fw fa-lg fa-twitter"></i></a>
+              <a href="#" data-action="share-facebook"><i class="fa fa-fw fa-lg fa-facebook"></i></a>
+              <a href="#" data-action="share-gplus"><i class="fa fa-fw fa-lg fa-google-plus"></i></a>
+            </div>
+          </footer>
+        </section>
+      <section itemprop="comment" class="post-comments">
+        <div id="disqus_thread"></div>
+      </section>
+    </article>
+
+    <footer role="contentinfo" class="footer">
+      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2017. All Rights Reserved.</small></p>
+      <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
+      <p><small>Adapted by <a href="https://twitter.com/mgreau">Maxime Gréau</a></small></p>
+      <p><small>Published with <a href="http://hubpress.io">HubPress</a></small></p>
+    </footer>
+  </div>
+</section>
+
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+  var disqus_shortname = 'blog-chalda-cz'; // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js?v="></script> 
+      <script type="text/javascript">
+        jQuery( document ).ready(function() {
+          // change date with ago
+          jQuery('ago.ago').each(function(){
+            var element = jQuery(this).parent();
+            element.html( moment(element.text()).fromNow());
+          });
+        });
+
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1511453919844"></script>
+
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-91848308-1', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+
+  </body>
+</html>
