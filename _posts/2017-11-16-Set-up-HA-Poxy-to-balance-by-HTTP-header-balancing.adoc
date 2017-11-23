@@ -1,4 +1,4 @@
-= Set up HAProxy for HTTP header balancing
+= Set up HAProxy to balance by HTTP header balancing
 :hp-tags: load.balance, haproxy, admin
 :toc: macro
 :release: 1.0
