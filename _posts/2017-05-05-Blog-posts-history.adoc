@@ -5,6 +5,9 @@
 
 === 2017
 
+* [2017-11-23] http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html
+* [2017-11-16] http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-for-HTTP-header-balancing.html
+* [2017-10-01] https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift
 * [2017-09-30] http://blog.chalda.cz/2017/09/30/Augeas-and-XML.html
 * [2017-08-25] https://developer.jboss.org/wiki/Three-phaseCommitProtocol
 * [2017-06-14] http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html
