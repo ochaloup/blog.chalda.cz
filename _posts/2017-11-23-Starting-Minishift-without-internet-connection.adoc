@@ -22,26 +22,24 @@ If you create an OpenShift route in Minishift it uses the `nip.io` for translati
 oc get routes
 ```
 
-gets
+gets the output similar to this
 
 |===
-| ...
+5+| ...
 
 | NAME
 | HOST/PORT
-| PATH
 | SERVICES
 | PORT
-| TERMINATION
 | WILDCARD
 
 | hola
 | hola-helloworld-msa-lra.app.192.168.99.100.nip.io
-|
 | hola
 | 8080-tcp
 | None
 
+5+| ...
 |===
 
 This causes a trouble if you run the Minishift when you are not online. There is a chance to start your local DNS server and let make the translation on your machine. I was trying the https://github.com/basecamp/xip-pdns but probably as I'm not a good Linux administrator it does not succeed.
@@ -64,6 +62,12 @@ address=/192.168.99.100.nip.io/192.168.99.100
 systemctl start dnsmasq
 ```
 
+From now the dnsmasq should be returning the DNS requests on `192.168.99.100.nip.io` to `192.168.99.100` which is the address where Minishift was started on (see the `oc get routes` commands, output in the table above)
+
+=== More to investigate
+
+* If network is first up and then put down the DNS resolution inside of the Minishift seems retries to connect to outside network and it takes time until `dnsmasq` is used. An one request could take 10 seconds.
+* Usage of `--public-hostname` and `--routing-suffix` could help in configuration but somehow does not work for me.
 
 
 
