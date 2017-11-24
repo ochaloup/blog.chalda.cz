@@ -19,4 +19,67 @@ host 127.0.0.7.nip.io
 If you create an OpenShift route in Minishift it uses the `nip.io` for translation.
 
 ```bash
+oc get routes
 ```
+
+gets
+
+|===
+| ...
+
+| NAME
+| HOST/PORT
+| PATH
+| SERVICES
+| PORT
+| TERMINATION
+| WILDCARD
+
+| hola
+| hola-helloworld-msa-lra.app.192.168.99.100.nip.io
+|
+| hola
+| 8080-tcp
+| None
+
+|===
+
+This causes a trouble if you run the Minishift when you are not online. There is a chance to start your local DNS server and let make the translation on your machine. I was trying the https://github.com/basecamp/xip-pdns but probably as I'm not a good Linux administrator it does not succeed.
+
+Then I found about existence http://www.thekelleys.org.uk/dnsmasq/doc.html[dnsmasq service] which works for me. On my Fedora 26
+
+```bash
+# install the service
+dnf install dnsmasq
+
+# -- Adding configuration for the translation to the end of the config file
+vim /etc/dnsmasq.conf
+#
+# Reverse DNS record for master
+host-record=master.192.168.99.100.nip.io,192.168.1.100
+# Wildcard DNS for OpenShift Applications - Points to Router
+address=/192.168.99.100.nip.io/192.168.99.100
+
+# Start the service
+systemctl start dnsmasq
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
