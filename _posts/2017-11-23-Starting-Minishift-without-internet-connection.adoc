@@ -1,0 +1,22 @@
+= Starting Minishift without internet connection
+:hp-tags: openshift, minishift
+:toc: macro
+:release: 1.0
+:published_at: 2017-11-23
+:icons: font
+
+image::articles/open_shift.png[]
+
+The https://github.com/minishift/minishift[Minishift] is an tool which provides an easy way to run https://www.openshift.org[OpenShift] locally on developer's machine. Minishift uses an hypervisor to start a virtual machine where the whole OpenShift environment is set up. Thus you can start, stop and delete the whole environment in seconds.
+
+For the easy resolution of Minishift addresses there is used DNS http://nip.io (http://xip.io times before) which translate the DNS query to address mentioned befor the `nip.io` suffix.
+
+```bash
+host 127.0.0.7.nip.io
+127.0.0.7.nip.io has address 127.0.0.7
+```
+
+If you create an OpenShift route in Minishift it uses the `nip.io` for translation.
+
+```bash
+```
