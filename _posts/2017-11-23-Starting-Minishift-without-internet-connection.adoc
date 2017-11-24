@@ -67,7 +67,7 @@ From now the dnsmasq should be returning the DNS requests on `192.168.99.100.nip
 === More to investigate
 
 * If network is first up and then put down the DNS resolution inside of the Minishift seems retries to connect to outside network and it takes time until `dnsmasq` is used. An one request could take 10 seconds.
-* Usage of `--public-hostname` and `--routing-suffix` could help in configuration but somehow does not work for me.
+* https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md[Usage of] `--public-hostname` and `--routing-suffix` could help in configuration but somehow does not work for me.
 
 
 
