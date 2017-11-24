@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 24 Nov 2017 09:46:44 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Starting Minishift without internet connection]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 24 Nov 2017 09:52:35 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Starting Minishift without internet connection]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -97,7 +97,7 @@ systemctl start dnsmasq</code></pre>
 <p>If network is first up and then put down the DNS resolution inside of the Minishift seems retries to connect to outside network and it takes time until <code>dnsmasq</code> is used. An one request could take 10 seconds.</p>
 </li>
 <li>
-<p>Usage of <code>--public-hostname</code> and <code>--routing-suffix</code> could help in configuration but somehow does not work for me.</p>
+<p><a href="https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md">Usage of</a> <code>--public-hostname</code> and <code>--routing-suffix</code> could help in configuration but somehow does not work for me.</p>
 </li>
 </ul>
 </div>
