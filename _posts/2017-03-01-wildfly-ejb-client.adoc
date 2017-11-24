@@ -1,9 +1,0 @@
-= WildFly EJB client
-:hp-tags: jboss, wildfly, ejb, client
-:toc: macro
-:release: 1.0
-:published_at: 2017-03-01
-:icons: font
-
-Notes to check:
-https://blog.akquinet.de/2014/09/26/jboss-eap-wildfly-three-ways-to-invoke-remote-ejbs/
