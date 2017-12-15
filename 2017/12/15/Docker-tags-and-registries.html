@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Docker tags and registries</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Docker tags and registries">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Docker tags and registries">
+    <meta property="og:description" content="">
+
+    <!-- <meta name="twitter:site" content="">
+
+<meta name="twitter:creator" content="">
+
+<meta name="google-site-verification" content="">
+
+<meta property="fb:admins" content="">
+ -->
+
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link href="//fonts.googleapis.com/" rel="dns-prefetch">
+    <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
+
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1513343113817"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1513343113817"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1513343113817"/>
+
+
+
+
+    <script type="text/javascript">
+      var ga_ua = 'UA-XXXXX-X';
+      
+      var disqus_shortname = 'example';
+      
+      var enable_pjax = true;
+
+      // Pace Options
+      // ==============
+      window.paceOptions = {
+        catchupTime: 100,
+        minTime: 100,
+        elements: false,
+        restartOnRequestAfter: 500,
+        startOnPageLoad: false
+      }
+
+      // Ghostium Globals
+      // ==============
+      window.GHOSTIUM = {};
+      GHOSTIUM.haveGA = typeof ga_ua !== 'undefined' && ga_ua !== 'UA-XXXXX-X';
+      GHOSTIUM.haveDisqus = typeof disqus_shortname !== 'undefined' && disqus_shortname !== 'example';
+      GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
+    </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1513343113817"></script>
+
+    <link rel="canonical" href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
+    <meta name="referrer" content="origin" />
+    
+    <meta property="og:site_name" content="Chalda&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Docker tags and registries" />
+    <meta property="og:description" content="I&amp;#8217;m still quite new in world of Docker and I struggle a bit with the basic concepts. Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it when using with OpenShift/Minishift. If you build a Docker file (docker" />
+    <meta property="og:url" content="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
+    <meta property="article:published_time" content="2017-12-15T00:00:00.000Z" />
+    <meta property="article:tag" content="docker" />
+    <meta property="article:tag" content="minishift" />
+    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Docker tags and registries" />
+    <meta name="twitter:description" content="I&amp;#8217;m still quite new in world of Docker and I struggle a bit with the basic concepts. Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it when using with OpenShift/Minishift. If you build a Docker file (docker" />
+    <meta name="twitter:url" content="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "publisher": "Chalda's blog",
+    "author": {
+        "@type": "Person",
+        "name": "chalda",
+        "image": "https://avatars2.githubusercontent.com/u/1104559?v=4",
+        "url": "http://blog.chalda.cz/author/ochaloup/"
+    },
+    "headline": "Docker tags and registries",
+    "url": "http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html",
+    "datePublished": "2017-12-15T00:00:00.000Z",
+    "keywords": "docker, minishift",
+    "description": "I&amp;#8217;m still quite new in world of Docker and I struggle a bit with the basic concepts. Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it when using with OpenShift/Minishift. If you build a Docker file (docker"
+}
+    </script>
+
+    <meta name="generator" content="HubPress" />
+    <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog" href="http://blog.chalda.cz/rss/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/atom-one-dark.min.css">
+    
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </head>
+  <body class="post-template tag-docker tag-minishift">
+
+    <button data-action="open-drawer" id="drawer-button" class="drawer-button"><i class="fa fa-bars"></i></button>
+    <nav tabindex="-1" class="drawer">
+      <div class="drawer-container">
+        <!--.drawer-search(role="search")-->
+        <ul role="navigation" class="drawer-list">
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" data-pjax>
+              <i class="fa fa-home"></i>Home
+            </a>
+          </li>
+          <!-- <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" title="Chalda&#x27;s blog" data-pjax>
+              <i class="fa fa-list-alt"></i>All posts
+            </a>
+          </li> -->
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/rss/">
+              <i class="fa fa-rss"></i>Subscribe to Feed
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-divider"></li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/01/01/About-the-blog.html" data-pjax>
+              <i class="fa fa-rocket"></i>About the blog
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Blog-posts-history.html" data-pjax>
+              <i class="fa fa-bolt"></i>Blog history
+            </a>
+          </li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Links.html" data-pjax>
+              <i class="fa fa-navicon"></i>Links
+            </a>
+          </li>
+          
+          <!--
+          <li class="drawer-list-divider"></li>
+          <li class="drawer-list-item drawer-list-title">
+            Follow me
+          </li> -->
+          
+          
+          <li class="drawer-list-item">
+            <a href="https://twitter.com/_chalda" title="Twitter" target="_blank">
+              <i class="fa fa-twitter"></i>Twitter
+            </a>
+          </li>
+          <li class="drawer-list-item">
+            <a href="github.com/ochaloup/" title="Github" target="_blank">
+              <i class="fa fa-github"></i>Github
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="drawer-overlay"></div>
+    <main id="container" role="main" class="container">
+      <div class="surface">
+        <div class="surface-container">
+          <div data-pjax-container class="content">
+            
+<section class="wrapper wrapper-post">
+  <div class="wrapper-container">
+    <article itemscope itemtype="http://schema.org/BlogPosting" role="article" class="post post tag-docker tag-minishift">
+        <section class="post-container">
+          <header class="post-header">
+            <ul class="post-meta-list">
+              <li class="post-meta-item">
+                <time datetime="2017-12-15" itemprop="datePublished">
+                  14 hours ago
+                </time>
+              </li>
+                <li class="post-meta-item">
+                  <span class="tags"><i class="fa fa-tags"></i>
+                      <span>
+                      <a href="http://blog.chalda.cz/tag/docker/">docker</a>, <a href="http://blog.chalda.cz/tag/minishift/">minishift</a></span>
+                  </span>
+                </li>
+              <li class="post-meta-item">
+                <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
+              </li>
+            </ul>
+            <h1 itemprop="name headline" class="post-title"><a href="/" itemprop="url" data-pjax title="Docker tags and registries">Docker tags and registries</a></h1>
+            <!--h2 itemprop="about" class="post-subtitle"></h2-->
+          </header>
+          <aside class="post-side">
+            <div class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <a href="http://blog.chalda.cz" class="post-author-name">
+                  chalda
+                </a>
+                <p class="post-author-bio"></p>
+              </div>
+            </div>
+          </aside>
+          <div itemprop="articleBody" class="post-body">
+            <div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/docker-tag.png" alt="docker tag.png">
+</div>
+</div>
+<div class="paragraph">
+<p>I&#8217;m still quite new in world of <a href="http://docker.io">Docker</a> and I struggle a bit with the basic concepts.
+Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it
+when using with <a href="https://github.com/minishift/minishift">OpenShift/Minishift</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you build a Docker file (<code>docker build .</code>) you get a docker image. That&#8217;s some hash that you can
+start (<code>docker run &lt;image_hash&gt;</code>). But remembering and differentiating hash as reference to an existing "app"
+is just hard. That&#8217;s where you can name (<em>tag</em>) the image: <code>docker tag &lt;image_hash&gt; &lt;tag_name&gt;</code>. When you do so
+you can run the image just with the name <code>docker tag &lt;tag_name&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p>For the purpose of this post I will be working with Narayana LRA</p>
+</div>
+<div class="paragraph">
+<p>There is an convention about tag name in docker which is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>${REGISTRY}/${PROJECT}/${IMAGE_NAME}:{IMAGE_VERSION}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There is no defined that tag has to be in this format but when you manipulating with the image
+(<code>docker pull</code>/<code>docker push</code>) the Docker understands this format.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s look at the format starting from right. We have here a <em>IMAGE_VERSION</em>. That&#8217;s an arbitrary
+string, depending on you what is the meaning of it. You can tag an image as
+<code>docker tag &lt;hash&gt; &lt;tag_name&gt;:1.0</code> and later with new version of your app as <code>docker tag &lt;hash&gt; &lt;tag_name&gt;:1.1</code>.
+But nobody checks or guarantees that the tag version <code>1.1</code> is somehow newer than the <code>1.0</code>.
+There is an convention about tag version <code>latest</code>. That&#8217;s represent a default version
+which is used from repository when you don&#8217;t define a version manually. I like this article
+<a href="http://container-solutions.com/docker-latest-confusion">Docker: The latest Confusion</a>
+which explains that <code>latest</code> is not related to <em>time</em> but the meaning is rather <em>default</em>.</p>
+</div>
+<div class="paragraph">
+<p>The <em>IMAGE_NAME</em> is just name of your app for you being able to differentiate and refer to it
+in the set of your applications.</p>
+</div>
+<div class="paragraph">
+<p>The <em>PROJECT</em> and <em>REGISTRY</em> is used to know where this image belongs to or where it comes from.
+If you push or pull an image to the Docker registry you define where it is by this section of the tag definition.
+There is no <code>docker</code> command line option <code>--registry=&lt;REGISTRY&gt;</code>. The information where to push
+is just taken from the tag.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_docker_build_example">Docker build example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s say I have here a <code>Dockerfile</code> with env variables definition for Centos PostgreSQL image.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-dockerfile" data-lang="dockerfile">FROM centos/postgresql-96-centos7
+
+ENV POSTGRESQL_DATABASE crashrec
+ENV POSTGRESQL_USER crashrec
+ENV POSTGRESQL_PASSWORD crashrec
+ENV POSTGRESQL_MAX_PREPARED_TRANSACTIONS 50</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Running of <code>docker build .</code>, at the directory where the <code>Dockerfile</code> resides, provides output</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>Sending build context to Docker daemon 11.78 kB
+Step 1/15 : FROM centos/postgresql-96-centos7
+ ---&gt; 75740e572487
+Step 2/15 : ENV POSTGRESQL_DATABASE crashrec
+ ---&gt; Using cache
+ ---&gt; 3caf03ae8e7d
+    ...
+ ---&gt; Using cache
+ ---&gt; 4188383000de
+
+ Successfully built 4188383000de</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I can take the image hash <code>4188383000de</code> and tag it with name. <code>docker tag 4188383000de postgresql-9.6-centos</code>.
+By running <code>docker images</code> I can verify the assignment of the hash to the tag.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker images
+REPOSITORY               TAG       IMAGE ID        CREATED          SIZE
+postgresql-9.6-centos    latest    4188383000de    9 minutes ago    337 MB
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>First listing uses terms <em>REPOSITORY</em> and <em>TAG</em> in way of I used here <em>name</em> and <em>version</em>.
+So just be care of it.</p>
+</div>
+<div class="paragraph">
+<p>I haven&#8217;t defined any version but the image name was assigned with the <em>default</em> <code>latest</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pushing_image">Pushing image</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The next step is to marked the image with repository name and thus being able to push it there.
+My account at <a href="http://dockerhub.com/">Docker hub</a> is <a href="https://hub.docker.com/r/ochaloup/" class="bare">https://hub.docker.com/r/ochaloup/</a>. Thus my
+regitry name to be used for being able to push there is <code>ochaloup</code>.</p>
+</div>
+<div class="paragraph">
+<p>By tagging the image with <code>docker.io</code> as registry, the <code>docker push</code> can publish the image there.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker tag postgresql-9.6-centos docker.io/ochaloup/postgresql-9.6-centos
+docker push docker.io/ochaloup/postgresql-9.6-centos</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+maybe login to the docker.io will be needed first: <code>docker login docker.io -u ochaloup</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pulling_image">Pulling image</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If we want to run some image we can just run it</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can say what is the repository we want the image from explicitly</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using the <code>docker.io</code> is not necessary because docker searches through all predefined registries if there is such
+image. And the Docker hub is the default one where to search for the image.</p>
+</div>
+<div class="paragraph">
+<p>You can see that I haven&#8217;t used any <code>version</code> parameter thus the <em>default</em> latest version was used.</p>
+</div>
+<div class="paragraph">
+<p>Of course we can say some specific version to be run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If we don&#8217;t want to directly run the image but you want it to be downloaded to the local machine,
+you can use <code>docker pull</code> command. The following output says the image was already downloaded
+as the same the <code>docker run</code> command first downloads locally and then run. Thus the image is already present on my laptop.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker pull centos/postgresql-96-centos7
+
+Using default tag: latest
+Trying to pull repository brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/centos/postgresql-96-centos7 ...
+Pulling repository brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/centos/postgresql-96-centos7
+Trying to pull repository docker.io/centos/postgresql-96-centos7 ...
+sha256:88c5f8ffb934cc63f7eb819e3328c0380887c206fa6280c553a0a6385fa59e63: Pulling from docker.io/centos/postgresql-96-centos7
+...
+Status: Image is up to date for docker.io/centos/postgresql-96-centos7:latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I can name it as <code>p</code> like <code>docker tag docker.io/centos/postgresql-96-centos7 p</code> and
+run it <code>docker run p &#8230;&#8203;</code>, still starting the same image.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_docker_insecure_registries">Docker insecure registries</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The list of repositories which are check about image existence (if registry hostname is not provided)
+are hardcoded (somewhere) in docker and can&#8217;t be changed by some parameters.</p>
+</div>
+<div class="paragraph">
+<p>If you pull image from some private (different) registry it has to be using <code>https</code>.
+If communication goes over <code>http</code> then <code>docker pull</code> fails. In such case you need to permit
+docker to use such registry for pulling by adding such registry to list of insecure ones.</p>
+</div>
+<div class="paragraph">
+<p>On my Fedora 26 I need to edit file <code>/etc/sysconfig/docker</code> and add such registry to
+the list of <code>OPTIONS</code>. For example for the usage of Minishift private registry the <code>OPTIONS</code>
+parametr looked</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>OPTIONS='--selinux-enabled --log-driver=journald --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now <code>restart</code> docker and you can push and pull from the non-https docker registry.</p>
+</div>
+<div class="paragraph">
+<p>In case of Red Hat clone of the docker client you can use settings described in article
+<a href="https://access.redhat.com/articles/1354823" class="bare">https://access.redhat.com/articles/1354823</a></p>
+</div>
+<div class="paragraph">
+<p>In short you can use <code>ADD_REGISTRY</code> and <code>INSECURE_REGISTRY</code> variables in <code>/etc/sysconfig/docker</code>.
+(<em>ADD_REGISTRY</em> are registries search for the image when not defined explicitly by user)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>echo "ADD_REGISTRY='--add-registry docker-registry-default.192.168.99.100.nip.io:443'" &gt;&gt; /etc/sysconfig/docker
+echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.100.nip.io:443'" &gt;&gt; /etc/sysconfig/docker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For the other OSes, you need to change probably the <code>/etc/docker/daemon.json</code> with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "registry-mirrors": ["docker-registry-default.192.168.99.100.nip.io:443"],
+  "insecure-registries" :["docker-registry-default.192.168.99.100.nip.io:443"]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+          </div>
+          <footer class="post-footer">
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person" class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img itemprop="image" src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <h4 class="post-footer-heading">Written By</h4>
+                <a href="http://blog.chalda.cz" itemprop="url" class="post-author-name">
+                  <span itemprop="name">chalda</span>
+                </a>
+                <p itemprop="description" class="post-author-bio"></p>
+                <p class="post-info">
+                  <b class="post-info-title">Published on</b>
+                  <time class="post-date">December 15, 2017</time>
+                </p>
+              </div>
+            </div>
+            <div class="post-social">
+              <h4 class="post-footer-heading">Spread the word</h4>
+              <a href="#" data-action="share-twitter"><i class="fa fa-fw fa-lg fa-twitter"></i></a>
+              <a href="#" data-action="share-facebook"><i class="fa fa-fw fa-lg fa-facebook"></i></a>
+              <a href="#" data-action="share-gplus"><i class="fa fa-fw fa-lg fa-google-plus"></i></a>
+            </div>
+          </footer>
+        </section>
+      <section itemprop="comment" class="post-comments">
+        <div id="disqus_thread"></div>
+      </section>
+    </article>
+
+    <footer role="contentinfo" class="footer">
+      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2017. All Rights Reserved.</small></p>
+      <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
+      <p><small>Adapted by <a href="https://twitter.com/mgreau">Maxime Gréau</a></small></p>
+      <p><small>Published with <a href="http://hubpress.io">HubPress</a></small></p>
+    </footer>
+  </div>
+</section>
+
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+  var disqus_shortname = 'blog-chalda-cz'; // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js?v="></script> 
+      <script type="text/javascript">
+        jQuery( document ).ready(function() {
+          // change date with ago
+          jQuery('ago.ago').each(function(){
+            var element = jQuery(this).parent();
+            element.html( moment(element.text()).fromNow());
+          });
+        });
+
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1513343113817"></script>
+
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-91848308-1', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+
+  </body>
+</html>

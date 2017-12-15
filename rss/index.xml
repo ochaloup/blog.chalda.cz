@@ -1,4 +1,254 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 24 Nov 2017 09:52:35 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Starting Minishift without internet connection]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 15 Dec 2017 13:05:13 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Docker tags and registries]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/docker-tag.png" alt="docker tag.png">
+</div>
+</div>
+<div class="paragraph">
+<p>I&#8217;m still quite new in world of <a href="http://docker.io">Docker</a> and I struggle a bit with the basic concepts.
+Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it
+when using with <a href="https://github.com/minishift/minishift">OpenShift/Minishift</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you build a Docker file (<code>docker build .</code>) you get a docker image. That&#8217;s some hash that you can
+start (<code>docker run &lt;image_hash&gt;</code>). But remembering and differentiating hash as reference to an existing "app"
+is just hard. That&#8217;s where you can name (<em>tag</em>) the image: <code>docker tag &lt;image_hash&gt; &lt;tag_name&gt;</code>. When you do so
+you can run the image just with the name <code>docker tag &lt;tag_name&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p>For the purpose of this post I will be working with Narayana LRA</p>
+</div>
+<div class="paragraph">
+<p>There is an convention about tag name in docker which is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>${REGISTRY}/${PROJECT}/${IMAGE_NAME}:{IMAGE_VERSION}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There is no defined that tag has to be in this format but when you manipulating with the image
+(<code>docker pull</code>/<code>docker push</code>) the Docker understands this format.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s look at the format starting from right. We have here a <em>IMAGE_VERSION</em>. That&#8217;s an arbitrary
+string, depending on you what is the meaning of it. You can tag an image as
+<code>docker tag &lt;hash&gt; &lt;tag_name&gt;:1.0</code> and later with new version of your app as <code>docker tag &lt;hash&gt; &lt;tag_name&gt;:1.1</code>.
+But nobody checks or guarantees that the tag version <code>1.1</code> is somehow newer than the <code>1.0</code>.
+There is an convention about tag version <code>latest</code>. That&#8217;s represent a default version
+which is used from repository when you don&#8217;t define a version manually. I like this article
+<a href="http://container-solutions.com/docker-latest-confusion">Docker: The latest Confusion</a>
+which explains that <code>latest</code> is not related to <em>time</em> but the meaning is rather <em>default</em>.</p>
+</div>
+<div class="paragraph">
+<p>The <em>IMAGE_NAME</em> is just name of your app for you being able to differentiate and refer to it
+in the set of your applications.</p>
+</div>
+<div class="paragraph">
+<p>The <em>PROJECT</em> and <em>REGISTRY</em> is used to know where this image belongs to or where it comes from.
+If you push or pull an image to the Docker registry you define where it is by this section of the tag definition.
+There is no <code>docker</code> command line option <code>--registry=&lt;REGISTRY&gt;</code>. The information where to push
+is just taken from the tag.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_docker_build_example">Docker build example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s say I have here a <code>Dockerfile</code> with env variables definition for Centos PostgreSQL image.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-dockerfile" data-lang="dockerfile">FROM centos/postgresql-96-centos7
+
+ENV POSTGRESQL_DATABASE crashrec
+ENV POSTGRESQL_USER crashrec
+ENV POSTGRESQL_PASSWORD crashrec
+ENV POSTGRESQL_MAX_PREPARED_TRANSACTIONS 50</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Running of <code>docker build .</code>, at the directory where the <code>Dockerfile</code> resides, provides output</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>Sending build context to Docker daemon 11.78 kB
+Step 1/15 : FROM centos/postgresql-96-centos7
+ ---&gt; 75740e572487
+Step 2/15 : ENV POSTGRESQL_DATABASE crashrec
+ ---&gt; Using cache
+ ---&gt; 3caf03ae8e7d
+    ...
+ ---&gt; Using cache
+ ---&gt; 4188383000de
+
+ Successfully built 4188383000de</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I can take the image hash <code>4188383000de</code> and tag it with name. <code>docker tag 4188383000de postgresql-9.6-centos</code>.
+By running <code>docker images</code> I can verify the assignment of the hash to the tag.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker images
+REPOSITORY               TAG       IMAGE ID        CREATED          SIZE
+postgresql-9.6-centos    latest    4188383000de    9 minutes ago    337 MB
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>First listing uses terms <em>REPOSITORY</em> and <em>TAG</em> in way of I used here <em>name</em> and <em>version</em>.
+So just be care of it.</p>
+</div>
+<div class="paragraph">
+<p>I haven&#8217;t defined any version but the image name was assigned with the <em>default</em> <code>latest</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pushing_image">Pushing image</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The next step is to marked the image with repository name and thus being able to push it there.
+My account at <a href="http://dockerhub.com/">Docker hub</a> is <a href="https://hub.docker.com/r/ochaloup/" class="bare">https://hub.docker.com/r/ochaloup/</a>. Thus my
+regitry name to be used for being able to push there is <code>ochaloup</code>.</p>
+</div>
+<div class="paragraph">
+<p>By tagging the image with <code>docker.io</code> as registry, the <code>docker push</code> can publish the image there.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker tag postgresql-9.6-centos docker.io/ochaloup/postgresql-9.6-centos
+docker push docker.io/ochaloup/postgresql-9.6-centos</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+maybe login to the docker.io will be needed first: <code>docker login docker.io -u ochaloup</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pulling_image">Pulling image</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If we want to run some image we can just run it</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can say what is the repository we want the image from explicitly</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using the <code>docker.io</code> is not necessary because docker searches through all predefined registries if there is such
+image. And the Docker hub is the default one where to search for the image.</p>
+</div>
+<div class="paragraph">
+<p>You can see that I haven&#8217;t used any <code>version</code> parameter thus the <em>default</em> latest version was used.</p>
+</div>
+<div class="paragraph">
+<p>Of course we can say some specific version to be run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If we don&#8217;t want to directly run the image but you want it to be downloaded to the local machine,
+you can use <code>docker pull</code> command. The following output says the image was already downloaded
+as the same the <code>docker run</code> command first downloads locally and then run. Thus the image is already present on my laptop.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker pull centos/postgresql-96-centos7
+
+Using default tag: latest
+Trying to pull repository brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/centos/postgresql-96-centos7 ...
+Pulling repository brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/centos/postgresql-96-centos7
+Trying to pull repository docker.io/centos/postgresql-96-centos7 ...
+sha256:88c5f8ffb934cc63f7eb819e3328c0380887c206fa6280c553a0a6385fa59e63: Pulling from docker.io/centos/postgresql-96-centos7
+...
+Status: Image is up to date for docker.io/centos/postgresql-96-centos7:latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I can name it as <code>p</code> like <code>docker tag docker.io/centos/postgresql-96-centos7 p</code> and
+run it <code>docker run p &#8230;&#8203;</code>, still starting the same image.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_docker_insecure_registries">Docker insecure registries</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The list of repositories which are check about image existence (if registry hostname is not provided)
+are hardcoded (somewhere) in docker and can&#8217;t be changed by some parameters.</p>
+</div>
+<div class="paragraph">
+<p>If you pull image from some private (different) registry it has to be using <code>https</code>.
+If communication goes over <code>http</code> then <code>docker pull</code> fails. In such case you need to permit
+docker to use such registry for pulling by adding such registry to list of insecure ones.</p>
+</div>
+<div class="paragraph">
+<p>On my Fedora 26 I need to edit file <code>/etc/sysconfig/docker</code> and add such registry to
+the list of <code>OPTIONS</code>. For example for the usage of Minishift private registry the <code>OPTIONS</code>
+parametr looked</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>OPTIONS='--selinux-enabled --log-driver=journald --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now <code>restart</code> docker and you can push and pull from the non-https docker registry.</p>
+</div>
+<div class="paragraph">
+<p>In case of Red Hat clone of the docker client you can use settings described in article
+<a href="https://access.redhat.com/articles/1354823" class="bare">https://access.redhat.com/articles/1354823</a></p>
+</div>
+<div class="paragraph">
+<p>In short you can use <code>ADD_REGISTRY</code> and <code>INSECURE_REGISTRY</code> variables in <code>/etc/sysconfig/docker</code>.
+(<em>ADD_REGISTRY</em> are registries search for the image when not defined explicitly by user)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>echo "ADD_REGISTRY='--add-registry docker-registry-default.192.168.99.100.nip.io:443'" &gt;&gt; /etc/sysconfig/docker
+echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.100.nip.io:443'" &gt;&gt; /etc/sysconfig/docker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For the other OSes, you need to change probably the <code>/etc/docker/daemon.json</code> with</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "registry-mirrors": ["docker-registry-default.192.168.99.100.nip.io:443"],
+  "insecure-registries" :["docker-registry-default.192.168.99.100.nip.io:443"]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html</guid><category><![CDATA[docker]]></category><category><![CDATA[minishift]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 15 Dec 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Starting Minishift without internet connection]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
