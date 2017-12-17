@@ -18,28 +18,25 @@ you can start the container then with `docker run <tag_name>`.
 There is an convention about tag name in docker which is:
 
 ```
-${REGISTRY}/${PROJECT}/${IMAGE_NAME}:{IMAGE_VERSION}
+{REGISTRY}/{PROJECT}/{IMAGE_NAME}:{IMAGE_VERSION}
 ```
 
-There is no defined that tag has to be in this format but when you manipulating with the image
-(`docker pull`/`docker push`) the Docker understands this format.
+The format is not compulsory but the docker client understands the convention and it's what the commands `docker pull`/`docker push` work with.
 
-Let's look at the format starting from right. We have here a _IMAGE_VERSION_. That's an arbitrary
-string, depending on you what is the meaning of it. You can tag an image as
+Let's investiage a bit on it. From right to left - we have a _IMAGE_VERSION_ here. It's an arbitrary
+string and is up to you how that looks like. You can tag an image as
 `docker tag <hash> <tag_name>:1.0` and later with new version of your app as `docker tag <hash> <tag_name>:1.1`.
 But nobody checks or guarantees that the tag version `1.1` is somehow newer than the `1.0`.
-There is an convention about tag version `latest`. That's represent a default version
-which is used from repository when you don't define a version manually. I like this article
+There is a convention of version `latest`. That represents a *default version*
+which is used when you don't define a version manually. I like this article
 http://container-solutions.com/docker-latest-confusion[Docker: The latest Confusion]
 which explains that `latest` is not related to _time_ but the meaning is rather _default_.
 
-The _IMAGE_NAME_ is just name of your app for you being able to differentiate and refer to it
-in the set of your applications.
+The _IMAGE_NAME_ is name of your app for you being able to differentiate and refer to it.
 
 The _PROJECT_ and _REGISTRY_ is used to know where this image belongs to or where it comes from.
 If you push or pull an image to the Docker registry you define where it is by this section of the tag definition.
-There is no `docker` command line option `--registry=<REGISTRY>`. The information where to push
-is just taken from the tag.
+There is no `docker` command line option _--registry=<REGISTRY>_. The information where to push to is taken from the tag.
 
 == Docker build example
 
@@ -80,18 +77,19 @@ postgresql-9.6-centos    latest    4188383000de    9 minutes ago    337 MB
 ...
 ```
 
-First listing uses terms _REPOSITORY_ and _TAG_ in way of I used here _name_ and _version_.
-So just be care of it.
-
-I haven't defined any version but the image name was assigned with the _default_ `latest`.
+* The  listing uses terms _REPOSITORY_ and _TAG_ in way of I used here _name_ and _version_.
+* I haven't defined any version but the image name was assigned with the _default_ `latest`.
+* As there is not defined a registry (only name a.k.a  `${PROJECT}/${IMAGE_NAME}`) the image is search in the predefined registres (see _ADD_REGISTRY_ below). If found then it's downloaded. But you can download the image manually with `docker pull` and then as such named image already resides in the local cache it will be taken from there.
 
 == Pushing image
 
-The next step is to marked the image with repository name and thus being able to push it there.
+The next step could be to mark the image with repository name and thus being able to push it there.
 My account at http://dockerhub.com/[Docker hub] is https://hub.docker.com/r/ochaloup/. Thus my
 regitry name to be used for being able to push there is `ochaloup`.
 
-By tagging the image with `docker.io` as registry, the `docker push` can publish the image there.
+The tag then defines registry `docker.io` for `docker push` can publish the image there.
+
+The whole name is then `docker.io/ochaloup/postgresql-9.6-centos`.
 
 ```bash
 docker tag postgresql-9.6-centos docker.io/ochaloup/postgresql-9.6-centos
@@ -121,16 +119,16 @@ image. And the Docker hub is the default one where to search for the image.
 
 You can see that I haven't used any `version` parameter thus the _default_ latest version was used.
 
-Of course we can say some specific version to be run
+Of course we could want https://hub.docker.com/r/centos/postgresql-94-centos7/tags/[some specific version] to be run
 
 ```
 docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
 --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6
 ```
 
-If we don't want to directly run the image but you want it to be downloaded to the local machine,
+If we don't want to directly run the image but you want it to be downloaded to the local machine (to the https://thenewstack.io/understanding-the-docker-cache-for-faster-builds/[docker cache]),
 you can use `docker pull` command. The following output says the image was already downloaded
-as the same the `docker run` command first downloads locally and then run. Thus the image is already present on my laptop.
+as the `docker run` command was already run and it downloads first and then run the image.
 
 ```
 docker pull centos/postgresql-96-centos7
@@ -144,27 +142,28 @@ sha256:88c5f8ffb934cc63f7eb819e3328c0380887c206fa6280c553a0a6385fa59e63: Pulling
 Status: Image is up to date for docker.io/centos/postgresql-96-centos7:latest
 ```
 
-I can name it as `p` like `docker tag docker.io/centos/postgresql-96-centos7 p` and
-run it `docker run p ...`, still starting the same image.
+I can name it as e.g. `pgsl` like `docker tag docker.io/centos/postgresql-96-centos7 pgsl` and
+run it `docker run pgsl ...` and I'm still starting the same image.
 
 == Docker insecure registries
 
-The list of repositories which are check about image existence (if registry hostname is not provided)
-are hardcoded (somewhere) in docker and can't be changed by some parameters.
+The list of repositories which are check for existence of the image (if not defined explicitly)
+are hardcoded in docker config and can't be changed by a parameters.
 
-If you pull image from some private (different) registry it has to be using `https`.
-If communication goes over `http` then `docker pull` fails. In such case you need to permit
-docker to use such registry for pulling by adding such registry to list of insecure ones.
+If you want to pull image with the respository defined explicitly the repository needs to be running over `https`. If communication goes over `http` then `docker pull` fails.
+
+In such case you need to add permition for docker to allow it to pull from that particular insecure registry.
 
 On my Fedora 26 I need to edit file `/etc/sysconfig/docker` and add such registry to
-the list of `OPTIONS`. For example for the usage of Minishift private registry the `OPTIONS`
-parametr looked
+the list of `OPTIONS`. For example for the usage of Minishift private registry the `OPTIONS` parametr looks
 
 ```
 OPTIONS='--selinux-enabled --log-driver=journald --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'
 ```
 
-Now `restart` docker and you can push and pull from the non-https docker registry.
+You will need to `restart` docker after the change and you can pull from the non-https registry now.
+
+=== Insecure registries set up
 
 In case of Red Hat clone of the docker client you can use settings described in article
 https://access.redhat.com/articles/1354823
