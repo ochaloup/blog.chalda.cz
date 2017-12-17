@@ -7,16 +7,13 @@
 
 image::articles/docker-tag.png[]
 
-I'm still quite new in world of http://docker.io[Docker] and I struggle a bit with the basic concepts.
-Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it
-when using with https://github.com/minishift/minishift[OpenShift/Minishift].
+As a newcomer to the world of http://docker.io[Docker] and I struggle a bit with basic concepts. Here, I would like to summarize my observation about Docker tagging and repositories.
 
-If you build a Docker file (`docker build .`) you get a docker image. That's some hash that you can
-start (`docker run <image_hash>`). But remembering and differentiating hash as reference to an existing "app"
-is just hard. That's where you can name (_tag_) the image: `docker tag <image_hash> <tag_name>`. When you do so
-you can run the image just with the name `docker tag <tag_name>`.
-
-For the purpose of this post I will be working with Narayana LRA
+If you build a Dockerfile (`docker build .`) you get a docker image. That's identified with a hash. You can take it and
+start it (`docker run <image_hash>`) as a docker container.
+But using a hash hash as reference to an existing "app"
+is just hard. How can a human remember and differentiate them? That's where you can name (_tag_) the image with command `docker tag <image_hash> <tag_name>`. When you do so
+you can start the container then with `docker run <tag_name>`.
 
 There is an convention about tag name in docker which is:
 
@@ -108,13 +105,15 @@ NOTE: maybe login to the docker.io will be needed first: `docker login docker.io
 If we want to run some image we can just run it
 
 ```
-docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`
+docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`
 ```
 
 We can say what is the repository we want the image from explicitly
 
 ```
-docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7
+docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7
 ```
 
 Using the `docker.io` is not necessary because docker searches through all predefined registries if there is such
@@ -125,7 +124,8 @@ You can see that I haven't used any `version` parameter thus the _default_ lates
 Of course we can say some specific version to be run
 
 ```
-docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6
+docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6
 ```
 
 If we don't want to directly run the image but you want it to be downloaded to the local machine,
