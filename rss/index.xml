@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 15 Dec 2017 13:05:13 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Docker tags and registries]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 17 Dec 2017 05:59:52 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Docker tags and registries]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -6,18 +6,14 @@
 </div>
 </div>
 <div class="paragraph">
-<p>I&#8217;m still quite new in world of <a href="http://docker.io">Docker</a> and I struggle a bit with the basic concepts.
-Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it
-when using with <a href="https://github.com/minishift/minishift">OpenShift/Minishift</a>.</p>
+<p>As a newcomer to the world of <a href="http://docker.io">Docker</a> and I struggle a bit with basic concepts. Here, I would like to summarize my observation about Docker tagging and repositories.</p>
 </div>
 <div class="paragraph">
-<p>If you build a Docker file (<code>docker build .</code>) you get a docker image. That&#8217;s some hash that you can
-start (<code>docker run &lt;image_hash&gt;</code>). But remembering and differentiating hash as reference to an existing "app"
-is just hard. That&#8217;s where you can name (<em>tag</em>) the image: <code>docker tag &lt;image_hash&gt; &lt;tag_name&gt;</code>. When you do so
-you can run the image just with the name <code>docker tag &lt;tag_name&gt;</code>.</p>
-</div>
-<div class="paragraph">
-<p>For the purpose of this post I will be working with Narayana LRA</p>
+<p>If you build a Dockerfile (<code>docker build .</code>) you get a docker image. That&#8217;s identified with a hash. You can take it and
+start it (<code>docker run &lt;image_hash&gt;</code>) as a docker container.
+But using a hash hash as reference to an existing "app"
+is just hard. How can a human remember and differentiate them? That&#8217;s where you can name (<em>tag</em>) the image with command <code>docker tag &lt;image_hash&gt; &lt;tag_name&gt;</code>. When you do so
+you can start the container then with <code>docker run &lt;tag_name&gt;</code>.</p>
 </div>
 <div class="paragraph">
 <p>There is an convention about tag name in docker which is:</p>
@@ -147,7 +143,8 @@ maybe login to the docker.io will be needed first: <code>docker login docker.io 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`</code></pre>
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -155,7 +152,8 @@ maybe login to the docker.io will be needed first: <code>docker login docker.io 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7</code></pre>
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -170,7 +168,8 @@ image. And the Docker hub is the default one where to search for the image.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6</code></pre>
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6</code></pre>
 </div>
 </div>
 <div class="paragraph">

@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1513343113817"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1513343113817"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1513343113817"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1513490392749"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1513490392749"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1513490392749"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1513343113817"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1513490392749"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
     <meta name="referrer" content="origin" />
@@ -78,7 +78,7 @@
     <meta property="og:site_name" content="Chalda&#x27;s blog" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Docker tags and registries" />
-    <meta property="og:description" content="I&amp;#8217;m still quite new in world of Docker and I struggle a bit with the basic concepts. Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it when using with OpenShift/Minishift. If you build a Docker file (docker" />
+    <meta property="og:description" content="As a newcomer to the world of Docker and I struggle a bit with basic concepts. Here, I would like to summarize my observation about Docker tagging and repositories. If you build a Dockerfile (docker build .) you get a docker image. That&amp;#8217;s identified with a hash. You can" />
     <meta property="og:url" content="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
     <meta property="article:published_time" content="2017-12-15T00:00:00.000Z" />
     <meta property="article:tag" content="docker" />
@@ -86,7 +86,7 @@
     
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Docker tags and registries" />
-    <meta name="twitter:description" content="I&amp;#8217;m still quite new in world of Docker and I struggle a bit with the basic concepts. Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it when using with OpenShift/Minishift. If you build a Docker file (docker" />
+    <meta name="twitter:description" content="As a newcomer to the world of Docker and I struggle a bit with basic concepts. Here, I would like to summarize my observation about Docker tagging and repositories. If you build a Dockerfile (docker build .) you get a docker image. That&amp;#8217;s identified with a hash. You can" />
     <meta name="twitter:url" content="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
     
     <script type="application/ld+json">
@@ -104,7 +104,7 @@
     "url": "http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html",
     "datePublished": "2017-12-15T00:00:00.000Z",
     "keywords": "docker, minishift",
-    "description": "I&amp;#8217;m still quite new in world of Docker and I struggle a bit with the basic concepts. Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it when using with OpenShift/Minishift. If you build a Docker file (docker"
+    "description": "As a newcomer to the world of Docker and I struggle a bit with basic concepts. Here, I would like to summarize my observation about Docker tagging and repositories. If you build a Dockerfile (docker build .) you get a docker image. That&amp;#8217;s identified with a hash. You can"
 }
     </script>
 
@@ -195,7 +195,7 @@
             <ul class="post-meta-list">
               <li class="post-meta-item">
                 <time datetime="2017-12-15" itemprop="datePublished">
-                  14 hours ago
+                  2 days ago
                 </time>
               </li>
                 <li class="post-meta-item">
@@ -208,7 +208,7 @@
                 <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
               </li>
             </ul>
-            <h1 itemprop="name headline" class="post-title"><a href="/" itemprop="url" data-pjax title="Docker tags and registries">Docker tags and registries</a></h1>
+            <h1 itemprop="name headline" class="post-title"><a href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" itemprop="url" data-pjax title="Docker tags and registries">Docker tags and registries</a></h1>
             <!--h2 itemprop="about" class="post-subtitle"></h2-->
           </header>
           <aside class="post-side">
@@ -233,18 +233,14 @@
 </div>
 </div>
 <div class="paragraph">
-<p>I&#8217;m still quite new in world of <a href="http://docker.io">Docker</a> and I struggle a bit with the basic concepts.
-Here I would like to summarize a bit about Docker tagging and repositories and follow to connect to it
-when using with <a href="https://github.com/minishift/minishift">OpenShift/Minishift</a>.</p>
+<p>As a newcomer to the world of <a href="http://docker.io">Docker</a> and I struggle a bit with basic concepts. Here, I would like to summarize my observation about Docker tagging and repositories.</p>
 </div>
 <div class="paragraph">
-<p>If you build a Docker file (<code>docker build .</code>) you get a docker image. That&#8217;s some hash that you can
-start (<code>docker run &lt;image_hash&gt;</code>). But remembering and differentiating hash as reference to an existing "app"
-is just hard. That&#8217;s where you can name (<em>tag</em>) the image: <code>docker tag &lt;image_hash&gt; &lt;tag_name&gt;</code>. When you do so
-you can run the image just with the name <code>docker tag &lt;tag_name&gt;</code>.</p>
-</div>
-<div class="paragraph">
-<p>For the purpose of this post I will be working with Narayana LRA</p>
+<p>If you build a Dockerfile (<code>docker build .</code>) you get a docker image. That&#8217;s identified with a hash. You can take it and
+start it (<code>docker run &lt;image_hash&gt;</code>) as a docker container.
+But using a hash hash as reference to an existing "app"
+is just hard. How can a human remember and differentiate them? That&#8217;s where you can name (<em>tag</em>) the image with command <code>docker tag &lt;image_hash&gt; &lt;tag_name&gt;</code>. When you do so
+you can start the container then with <code>docker run &lt;tag_name&gt;</code>.</p>
 </div>
 <div class="paragraph">
 <p>There is an convention about tag name in docker which is:</p>
@@ -374,7 +370,8 @@ maybe login to the docker.io will be needed first: <code>docker login docker.io 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`</code></pre>
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -382,7 +379,8 @@ maybe login to the docker.io will be needed first: <code>docker login docker.io 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7</code></pre>
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -397,7 +395,8 @@ image. And the Docker hub is the default one where to search for the image.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec --env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6</code></pre>
+<pre class="highlight"><code>docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -551,7 +550,7 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1513343113817"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1513490392749"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
