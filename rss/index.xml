@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 17 Dec 2017 05:59:52 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Docker tags and registries]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sun, 17 Dec 2017 06:31:04 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Docker tags and registries]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -20,32 +20,29 @@ you can start the container then with <code>docker run &lt;tag_name&gt;</code>.<
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>${REGISTRY}/${PROJECT}/${IMAGE_NAME}:{IMAGE_VERSION}</code></pre>
+<pre class="highlight"><code>{REGISTRY}/{PROJECT}/{IMAGE_NAME}:{IMAGE_VERSION}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>There is no defined that tag has to be in this format but when you manipulating with the image
-(<code>docker pull</code>/<code>docker push</code>) the Docker understands this format.</p>
+<p>The format is not compulsory but the docker client understands the convention and it&#8217;s what the commands <code>docker pull</code>/<code>docker push</code> work with.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s look at the format starting from right. We have here a <em>IMAGE_VERSION</em>. That&#8217;s an arbitrary
-string, depending on you what is the meaning of it. You can tag an image as
+<p>Let&#8217;s investiage a bit on it. From right to left - we have a <em>IMAGE_VERSION</em> here. It&#8217;s an arbitrary
+string and is up to you how that looks like. You can tag an image as
 <code>docker tag &lt;hash&gt; &lt;tag_name&gt;:1.0</code> and later with new version of your app as <code>docker tag &lt;hash&gt; &lt;tag_name&gt;:1.1</code>.
 But nobody checks or guarantees that the tag version <code>1.1</code> is somehow newer than the <code>1.0</code>.
-There is an convention about tag version <code>latest</code>. That&#8217;s represent a default version
-which is used from repository when you don&#8217;t define a version manually. I like this article
+There is a convention of version <code>latest</code>. That represents a <strong>default version</strong>
+which is used when you don&#8217;t define a version manually. I like this article
 <a href="http://container-solutions.com/docker-latest-confusion">Docker: The latest Confusion</a>
 which explains that <code>latest</code> is not related to <em>time</em> but the meaning is rather <em>default</em>.</p>
 </div>
 <div class="paragraph">
-<p>The <em>IMAGE_NAME</em> is just name of your app for you being able to differentiate and refer to it
-in the set of your applications.</p>
+<p>The <em>IMAGE_NAME</em> is name of your app for you being able to differentiate and refer to it.</p>
 </div>
 <div class="paragraph">
 <p>The <em>PROJECT</em> and <em>REGISTRY</em> is used to know where this image belongs to or where it comes from.
 If you push or pull an image to the Docker registry you define where it is by this section of the tag definition.
-There is no <code>docker</code> command line option <code>--registry=&lt;REGISTRY&gt;</code>. The information where to push
-is just taken from the tag.</p>
+There is no <code>docker</code> command line option <em>--registry=&lt;REGISTRY&gt;</em>. The information where to push to is taken from the tag.</p>
 </div>
 </div>
 </div>
@@ -95,12 +92,18 @@ postgresql-9.6-centos    latest    4188383000de    9 minutes ago    337 MB
 ...</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>First listing uses terms <em>REPOSITORY</em> and <em>TAG</em> in way of I used here <em>name</em> and <em>version</em>.
-So just be care of it.</p>
-</div>
-<div class="paragraph">
+<div class="ulist">
+<ul>
+<li>
+<p>The  listing uses terms <em>REPOSITORY</em> and <em>TAG</em> in way of I used here <em>name</em> and <em>version</em>.</p>
+</li>
+<li>
 <p>I haven&#8217;t defined any version but the image name was assigned with the <em>default</em> <code>latest</code>.</p>
+</li>
+<li>
+<p>As there is not defined a registry (only name a.k.a  <code>${PROJECT}/${IMAGE_NAME}</code>) the image is search in the predefined registres (see <em>ADD_REGISTRY</em> below). If found then it&#8217;s downloaded. But you can download the image manually with <code>docker pull</code> and then as such named image already resides in the local cache it will be taken from there.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -108,12 +111,15 @@ So just be care of it.</p>
 <h2 id="_pushing_image">Pushing image</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The next step is to marked the image with repository name and thus being able to push it there.
+<p>The next step could be to mark the image with repository name and thus being able to push it there.
 My account at <a href="http://dockerhub.com/">Docker hub</a> is <a href="https://hub.docker.com/r/ochaloup/" class="bare">https://hub.docker.com/r/ochaloup/</a>. Thus my
 regitry name to be used for being able to push there is <code>ochaloup</code>.</p>
 </div>
 <div class="paragraph">
-<p>By tagging the image with <code>docker.io</code> as registry, the <code>docker push</code> can publish the image there.</p>
+<p>The tag then defines registry <code>docker.io</code> for <code>docker push</code> can publish the image there.</p>
+</div>
+<div class="paragraph">
+<p>The whole name is then <code>docker.io/ochaloup/postgresql-9.6-centos</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -164,7 +170,7 @@ image. And the Docker hub is the default one where to search for the image.</p>
 <p>You can see that I haven&#8217;t used any <code>version</code> parameter thus the <em>default</em> latest version was used.</p>
 </div>
 <div class="paragraph">
-<p>Of course we can say some specific version to be run</p>
+<p>Of course we could want <a href="https://hub.docker.com/r/centos/postgresql-94-centos7/tags/">some specific version</a> to be run</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -173,9 +179,9 @@ image. And the Docker hub is the default one where to search for the image.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>If we don&#8217;t want to directly run the image but you want it to be downloaded to the local machine,
+<p>If we don&#8217;t want to directly run the image but you want it to be downloaded to the local machine (to the <a href="https://thenewstack.io/understanding-the-docker-cache-for-faster-builds/">docker cache</a>),
 you can use <code>docker pull</code> command. The following output says the image was already downloaded
-as the same the <code>docker run</code> command first downloads locally and then run. Thus the image is already present on my laptop.</p>
+as the <code>docker run</code> command was already run and it downloads first and then run the image.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -191,8 +197,8 @@ Status: Image is up to date for docker.io/centos/postgresql-96-centos7:latest</c
 </div>
 </div>
 <div class="paragraph">
-<p>I can name it as <code>p</code> like <code>docker tag docker.io/centos/postgresql-96-centos7 p</code> and
-run it <code>docker run p &#8230;&#8203;</code>, still starting the same image.</p>
+<p>I can name it as e.g. <code>pgsl</code> like <code>docker tag docker.io/centos/postgresql-96-centos7 pgsl</code> and
+run it <code>docker run pgsl &#8230;&#8203;</code> and I&#8217;m still starting the same image.</p>
 </div>
 </div>
 </div>
@@ -200,18 +206,18 @@ run it <code>docker run p &#8230;&#8203;</code>, still starting the same image.<
 <h2 id="_docker_insecure_registries">Docker insecure registries</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The list of repositories which are check about image existence (if registry hostname is not provided)
-are hardcoded (somewhere) in docker and can&#8217;t be changed by some parameters.</p>
+<p>The list of repositories which are check for existence of the image (if not defined explicitly)
+are hardcoded in docker config and can&#8217;t be changed by a parameters.</p>
 </div>
 <div class="paragraph">
-<p>If you pull image from some private (different) registry it has to be using <code>https</code>.
-If communication goes over <code>http</code> then <code>docker pull</code> fails. In such case you need to permit
-docker to use such registry for pulling by adding such registry to list of insecure ones.</p>
+<p>If you want to pull image with the respository defined explicitly the repository needs to be running over <code>https</code>. If communication goes over <code>http</code> then <code>docker pull</code> fails.</p>
+</div>
+<div class="paragraph">
+<p>In such case you need to add permition for docker to allow it to pull from that particular insecure registry.</p>
 </div>
 <div class="paragraph">
 <p>On my Fedora 26 I need to edit file <code>/etc/sysconfig/docker</code> and add such registry to
-the list of <code>OPTIONS</code>. For example for the usage of Minishift private registry the <code>OPTIONS</code>
-parametr looked</p>
+the list of <code>OPTIONS</code>. For example for the usage of Minishift private registry the <code>OPTIONS</code> parametr looks</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -219,8 +225,10 @@ parametr looked</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Now <code>restart</code> docker and you can push and pull from the non-https docker registry.</p>
+<p>You will need to <code>restart</code> docker after the change and you can pull from the non-https registry now.</p>
 </div>
+<div class="sect2">
+<h3 id="_insecure_registries_set_up">Insecure registries set up</h3>
 <div class="paragraph">
 <p>In case of Red Hat clone of the docker client you can use settings described in article
 <a href="https://access.redhat.com/articles/1354823" class="bare">https://access.redhat.com/articles/1354823</a></p>
@@ -244,6 +252,7 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
   "registry-mirrors": ["docker-registry-default.192.168.99.100.nip.io:443"],
   "insecure-registries" :["docker-registry-default.192.168.99.100.nip.io:443"]
 }</code></pre>
+</div>
 </div>
 </div>
 </div>
