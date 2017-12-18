@@ -1,0 +1,191 @@
+= How to work with a docker image to Minishift repository
+:hp-tags: docker, minishift, OpenShift
+:toc: macro
+:release: 1.0
+:published_at: 2017-12-18
+:icons: font
+
+image::articles/docker-to-openshift.png[]
+
+_this is a bit follow-up article to http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html_
+
+Minishift is a "small version" of OpenShift where https://docs.openshift.org/latest/architecture/index.html[all the deployment setup]
+is done as part of a virtual machine. This virtual machine could be managed by https://docs.openshift.org/latest/minishift/getting-started/installing.html[various hypervisors].
+The purpose is to give to developers an easy way to develop applications for OpenShift.
+Which is why the Minishift is productized by Red Hat as https://developers.redhat.com/products/cdk/overview/[Red Hat Container Development Kit (Red Hat CDK 3)].
+https://github.com/minishift/minishift[Minishift] is kind of incarnation of https://github.com/kubernetes/minikube[MiniKube] for OpenShift.
+
+Minishift serves as manager of docker containers and anything it works with is a docker container.
+If you want to start an application running there you need to provide a docker container.
+There is basically two ways to get the app there. Use the tool
+https://docs.openshift.org/latest/architecture/core_concepts/builds_and_image_streams.html#source-build[Source to image - S2I]
+or get a docker image and set it up for Minishift to consume it.
+For development purposes the S2I way is not appropriate and we will elaborate on the second option.
+
+Minishift provides a https://docs.docker.com/registry/[private docker registry] where any docker image,
+used by the Minishift platform, is put into it. If you have a docker image of your desire
+in the Minishift registry you can start the app. Kubernetes/OpenShift/Minishift adds one more layer of abstraction
+on top of this which is https://blog.openshift.com/image-streams-faq/[image stream].
+The image stream holds a https://access.redhat.com/documentation/en-us/openshift_enterprise/3.2/html/developer_guide/dev-guide-managing-images[metadata about image and can make "a binding"]
+of the docker image to an application.
+
+You can find out what are image streams available at the Minishift instance by calling
+`oc get imagestreams` (or `oc get is`). The application can be created base of it
+by calling `oc new-app --image-stream=eap7 --name=eap7`. If there is created an image stream
+and application started from it then (by default) whenever you will push a new image to the private registry
+the application is redeployed with the new version.
+Whenever you push/pull something to the registry a https://blog.openshift.com/image-streams-faq[new image stream (if does not exists) is created].
+
+```bash
+# creating new application from a docker image centos/postgresql-96-centos7
+# the image is search on dockerhub, pulled to private registry and new image stream is created,
+# then the app is started
+oc new-app --docker-image=centos/postgresql-96-centos7 --name=postgresql-96-centos7
+
+oc get is
+NAME                    DOCKER REPO                                       TAGS      UPDATED
+postgresql-96-centos7   172.30.1.1:5000/myproject/postgresql-96-centos7   latest    6 minutes ago
+
+# if there is the image already existing in the internal repository I can start an application
+# directly from the image stream by name
+docker push docker-registry-default.192.168.99.100.nip.io:443/myproject/postgresql-96-centos7
+oc new-app --image-stream=postgresql-96-centos7 --name=postgresql-96-centos7
+
+# NOTE: for the postgresql image would start we need to define compulsory env properties
+oc env dc/postgresql-96-centos7 -e POSTGRESQL_USER=crashrec -e POSTGRESQL_PASSWORD=crashrec -e POSTGRESQL_DATABASE=crashrec
+# checking how that was started
+oc logs dc/postgresql-96-centos7
+```
+
+[NOTE]
+====
+I'm using term 'a Minishift application' here but application in Minishift is
+composed with several OpenShift objects. (By default) one of them is the ImageStream which
+defines the link between docker image and the running docker image in the Minishift environment.
+
+If you run `oc new-app` you can check what are the objects being created - see section 'Creating resources'
+
+```
+oc new-app --image-stream=postgresql-96-centos7 --name=postgresql-96-centos7
+--> Found image 75740e5 (3 days old) in image stream "myproject/postgresql-96-centos7"
+    under tag "latest" for "postgresql-96-centos7"
+  ...
+--> Creating resources ...
+    deploymentconfig "postgresql-96-centos7" created
+    service "postgresql-96-centos7" created
+--> Success
+    Run 'oc status' to view your app.
+```
+====
+
+Ok, now we know we want to have an image in the Minishift repository but how to do so.
+There are two options, I'm aware of.
+
+* push image of your localhost docker registry to the Minishift registry
+* configure shell environment to use Minishift docker environment and build image with that (inside such configured shell)
+
+== Pushing from local docker to Minishift registry
+
+For being able to push to Minishift registry from outside world we need two basic things
+
+* expose the Minishift registry to the outside world
+* permit local docker to push to insecure Minishift registry
+
+There is another good article talking about this:
+https://torstenwalter.de/minishift/openshift/docker/registry/2017/07/25/build-docker-image-and-upload-to-openshift-registry.html
+
+Let's look at the steps
+
+```bash
+# starting minishift
+minishift start
+# exposing minishift docker registry
+# WARN !!! : use Minishift version 1.9 or later !!!
+minishift addon apply registry-route
+# the hostname of exposed registry should be printed, something like docker-registry-default.192.168.99.100.nip.io
+
+# now the docker on localhost machine needs to get permitted to push to non-https
+su -
+cp /etc/sysconfig/docker /etc/sysconfig/docker.bkp
+sed -i "s/\(OPTIONS.*\)'/\1 --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'/" /etc/sysconfig/docker
+# check your /etc/sysconfig/docker have options variable defined as
+#   OPTIONS='--selinux-enabled --log-driver=journald --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'
+exit
+
+# restart docker
+sudo systemctl restart docker
+
+# tag the postgresql image image as docker-registry-default.192.168.99.100.nip.io:443/<project>/<name of stream>:latest
+docker tag docker.io/centos/postgresql-96-centos7 docker-registry-default.192.168.99.100.nip.io:443/myproject/postgresql-96-centos7
+# it's necessary to login to the Minishift registry. You need to check the security token by running 'oc whoami -t'
+# of the running minishift in shell script where oc is configured
+# As one-liner that could be done as
+docker login -u developer -p `oc whoami -t` docker-registry-default.192.168.99.100.nip.io:443
+# pushing image to the docker registry
+docker push docker-registry-default.192.168.99.100.nip.io:443/myproject/postgresql-96-centos7
+
+# at this time the image stream with name 'postgresql-96-centos7' under project 'myproject'
+# should be created
+
+# the new application could be run
+oc new-app --image-stream=postgresql-96-centos7 --name=postgresql-96-centos7
+# compulsory environmental variables
+oc env dc/postgresql-96-centos7 -e POSTGRESQL_USER=crashrec -e POSTGRESQL_PASSWORD=crashrec -e POSTGRESQL_DATABASE=crashrec
+```
+
+== Building image from shell with Minishift docker environment setup
+
+In summary the following is needed
+
+* setup shell environment to use Minishift docker
+* if needed to get docker image from insecure registry setup Minishift to permit so
+
+For setting the docker shell environment of Minishift see
+https://github.com/minishift/minishift/blob/master/docs/source/openshift/openshift-docker-registry.adoc
+
+Let's look at the steps
+
+```bash
+# Starting with the Minishift insecure registry setup
+# I haven't find a way to say minishift to pull the image from unknown
+# registry via some parameter
+# aka. minishift start --insecure-registry does not work for me for some reason
+# the global Minishift setup is needed
+# (we need to have defined the 172.30.0.0/16 as default settings)
+minishift stop
+minishift delete
+minishift config set insecure-registry 172.30.0.0/16,my-insecure-registry.io:8080
+minishift start
+
+# now the docker pull will work
+docker pull my-insecure-registry.io:8080/project/myproject
+
+
+# Setting up the shell environment to use Minishift docker
+eval $(minishift docker-env)
+
+# going to place with Dockerfile
+cd postgresql
+docker build . --tag mypostgresql
+
+# NOTE: Minishift version 1.10
+# the following commands worked for me but I'm not sure why this is not now.
+# I expect this being a bug.
+docker tag mypostgresql $(minishift openshift registry)/myproject/mypostgresql
+docker push $(minishift openshift registry)/myproject/mypostgresql
+oc new-app --image-stream=mypostgresql --name=mypostgresql
+
+# another approach is use oc build (running the docker build underneath)
+# we will create a new image stream with name 'mypostgresql', this is because we defined
+# --binary option - nothing is downloaded, just metadata created
+oc new-build --binary --name=mypostgresql -l app=mypostgresql
+# running the docker build on the Dockerfile of the current directory and pushing to the
+# already defined image stream with the same name
+oc start-build mypostgresql --from-dir=. --follow
+# creating an app from the image stream
+oc new-app --image-stream=mypostgresql --name=mypostgresql
+
+# as abbreviation should be fine to create a new app only with command
+# where app is named as defined and the imagestream of the same name is searched for
+oc new-app mypostgresql
+```
