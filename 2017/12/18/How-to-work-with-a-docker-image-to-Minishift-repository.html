@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>How to work with a docker image to Minishift repository</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="How to work with a docker image to Minishift repository">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="How to work with a docker image to Minishift repository">
+    <meta property="og:description" content="">
+
+    <!-- <meta name="twitter:site" content="">
+
+<meta name="twitter:creator" content="">
+
+<meta name="google-site-verification" content="">
+
+<meta property="fb:admins" content="">
+ -->
+
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link href="//fonts.googleapis.com/" rel="dns-prefetch">
+    <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
+
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1513593788958"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1513593788958"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1513593788958"/>
+
+
+
+
+    <script type="text/javascript">
+      var ga_ua = 'UA-XXXXX-X';
+      
+      var disqus_shortname = 'example';
+      
+      var enable_pjax = true;
+
+      // Pace Options
+      // ==============
+      window.paceOptions = {
+        catchupTime: 100,
+        minTime: 100,
+        elements: false,
+        restartOnRequestAfter: 500,
+        startOnPageLoad: false
+      }
+
+      // Ghostium Globals
+      // ==============
+      window.GHOSTIUM = {};
+      GHOSTIUM.haveGA = typeof ga_ua !== 'undefined' && ga_ua !== 'UA-XXXXX-X';
+      GHOSTIUM.haveDisqus = typeof disqus_shortname !== 'undefined' && disqus_shortname !== 'example';
+      GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
+    </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1513593788958"></script>
+
+    <link rel="canonical" href="http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html" />
+    <meta name="referrer" content="origin" />
+    
+    <meta property="og:site_name" content="Chalda&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="How to work with a docker image to Minishift repository" />
+    <meta property="og:description" content="this is a bit follow-up article to http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html Minishift is a &quot;small version&quot; of OpenShift where all the deployment setup is done as part of a virtual machine. This virtual machine could be managed by various hypervisors. The purpose is to give" />
+    <meta property="og:url" content="http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html" />
+    <meta property="article:published_time" content="2017-12-18T00:00:00.000Z" />
+    <meta property="article:tag" content="docker" />
+    <meta property="article:tag" content="minishift" />
+    <meta property="article:tag" content="OpenShift" />
+    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="How to work with a docker image to Minishift repository" />
+    <meta name="twitter:description" content="this is a bit follow-up article to http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html Minishift is a &quot;small version&quot; of OpenShift where all the deployment setup is done as part of a virtual machine. This virtual machine could be managed by various hypervisors. The purpose is to give" />
+    <meta name="twitter:url" content="http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "publisher": "Chalda's blog",
+    "author": {
+        "@type": "Person",
+        "name": "chalda",
+        "image": "https://avatars2.githubusercontent.com/u/1104559?v=4",
+        "url": "http://blog.chalda.cz/author/ochaloup/"
+    },
+    "headline": "How to work with a docker image to Minishift repository",
+    "url": "http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html",
+    "datePublished": "2017-12-18T00:00:00.000Z",
+    "keywords": "docker, minishift, OpenShift",
+    "description": "this is a bit follow-up article to http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html Minishift is a &quot;small version&quot; of OpenShift where all the deployment setup is done as part of a virtual machine. This virtual machine could be managed by various hypervisors. The purpose is to give"
+}
+    </script>
+
+    <meta name="generator" content="HubPress" />
+    <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog" href="http://blog.chalda.cz/rss/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/atom-one-dark.min.css">
+    
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </head>
+  <body class="post-template tag-docker tag-minishift tag-Open-Shift">
+
+    <button data-action="open-drawer" id="drawer-button" class="drawer-button"><i class="fa fa-bars"></i></button>
+    <nav tabindex="-1" class="drawer">
+      <div class="drawer-container">
+        <!--.drawer-search(role="search")-->
+        <ul role="navigation" class="drawer-list">
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" data-pjax>
+              <i class="fa fa-home"></i>Home
+            </a>
+          </li>
+          <!-- <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" title="Chalda&#x27;s blog" data-pjax>
+              <i class="fa fa-list-alt"></i>All posts
+            </a>
+          </li> -->
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/rss/">
+              <i class="fa fa-rss"></i>Subscribe to Feed
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-divider"></li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/01/01/About-the-blog.html" data-pjax>
+              <i class="fa fa-rocket"></i>About the blog
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Blog-posts-history.html" data-pjax>
+              <i class="fa fa-bolt"></i>Blog history
+            </a>
+          </li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Links.html" data-pjax>
+              <i class="fa fa-navicon"></i>Links
+            </a>
+          </li>
+          
+          <!--
+          <li class="drawer-list-divider"></li>
+          <li class="drawer-list-item drawer-list-title">
+            Follow me
+          </li> -->
+          
+          
+          <li class="drawer-list-item">
+            <a href="https://twitter.com/_chalda" title="Twitter" target="_blank">
+              <i class="fa fa-twitter"></i>Twitter
+            </a>
+          </li>
+          <li class="drawer-list-item">
+            <a href="github.com/ochaloup/" title="Github" target="_blank">
+              <i class="fa fa-github"></i>Github
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="drawer-overlay"></div>
+    <main id="container" role="main" class="container">
+      <div class="surface">
+        <div class="surface-container">
+          <div data-pjax-container class="content">
+            
+<section class="wrapper wrapper-post">
+  <div class="wrapper-container">
+    <article itemscope itemtype="http://schema.org/BlogPosting" role="article" class="post post tag-docker tag-minishift tag-Open-Shift">
+        <section class="post-container">
+          <header class="post-header">
+            <ul class="post-meta-list">
+              <li class="post-meta-item">
+                <time datetime="2017-12-18" itemprop="datePublished">
+                  12 hours ago
+                </time>
+              </li>
+                <li class="post-meta-item">
+                  <span class="tags"><i class="fa fa-tags"></i>
+                      <span>
+                      <a href="http://blog.chalda.cz/tag/docker/">docker</a>, <a href="http://blog.chalda.cz/tag/minishift/">minishift</a>, <a href="http://blog.chalda.cz/tag/Open-Shift/">OpenShift</a></span>
+                  </span>
+                </li>
+              <li class="post-meta-item">
+                <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
+              </li>
+            </ul>
+            <h1 itemprop="name headline" class="post-title"><a href="/" itemprop="url" data-pjax title="How to work with a docker image to Minishift repository">How to work with a docker image to Minishift repository</a></h1>
+            <!--h2 itemprop="about" class="post-subtitle"></h2-->
+          </header>
+          <aside class="post-side">
+            <div class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <a href="http://blog.chalda.cz" class="post-author-name">
+                  chalda
+                </a>
+                <p class="post-author-bio"></p>
+              </div>
+            </div>
+          </aside>
+          <div itemprop="articleBody" class="post-body">
+            <div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/docker-to-openshift.png" alt="docker to openshift.png">
+</div>
+</div>
+<div class="paragraph">
+<p><em>this is a bit follow-up article to <a href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" class="bare">http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html</a></em></p>
+</div>
+<div class="paragraph">
+<p>Minishift is a "small version" of OpenShift where <a href="https://docs.openshift.org/latest/architecture/index.html">all the deployment setup</a>
+is done as part of a virtual machine. This virtual machine could be managed by <a href="https://docs.openshift.org/latest/minishift/getting-started/installing.html">various hypervisors</a>.
+The purpose is to give to developers an easy way to develop applications for OpenShift.
+Which is why the Minishift is productized by Red Hat as <a href="https://developers.redhat.com/products/cdk/overview/">Red Hat Container Development Kit (Red Hat CDK 3)</a>.
+<a href="https://github.com/minishift/minishift">Minishift</a> is kind of incarnation of <a href="https://github.com/kubernetes/minikube">MiniKube</a> for OpenShift.</p>
+</div>
+<div class="paragraph">
+<p>Minishift serves as manager of docker containers and anything it works with is a docker container.
+If you want to start an application running there you need to provide a docker container.
+There is basically two ways to get the app there. Use the tool
+<a href="https://docs.openshift.org/latest/architecture/core_concepts/builds_and_image_streams.html#source-build">Source to image - S2I</a>
+or get a docker image and set it up for Minishift to consume it.
+For development purposes the S2I way is not appropriate and we will elaborate on the second option.</p>
+</div>
+<div class="paragraph">
+<p>Minishift provides a <a href="https://docs.docker.com/registry/">private docker registry</a> where any docker image,
+used by the Minishift platform, is put into it. If you have a docker image of your desire
+in the Minishift registry you can start the app. Kubernetes/OpenShift/Minishift adds one more layer of abstraction
+on top of this which is <a href="https://blog.openshift.com/image-streams-faq/">image stream</a>.
+The image stream holds a <a href="https://access.redhat.com/documentation/en-us/openshift_enterprise/3.2/html/developer_guide/dev-guide-managing-images">metadata about image and can make "a binding"</a>
+of the docker image to an application.</p>
+</div>
+<div class="paragraph">
+<p>You can find out what are image streams available at the Minishift instance by calling
+<code>oc get imagestreams</code> (or <code>oc get is</code>). The application can be created base of it
+by calling <code>oc new-app --image-stream=eap7 --name=eap7</code>. If there is created an image stream
+and application started from it then (by default) whenever you will push a new image to the private registry
+the application is redeployed with the new version.
+Whenever you push/pull something to the registry a <a href="https://blog.openshift.com/image-streams-faq">new image stream (if does not exists) is created</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># creating new application from a docker image centos/postgresql-96-centos7
+# the image is search on dockerhub, pulled to private registry and new image stream is created,
+# then the app is started
+oc new-app --docker-image=centos/postgresql-96-centos7 --name=postgresql-96-centos7
+
+oc get is
+NAME                    DOCKER REPO                                       TAGS      UPDATED
+postgresql-96-centos7   172.30.1.1:5000/myproject/postgresql-96-centos7   latest    6 minutes ago
+
+# if there is the image already existing in the internal repository I can start an application
+# directly from the image stream by name
+docker push docker-registry-default.192.168.99.100.nip.io:443/myproject/postgresql-96-centos7
+oc new-app --image-stream=postgresql-96-centos7 --name=postgresql-96-centos7
+
+# NOTE: for the postgresql image would start we need to define compulsory env properties
+oc env dc/postgresql-96-centos7 -e POSTGRESQL_USER=crashrec -e POSTGRESQL_PASSWORD=crashrec -e POSTGRESQL_DATABASE=crashrec
+# checking how that was started
+oc logs dc/postgresql-96-centos7</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>I&#8217;m using term 'a Minishift application' here but application in Minishift is
+composed with several OpenShift objects. (By default) one of them is the ImageStream which
+defines the link between docker image and the running docker image in the Minishift environment.</p>
+</div>
+<div class="paragraph">
+<p>If you run <code>oc new-app</code> you can check what are the objects being created - see section 'Creating resources'</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>oc new-app --image-stream=postgresql-96-centos7 --name=postgresql-96-centos7
+--&gt; Found image 75740e5 (3 days old) in image stream "myproject/postgresql-96-centos7"
+    under tag "latest" for "postgresql-96-centos7"
+  ...
+--&gt; Creating resources ...
+    deploymentconfig "postgresql-96-centos7" created
+    service "postgresql-96-centos7" created
+--&gt; Success
+    Run 'oc status' to view your app.</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Ok, now we know we want to have an image in the Minishift repository but how to do so.
+There are two options, I&#8217;m aware of.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>push image of your localhost docker registry to the Minishift registry</p>
+</li>
+<li>
+<p>configure shell environment to use Minishift docker environment and build image with that (inside such configured shell)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pushing_from_local_docker_to_minishift_registry">Pushing from local docker to Minishift registry</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For being able to push to Minishift registry from outside world we need two basic things</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>expose the Minishift registry to the outside world</p>
+</li>
+<li>
+<p>permit local docker to push to insecure Minishift registry</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There is another good article talking about this:
+<a href="https://torstenwalter.de/minishift/openshift/docker/registry/2017/07/25/build-docker-image-and-upload-to-openshift-registry.html" class="bare">https://torstenwalter.de/minishift/openshift/docker/registry/2017/07/25/build-docker-image-and-upload-to-openshift-registry.html</a></p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s look at the steps</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># starting minishift
+minishift start
+# exposing minishift docker registry
+# WARN !!! : use Minishift version 1.9 or later !!!
+minishift addon apply registry-route
+# the hostname of exposed registry should be printed, something like docker-registry-default.192.168.99.100.nip.io
+
+# now the docker on localhost machine needs to get permitted to push to non-https
+su -
+cp /etc/sysconfig/docker /etc/sysconfig/docker.bkp
+sed -i "s/\(OPTIONS.*\)'/\1 --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'/" /etc/sysconfig/docker
+# check your /etc/sysconfig/docker have options variable defined as
+#   OPTIONS='--selinux-enabled --log-driver=journald --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'
+exit
+
+# restart docker
+sudo systemctl restart docker
+
+# tag the postgresql image image as docker-registry-default.192.168.99.100.nip.io:443/&lt;project&gt;/&lt;name of stream&gt;:latest
+docker tag docker.io/centos/postgresql-96-centos7 docker-registry-default.192.168.99.100.nip.io:443/myproject/postgresql-96-centos7
+# it's necessary to login to the Minishift registry. You need to check the security token by running 'oc whoami -t'
+# of the running minishift in shell script where oc is configured
+# As one-liner that could be done as
+docker login -u developer -p `oc whoami -t` docker-registry-default.192.168.99.100.nip.io:443
+# pushing image to the docker registry
+docker push docker-registry-default.192.168.99.100.nip.io:443/myproject/postgresql-96-centos7
+
+# at this time the image stream with name 'postgresql-96-centos7' under project 'myproject'
+# should be created
+
+# the new application could be run
+oc new-app --image-stream=postgresql-96-centos7 --name=postgresql-96-centos7
+# compulsory environmental variables
+oc env dc/postgresql-96-centos7 -e POSTGRESQL_USER=crashrec -e POSTGRESQL_PASSWORD=crashrec -e POSTGRESQL_DATABASE=crashrec</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_building_image_from_shell_with_minishift_docker_environment_setup">Building image from shell with Minishift docker environment setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In summary the following is needed</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>setup shell environment to use Minishift docker</p>
+</li>
+<li>
+<p>if needed to get docker image from insecure registry setup Minishift to permit so</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For setting the docker shell environment of Minishift see
+<a href="https://github.com/minishift/minishift/blob/master/docs/source/openshift/openshift-docker-registry.adoc" class="bare">https://github.com/minishift/minishift/blob/master/docs/source/openshift/openshift-docker-registry.adoc</a></p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s look at the steps</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Starting with the Minishift insecure registry setup
+# I haven't find a way to say minishift to pull the image from unknown
+# registry via some parameter
+# aka. minishift start --insecure-registry does not work for me for some reason
+# the global Minishift setup is needed
+# (we need to have defined the 172.30.0.0/16 as default settings)
+minishift stop
+minishift delete
+minishift config set insecure-registry 172.30.0.0/16,my-insecure-registry.io:8080
+minishift start
+
+# now the docker pull will work
+docker pull my-insecure-registry.io:8080/project/myproject
+
+
+# Setting up the shell environment to use Minishift docker
+eval $(minishift docker-env)
+
+# going to place with Dockerfile
+cd postgresql
+docker build . --tag mypostgresql
+
+# NOTE: Minishift version 1.10
+# the following commands worked for me but I'm not sure why this is not now.
+# I expect this being a bug.
+docker tag mypostgresql $(minishift openshift registry)/myproject/mypostgresql
+docker push $(minishift openshift registry)/myproject/mypostgresql
+oc new-app --image-stream=mypostgresql --name=mypostgresql
+
+# another approach is use oc build (running the docker build underneath)
+# we will create a new image stream with name 'mypostgresql', this is because we defined
+# --binary option - nothing is downloaded, just metadata created
+oc new-build --binary --name=mypostgresql -l app=mypostgresql
+# running the docker build on the Dockerfile of the current directory and pushing to the
+# already defined image stream with the same name
+oc start-build mypostgresql --from-dir=. --follow
+# creating an app from the image stream
+oc new-app --image-stream=mypostgresql --name=mypostgresql
+
+# as abbreviation should be fine to create a new app only with command
+# where app is named as defined and the imagestream of the same name is searched for
+oc new-app mypostgresql</code></pre>
+</div>
+</div>
+</div>
+</div>
+          </div>
+          <footer class="post-footer">
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person" class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img itemprop="image" src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <h4 class="post-footer-heading">Written By</h4>
+                <a href="http://blog.chalda.cz" itemprop="url" class="post-author-name">
+                  <span itemprop="name">chalda</span>
+                </a>
+                <p itemprop="description" class="post-author-bio"></p>
+                <p class="post-info">
+                  <b class="post-info-title">Published on</b>
+                  <time class="post-date">December 18, 2017</time>
+                </p>
+              </div>
+            </div>
+            <div class="post-social">
+              <h4 class="post-footer-heading">Spread the word</h4>
+              <a href="#" data-action="share-twitter"><i class="fa fa-fw fa-lg fa-twitter"></i></a>
+              <a href="#" data-action="share-facebook"><i class="fa fa-fw fa-lg fa-facebook"></i></a>
+              <a href="#" data-action="share-gplus"><i class="fa fa-fw fa-lg fa-google-plus"></i></a>
+            </div>
+          </footer>
+        </section>
+      <section itemprop="comment" class="post-comments">
+        <div id="disqus_thread"></div>
+      </section>
+    </article>
+
+    <footer role="contentinfo" class="footer">
+      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2017. All Rights Reserved.</small></p>
+      <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
+      <p><small>Adapted by <a href="https://twitter.com/mgreau">Maxime Gréau</a></small></p>
+      <p><small>Published with <a href="http://hubpress.io">HubPress</a></small></p>
+    </footer>
+  </div>
+</section>
+
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+  var disqus_shortname = 'blog-chalda-cz'; // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js?v="></script> 
+      <script type="text/javascript">
+        jQuery( document ).ready(function() {
+          // change date with ago
+          jQuery('ago.ago').each(function(){
+            var element = jQuery(this).parent();
+            element.html( moment(element.text()).fromNow());
+          });
+        });
+
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1513593788958"></script>
+
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-91848308-1', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+
+  </body>
+</html>
