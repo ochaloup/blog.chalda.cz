@@ -5,6 +5,9 @@
 
 === 2017
 
+* [2017-12-18] http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html
+* [2017-12-16] http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html 
+* [2017-12-05] https://www.youtube.com/watch?v=URgDZ6NCEtY[JOpen Space: Saga transactions a přístup, který volí transakční manager Narayana]
 * [2017-11-23] http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html
 * [2017-11-16] http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-for-HTTP-header-balancing.html
 * [2017-10-01] https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift

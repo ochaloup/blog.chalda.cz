@@ -184,3 +184,6 @@ For the other OSes, you need to change probably the `/etc/docker/daemon.json` wi
   "insecure-registries" :["docker-registry-default.192.168.99.100.nip.io:443"]
 }
 ```
+
+_There is a follow-up article about Minishift private registry at http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html_
+
