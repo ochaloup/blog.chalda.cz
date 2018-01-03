@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1514980863759"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1514980863759"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1514980863759"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1514981465662"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1514981465662"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1514981465662"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1514980863759"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1514981465662"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
     <meta name="referrer" content="origin" />
@@ -442,8 +442,12 @@ are hardcoded in docker config and can&#8217;t be changed by a parameters.</p>
 <div class="paragraph">
 <p>In such case you need to add permition for docker to allow it to pull from that particular insecure registry.</p>
 </div>
+<div class="sect2">
+<h3 id="_insecure_registries_set_up">Insecure registries set up</h3>
+<div class="sect3">
+<h4 id="_docker_packaget_configuration">Docker packaget configuration</h4>
 <div class="paragraph">
-<p>On my Fedora 26 I need to edit file <code>/etc/sysconfig/docker</code> and add such registry to
+<p>On my Fedora 26 when using rpm package <code>docker</code> I need to edit file <code>/etc/sysconfig/docker</code> and add such registry to
 the list of <code>OPTIONS</code>. For example for the usage of Minishift private registry the <code>OPTIONS</code> parametr looks</p>
 </div>
 <div class="listingblock">
@@ -454,10 +458,9 @@ the list of <code>OPTIONS</code>. For example for the usage of Minishift private
 <div class="paragraph">
 <p>You will need to <code>restart</code> docker after the change and you can pull from the non-https registry now.</p>
 </div>
-<div class="sect2">
-<h3 id="_insecure_registries_set_up">Insecure registries set up</h3>
+</div>
 <div class="sect3">
-<h4 id="_fedorea_26">Fedorea 26</h4>
+<h4 id="_fedora_26_registry_and_insecure_registry_patch">Fedora 26 - registry and insecure registry patch</h4>
 <div class="paragraph">
 <p>In case of Red Hat clone of the docker client you can use settings described in article
 <a href="https://access.redhat.com/articles/1354823" class="bare">https://access.redhat.com/articles/1354823</a></p>
@@ -607,7 +610,7 @@ ExecStart=/usr/bin/dockerd $OPTIONS
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1514980863759"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1514981465662"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
