@@ -165,6 +165,8 @@ You will need to `restart` docker after the change and you can pull from the non
 
 === Insecure registries set up
 
+==== Fedorea 26
+
 In case of Red Hat clone of the docker client you can use settings described in article
 https://access.redhat.com/articles/1354823
 
@@ -175,6 +177,37 @@ In short you can use `ADD_REGISTRY` and `INSECURE_REGISTRY` variables in `/etc/s
 echo "ADD_REGISTRY='--add-registry docker-registry-default.192.168.99.100.nip.io:443'" >> /etc/sysconfig/docker
 echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.100.nip.io:443'" >> /etc/sysconfig/docker
 ```
+This works for me on Fedora 26 when I have installed docker `package`.
+A trouble with docker package for me came with some other images (e.g. for Oracle XE: https://hub.docker.com/r/wnameless/oracle-xe-11g[wnameless/oracle-xe-11g]
+where issue https://github.com/wnameless/docker-oracle-xe-11g/issues/59 talks about troubles with `docker` package and `docker-ce` is needed to be used instead.
+
+==== RPM docker-ce to be configured for insecure registries
+
+Installation of `docker-ce` (replacing `docker`) is nicely introduced at guide https://docs.docker.com/engine/installation/linux/docker-ce/fedora/.
+
+Now what about the registries config. I found nice description at: https://forums.docker.com/t/error-with-docker-pull-from-insecure-registry/31007/8
+
+The `docker-ce` rpm pakcage has config at `/lib/systemd/system/docker.service`. After installation I needed to change and add lines
+
+```bash
+[Service]
+Type=notify
+EnvironmentFile=-/etc/sysconfig/docker
+ExecStart=/usr/bin/dockerd $OPTIONS
+
+# I have left the rest of the config file untouched
+# ....
+```
+
+From that I redirected the configuration of the `OPTIONS` variable to file `/etc/sysconfig/docker` where I added my insecured registry just at a separate line like
+
+```bash
+OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'
+```
+
+==== Other OSes and docker registry configuration
+
+*DISCLAIMER*: the following is untested
 
 For the other OSes, you need to change probably the `/etc/docker/daemon.json` with
 
