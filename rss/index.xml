@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Wed, 03 Jan 2018 12:11:05 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[How to work with a docker image to Minishift repository]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Wed, 03 Jan 2018 12:12:50 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[How to work with a docker image to Minishift repository]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -462,7 +462,7 @@ are hardcoded in docker config and can&#8217;t be changed by a parameters.</p>
 <div class="sect2">
 <h3 id="_insecure_registries_set_up">Insecure registries set up</h3>
 <div class="sect3">
-<h4 id="_docker_packaget_configuration">Docker packaget configuration</h4>
+<h4 id="_configuration_with_rpm_package_docker">Configuration with RPM package docker</h4>
 <div class="paragraph">
 <p>On my Fedora 26 when using rpm package <code>docker</code> I need to edit file <code>/etc/sysconfig/docker</code> and add such registry to
 the list of <code>OPTIONS</code>. For example for the usage of Minishift private registry the <code>OPTIONS</code> parametr looks</p>
