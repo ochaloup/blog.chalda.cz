@@ -154,7 +154,11 @@ If you want to pull image with the respository defined explicitly the repository
 
 In such case you need to add permition for docker to allow it to pull from that particular insecure registry.
 
-On my Fedora 26 I need to edit file `/etc/sysconfig/docker` and add such registry to
+=== Insecure registries set up
+
+==== Docker packaget configuration
+
+On my Fedora 26 when using rpm package `docker` I need to edit file `/etc/sysconfig/docker` and add such registry to
 the list of `OPTIONS`. For example for the usage of Minishift private registry the `OPTIONS` parametr looks
 
 ```
@@ -163,9 +167,7 @@ OPTIONS='--selinux-enabled --log-driver=journald --insecure-registry docker-regi
 
 You will need to `restart` docker after the change and you can pull from the non-https registry now.
 
-=== Insecure registries set up
-
-==== Fedorea 26
+==== Fedora 26 - registry and insecure registry patch
 
 In case of Red Hat clone of the docker client you can use settings described in article
 https://access.redhat.com/articles/1354823
