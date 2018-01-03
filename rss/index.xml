@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Mon, 18 Dec 2017 13:50:24 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[How to work with a docker image to Minishift repository]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Wed, 03 Jan 2018 12:01:03 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[How to work with a docker image to Minishift repository]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -473,6 +473,8 @@ the list of <code>OPTIONS</code>. For example for the usage of Minishift private
 </div>
 <div class="sect2">
 <h3 id="_insecure_registries_set_up">Insecure registries set up</h3>
+<div class="sect3">
+<h4 id="_fedorea_26">Fedorea 26</h4>
 <div class="paragraph">
 <p>In case of Red Hat clone of the docker client you can use settings described in article
 <a href="https://access.redhat.com/articles/1354823" class="bare">https://access.redhat.com/articles/1354823</a></p>
@@ -488,6 +490,48 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
 </div>
 </div>
 <div class="paragraph">
+<p>This works for me on Fedora 26 when I have installed docker <code>package</code>.
+A trouble with docker package for me came with some other images (e.g. for Oracle XE: <a href="https://hub.docker.com/r/wnameless/oracle-xe-11g">wnameless/oracle-xe-11g</a>
+where issue <a href="https://github.com/wnameless/docker-oracle-xe-11g/issues/59" class="bare">https://github.com/wnameless/docker-oracle-xe-11g/issues/59</a> talks about troubles with <code>docker</code> package and <code>docker-ce</code> is needed to be used instead.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rpm_docker_ce_to_be_configured_for_insecure_registries">RPM docker-ce to be configured for insecure registries</h4>
+<div class="paragraph">
+<p>Installation of <code>docker-ce</code> (replacing <code>docker</code>) is nicely introduced at guide <a href="https://docs.docker.com/engine/installation/linux/docker-ce/fedora/" class="bare">https://docs.docker.com/engine/installation/linux/docker-ce/fedora/</a>.</p>
+</div>
+<div class="paragraph">
+<p>Now what about the registries config. I found nice description at: <a href="https://forums.docker.com/t/error-with-docker-pull-from-insecure-registry/31007/8" class="bare">https://forums.docker.com/t/error-with-docker-pull-from-insecure-registry/31007/8</a></p>
+</div>
+<div class="paragraph">
+<p>The <code>docker-ce</code> rpm pakcage has config at <code>/lib/systemd/system/docker.service</code>. After installation I needed to change and add lines</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">[Service]
+Type=notify
+EnvironmentFile=-/etc/sysconfig/docker
+ExecStart=/usr/bin/dockerd $OPTIONS
+
+# I have left the rest of the config file untouched
+# ....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From that I redirected the configuration of the <code>OPTIONS</code> variable to file <code>/etc/sysconfig/docker</code> where I added my insecured registry just at a separate line like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_other_oses_and_docker_registry_configuration">Other OSes and docker registry configuration</h4>
+<div class="paragraph">
+<p><strong>DISCLAIMER</strong>: the following is untested</p>
+</div>
+<div class="paragraph">
 <p>For the other OSes, you need to change probably the <code>/etc/docker/daemon.json</code> with</p>
 </div>
 <div class="listingblock">
@@ -500,6 +544,7 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
 </div>
 <div class="paragraph">
 <p><em>There is a follow-up article about Minishift private registry at <a href="http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html" class="bare">http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html</a></em></p>
+</div>
 </div>
 </div>
 </div>

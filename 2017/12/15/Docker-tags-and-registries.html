@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1513605024950"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1513605024950"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1513605024950"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1514980863759"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1514980863759"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1514980863759"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1513605024950"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1514980863759"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
     <meta name="referrer" content="origin" />
@@ -195,7 +195,7 @@
             <ul class="post-meta-list">
               <li class="post-meta-item">
                 <time datetime="2017-12-15" itemprop="datePublished">
-                  4 days ago
+                  20 days ago
                 </time>
               </li>
                 <li class="post-meta-item">
@@ -208,7 +208,7 @@
                 <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
               </li>
             </ul>
-            <h1 itemprop="name headline" class="post-title"><a href="/" itemprop="url" data-pjax title="Docker tags and registries">Docker tags and registries</a></h1>
+            <h1 itemprop="name headline" class="post-title"><a href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" itemprop="url" data-pjax title="Docker tags and registries">Docker tags and registries</a></h1>
             <!--h2 itemprop="about" class="post-subtitle"></h2-->
           </header>
           <aside class="post-side">
@@ -456,6 +456,8 @@ the list of <code>OPTIONS</code>. For example for the usage of Minishift private
 </div>
 <div class="sect2">
 <h3 id="_insecure_registries_set_up">Insecure registries set up</h3>
+<div class="sect3">
+<h4 id="_fedorea_26">Fedorea 26</h4>
 <div class="paragraph">
 <p>In case of Red Hat clone of the docker client you can use settings described in article
 <a href="https://access.redhat.com/articles/1354823" class="bare">https://access.redhat.com/articles/1354823</a></p>
@@ -471,6 +473,48 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
 </div>
 </div>
 <div class="paragraph">
+<p>This works for me on Fedora 26 when I have installed docker <code>package</code>.
+A trouble with docker package for me came with some other images (e.g. for Oracle XE: <a href="https://hub.docker.com/r/wnameless/oracle-xe-11g">wnameless/oracle-xe-11g</a>
+where issue <a href="https://github.com/wnameless/docker-oracle-xe-11g/issues/59" class="bare">https://github.com/wnameless/docker-oracle-xe-11g/issues/59</a> talks about troubles with <code>docker</code> package and <code>docker-ce</code> is needed to be used instead.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rpm_docker_ce_to_be_configured_for_insecure_registries">RPM docker-ce to be configured for insecure registries</h4>
+<div class="paragraph">
+<p>Installation of <code>docker-ce</code> (replacing <code>docker</code>) is nicely introduced at guide <a href="https://docs.docker.com/engine/installation/linux/docker-ce/fedora/" class="bare">https://docs.docker.com/engine/installation/linux/docker-ce/fedora/</a>.</p>
+</div>
+<div class="paragraph">
+<p>Now what about the registries config. I found nice description at: <a href="https://forums.docker.com/t/error-with-docker-pull-from-insecure-registry/31007/8" class="bare">https://forums.docker.com/t/error-with-docker-pull-from-insecure-registry/31007/8</a></p>
+</div>
+<div class="paragraph">
+<p>The <code>docker-ce</code> rpm pakcage has config at <code>/lib/systemd/system/docker.service</code>. After installation I needed to change and add lines</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">[Service]
+Type=notify
+EnvironmentFile=-/etc/sysconfig/docker
+ExecStart=/usr/bin/dockerd $OPTIONS
+
+# I have left the rest of the config file untouched
+# ....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From that I redirected the configuration of the <code>OPTIONS</code> variable to file <code>/etc/sysconfig/docker</code> where I added my insecured registry just at a separate line like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_other_oses_and_docker_registry_configuration">Other OSes and docker registry configuration</h4>
+<div class="paragraph">
+<p><strong>DISCLAIMER</strong>: the following is untested</p>
+</div>
+<div class="paragraph">
 <p>For the other OSes, you need to change probably the <code>/etc/docker/daemon.json</code> with</p>
 </div>
 <div class="listingblock">
@@ -483,6 +527,7 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
 </div>
 <div class="paragraph">
 <p><em>There is a follow-up article about Minishift private registry at <a href="http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html" class="bare">http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html</a></em></p>
+</div>
 </div>
 </div>
 </div>
@@ -519,7 +564,7 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
     </article>
 
     <footer role="contentinfo" class="footer">
-      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2017. All Rights Reserved.</small></p>
+      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2018. All Rights Reserved.</small></p>
       <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
       <p><small>Adapted by <a href="https://twitter.com/mgreau">Maxime Gréau</a></small></p>
       <p><small>Published with <a href="http://hubpress.io">HubPress</a></small></p>
@@ -562,7 +607,7 @@ echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1513605024950"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1514980863759"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
