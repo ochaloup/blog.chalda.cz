@@ -3,6 +3,13 @@
 :hp-tags: blog
 :icons: font
 
+=== 2018
+
+* [2018-02-17] http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html
+* [2018-01-27] http://chalda.cz/presentations/byteman-workshop/slides.html[Byteman workshop for DevConf.cz 2018], https://github.com/ochaloup/byteman-workshop
+* [2018-01-11] http://jbossts.blogspot.cz/2018/01/narayana-periodic-recovery-of-xa.html
+* [2018-01-11] http://jbossts.blogspot.cz/2018/01/recovery-of-narayana-jdbc-transactional.html
+
 === 2017
 
 * [2017-12-18] http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html
@@ -19,3 +26,4 @@
 * [2017-05-06] http://blog.chalda.cz/2017/05/06/DNS-setting-for-Git-Hub-pages.html
 * [2017-05-05] http://blog.chalda.cz/2017/05/05/Links.html
 * [2017-05-05] http://blog.chalda.cz/2017/01/01/About-the-blog.html
+
