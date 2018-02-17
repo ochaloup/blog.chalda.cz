@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1518849895724"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1518849895724"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1518849895724"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1518850322820"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1518850322820"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1518850322820"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1518849895724"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1518850322820"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html" />
     <meta name="referrer" content="origin" />
@@ -411,7 +411,7 @@ the <code>&lt;configuration&gt;</code> element could be part of the <code>&lt;ex
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Mojo(name = "go-test")
+<pre class="highlight"><code class="language-java" data-lang="java">@Mojo(name = "go-test")
 public class MavenPluginTest extends AbstractMojo {
 
   @Parameter
@@ -441,7 +441,7 @@ One way of solving this is</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Parameter
+<pre class="highlight"><code class="language-java" data-lang="java">@Parameter
 private String[] buildPaths;
 
 @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -478,7 +478,7 @@ executed. Then this information is not needed to be part of the definition of th
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Mojo(name = "go-test", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+<pre class="highlight"><code class="language-java" data-lang="java">@Mojo(name = "go-test", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class MavenPluginTest extends AbstractMojo {</code></pre>
 </div>
 </div>
@@ -524,7 +524,7 @@ of the plugin project itself. Not the project it&#8217;s referenced in (the proj
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Parameter( defaultValue = "${plugin}", readonly = true )
+<pre class="highlight"><code class="language-java" data-lang="java">@Parameter( defaultValue = "${plugin}", readonly = true )
 private PluginDescriptor pluginDescriptor;
 
 // -- or --
@@ -548,7 +548,7 @@ for(URL url: classRealm.getURLs()) getLog().info(" &gt;&gt;&gt; " + url.toString
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>final File classes = new File(getProject().getBuild().getOutputDirectory());
+<pre class="highlight"><code class="language-java" data-lang="java">final File classes = new File(getProject().getBuild().getOutputDirectory());
 try {
   classRealm.addURL(classes.toURI().toURL());
 } catch (MalformedURLException e) {
@@ -567,7 +567,7 @@ you can use the following code snippet</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Mojo(name = "go-test", requiresDependencyResolution = ResolutionScope.COMPILE)
+<pre class="highlight"><code class="language-java" data-lang="java">@Mojo(name = "go-test", requiresDependencyResolution = ResolutionScope.COMPILE)
 public class MavenPluginTest extends AbstractMojo {
 
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -602,7 +602,7 @@ of <code>compile</code> scope, which was desired.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>List&lt;URL&gt; pathUrls = new ArrayList&lt;&gt;();
+<pre class="highlight"><code class="language-java" data-lang="java">List&lt;URL&gt; pathUrls = new ArrayList&lt;&gt;();
 for(String mavenCompilePath: project.getCompileClasspathElements()) {
     currentPathProcessed = mavenCompilePath;
     pathUrls.add(new File(mavenCompilePath).toURI().toURL());
@@ -646,7 +646,7 @@ See <a href="https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-rea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>System.out.printf("%n--%ncontextClassLoader:%s",
+<pre class="highlight"><code class="language-java" data-lang="java">System.out.printf("%n--%ncontextClassLoader:%s",
   ClassLoaderUtils.showClassLoaderHierarchy(
     Thread.currentThread().getContextClassLoader()));
 System.out.printf("%n--%ncontextClassLoader:%s",
@@ -735,7 +735,7 @@ System.out.printf("%n--%ncontextClassLoader:%s",
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1518849895724"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1518850322820"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

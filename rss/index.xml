@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sat, 17 Feb 2018 06:44:55 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Maven plugin and fight with classloading]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sat, 17 Feb 2018 06:52:02 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Maven plugin and fight with classloading]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -183,7 +183,7 @@ the <code>&lt;configuration&gt;</code> element could be part of the <code>&lt;ex
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Mojo(name = "go-test")
+<pre class="highlight"><code class="language-java" data-lang="java">@Mojo(name = "go-test")
 public class MavenPluginTest extends AbstractMojo {
 
   @Parameter
@@ -213,7 +213,7 @@ One way of solving this is</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Parameter
+<pre class="highlight"><code class="language-java" data-lang="java">@Parameter
 private String[] buildPaths;
 
 @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -250,7 +250,7 @@ executed. Then this information is not needed to be part of the definition of th
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Mojo(name = "go-test", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+<pre class="highlight"><code class="language-java" data-lang="java">@Mojo(name = "go-test", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class MavenPluginTest extends AbstractMojo {</code></pre>
 </div>
 </div>
@@ -296,7 +296,7 @@ of the plugin project itself. Not the project it&#8217;s referenced in (the proj
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Parameter( defaultValue = "${plugin}", readonly = true )
+<pre class="highlight"><code class="language-java" data-lang="java">@Parameter( defaultValue = "${plugin}", readonly = true )
 private PluginDescriptor pluginDescriptor;
 
 // -- or --
@@ -320,7 +320,7 @@ for(URL url: classRealm.getURLs()) getLog().info(" &gt;&gt;&gt; " + url.toString
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>final File classes = new File(getProject().getBuild().getOutputDirectory());
+<pre class="highlight"><code class="language-java" data-lang="java">final File classes = new File(getProject().getBuild().getOutputDirectory());
 try {
   classRealm.addURL(classes.toURI().toURL());
 } catch (MalformedURLException e) {
@@ -339,7 +339,7 @@ you can use the following code snippet</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>@Mojo(name = "go-test", requiresDependencyResolution = ResolutionScope.COMPILE)
+<pre class="highlight"><code class="language-java" data-lang="java">@Mojo(name = "go-test", requiresDependencyResolution = ResolutionScope.COMPILE)
 public class MavenPluginTest extends AbstractMojo {
 
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -374,7 +374,7 @@ of <code>compile</code> scope, which was desired.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>List&lt;URL&gt; pathUrls = new ArrayList&lt;&gt;();
+<pre class="highlight"><code class="language-java" data-lang="java">List&lt;URL&gt; pathUrls = new ArrayList&lt;&gt;();
 for(String mavenCompilePath: project.getCompileClasspathElements()) {
     currentPathProcessed = mavenCompilePath;
     pathUrls.add(new File(mavenCompilePath).toURI().toURL());
@@ -418,7 +418,7 @@ See <a href="https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-rea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>System.out.printf("%n--%ncontextClassLoader:%s",
+<pre class="highlight"><code class="language-java" data-lang="java">System.out.printf("%n--%ncontextClassLoader:%s",
   ClassLoaderUtils.showClassLoaderHierarchy(
     Thread.currentThread().getContextClassLoader()));
 System.out.printf("%n--%ncontextClassLoader:%s",
@@ -2914,6 +2914,25 @@ There is another article talking about this topic
 </div>
 </div>
 </div>]]></description><link>http://blog.chalda.cz/2017/05/05/Links.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/05/05/Links.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 05 May 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Blog posts history]]></title><description><![CDATA[<div class="sect2">
+<h3 id="_2018">2018</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>[2018-02-17] <a href="http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html" class="bare">http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html</a></p>
+</li>
+<li>
+<p>[2018-01-27] <a href="http://chalda.cz/presentations/byteman-workshop/slides.html">Byteman workshop for DevConf.cz 2018</a>, <a href="https://github.com/ochaloup/byteman-workshop" class="bare">https://github.com/ochaloup/byteman-workshop</a></p>
+</li>
+<li>
+<p>[2018-01-11] <a href="http://jbossts.blogspot.cz/2018/01/narayana-periodic-recovery-of-xa.html" class="bare">http://jbossts.blogspot.cz/2018/01/narayana-periodic-recovery-of-xa.html</a></p>
+</li>
+<li>
+<p>[2018-01-11] <a href="http://jbossts.blogspot.cz/2018/01/recovery-of-narayana-jdbc-transactional.html" class="bare">http://jbossts.blogspot.cz/2018/01/recovery-of-narayana-jdbc-transactional.html</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_2017">2017</h3>
 <div class="ulist">
 <ul>
