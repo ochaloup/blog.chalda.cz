@@ -1,4 +1,434 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Wed, 03 Jan 2018 12:14:49 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[How to work with a docker image to Minishift repository]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sat, 17 Feb 2018 06:44:55 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Maven plugin and fight with classloading]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/maven_plugin.png" alt="maven plugin.png">
+</div>
+</div>
+<div class="paragraph">
+<p>I wanted to write a Maven plugin with no experience on it.
+This is a short summary on my takeaways.</p>
+</div>
+<div class="paragraph">
+<p>As first step I would recommend Maven Apache documentation short tutorial at
+<a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" class="bare">https://maven.apache.org/guides/plugin/guide-java-plugin-development.html</a>. And then&#8230;&#8203; <span class="icon"><i class="fa fa-smile-o"></i></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_archetype_scaffolding">Archetype scaffolding</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can start with the Maven archetype generator</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">mvn archetype:generate -DgroupId=org.apache.maven -DartifactId=maven-plugin-test -DarchetypeArtifactId=maven-archetype-mojo -DinteractiveMode=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Maven generates the scaffolder of the Maven plugin project. Check the <code>pom.xml</code> of the generated project and its dependencies. There is provided dependency <code>org.apache.maven:maven-plugin-api</code> which provides parent class <code>AbstractMojo</code> for starting to write a Maven plugin. The generator then introduces class <code>or.apache.maven.MyMojo</code>. Check there the javadoc annotations used to define properties of the plugin.
+The documentation for this approach could be found at
+<a href="https://books.sonatype.com/mvnref-book/reference/writing-plugins-sect-mojo-params.html" class="bare">https://books.sonatype.com/mvnref-book/reference/writing-plugins-sect-mojo-params.html</a>.
+I haven&#8217;t written the plugin this way but I changed for using Maven annnotations.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_maven_plugin_creation">Maven plugin creation</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_plugin_project_dependencies">Plugin project dependencies</h3>
+<div class="paragraph">
+<p>I took the project and add these dependencies to the <code>pom.xml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;!-- basic Maven plugin dependency containing `AbstractMojo` class as parent
+     to all Maven plugin instances --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.maven&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-plugin-api&lt;/artifactId&gt;
+    &lt;version&gt;3.5.2&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;!-- annotation used for plugin properties definitions and injecting Maven objects --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.maven.plugin-tools&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-plugin-annotations&lt;/artifactId&gt;
+    &lt;version&gt;3.5.1&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;!-- Introducing Maven objects `MavenProject`, `PluginDescriptor` etc. --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.maven&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-core&lt;/artifactId&gt;
+    &lt;version&gt;3.5.2&lt;/version&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+I&#8217;m not sure about the correct <code>scope</code> but the <code>provided</code> works for me.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_source_code_definition">Source code definition</h3>
+<div class="paragraph">
+<p>The Maven plugin consists from one (or several) classes which inherit from class <code>org.apache.maven.plugin.AbstractMojo</code>.
+When inherited it forces you to implement method <code>execute()</code> which is called when the plugin is invoked.
+The plugin is introduced by annotation <code>@Mojo</code> (<em>Maven plain Old Java Object</em> )
+marking the class as the Maven plugin, assigning the name of executable <code>goal</code>.
+You can create multiple Mojo classes in your project and cover more goals.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import org.apache.maven.plugin.AbstractMojo;
+
+@Mojo(name = "go-test")
+public class MavenPluginTest extends AbstractMojo {
+
+  @Override
+    public void execute() throws MojoExecutionException, MojoFailureException     {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To get executed your plugin in the referenced project you will add this to the <code>pom.xml</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;build&gt;
+   &lt;plugins&gt;
+     &lt;plugin&gt;
+       &lt;groupId&gt;org.apache.maven&lt;/groupId&gt;
+       &lt;artifactId&gt;maven-test-plugin&lt;/artifactId&gt;
+       &lt;version&gt;...&lt;/version&gt;
+       &lt;executions&gt;
+         &lt;execution&gt;
+           &lt;phase&gt;process-classes&lt;/phase&gt;
+           &lt;goals&gt;
+             &lt;goal&gt;go-test&lt;/goal&gt;
+           &lt;/goals&gt;
+         &lt;/execution&gt;
+       &lt;/executions&gt;
+     &lt;/plugin&gt;
+   &lt;/plugins&gt;
+ &lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+you can define multiple <code>&lt;execution&gt;</code> elements (e.g. with different configuration), you can use multiple <code>&lt;goal&gt;</code> elements to get them executed
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_plugin_parametrized">Plugin parametrized</h3>
+<div class="paragraph">
+<p>The plugin can be parametrized by using <code>@Parameter</code> annotation. This provides
+way of passing values from the <code>pom.xml</code> to the plugin code execution.
+Let&#8217;s say you want to  provide name of the
+<a href="http://www.thinkcode.se/blog/2014/05/21/use-maven-build-directory-in-your-plugin">build directory for your plugin</a>
+which is resolved for <code>./target/classes</code>. The project executing the plugin defines in <code>pom.xml</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;plugin&gt;
+  &lt;groupId&gt;org.apache.maven&lt;/groupId&gt;
+  &lt;artifactId&gt;maven-test-plugin&lt;/artifactId&gt;
+  &lt;version&gt;...&lt;/version&gt;
+  &lt;configuration&gt;
+    &lt;buildDirectory&gt;${project.build.directory}&lt;/buildDirectory&gt;
+  &lt;/configuration&gt;
+  &lt;executions&gt;
+    &lt;execution&gt;
+      &lt;phase&gt;process-classes&lt;/phase&gt;
+      &lt;goals&gt;
+        &lt;goal&gt;go-test&lt;/goal&gt;
+      &lt;/goals&gt;
+    &lt;/execution&gt;
+  &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+the <code>&lt;configuration&gt;</code> element could be part of the <code>&lt;execution&gt;</code> element too
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>@Mojo(name = "go-test")
+public class MavenPluginTest extends AbstractMojo {
+
+  @Parameter
+  private String buildDirectory;
+
+  @Override
+  public void execute() throws MojoExecutionException, MojoFailureException {
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We&#8217;ve used the simple <code>@Parameter</code> annotation. This annotation offers several attributes.
+We can define the default value as the project build folder while using in form of Maven variable <code>@Parameter(defaultValue = "${project.build.directory}")</code>.</p>
+</div>
+<div class="paragraph">
+<p>A bit trouble is with multi value (array type) parameter. The <code>defaultValue</code> is not evaluated.
+This <code>@Parameter(defaultValue = "${project.build.directory}") private String[] buildPaths</code> does not work.
+We can define the default value by direct assignment
+<code>@Parameter private String[] buildPaths = new String()["${project.build.directory}"]</code> which works but it does not evaluate the stig form of the Maven configuration property.</p>
+</div>
+<div class="paragraph">
+<p>Maven brings several classes that could be used for getting information from the Maven
+execution. One of them is <code>org.apache.maven.project.MavenProject</code> that could be
+injected to <code>@Parameter</code> annotation and then queried for things like build directory.
+One way of solving this is</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>@Parameter
+private String[] buildPaths;
+
+@Parameter(defaultValue = "${project}", readonly = true, required = true)
+protected MavenProject project;
+
+@Override
+public void execute() throws MojoExecutionException, MojoFailureException {
+  if(buildPaths == null) buildPaths
+    = new String[] {project.getBuild().getOutputDirectory()};
+
+  getLog().info("provided buildPath is '" + Arrays.asList(buildPaths) + "'");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here I use the <code>getLog()</code> method declared in the <code>AbstractMojo</code> providing the
+Maven log - driven by Maven execution parameters (e.g. debug is switch on while run <code>mvn install -X</code>).</p>
+</div>
+<div class="paragraph">
+<p>The nice brief summary of the annotations and the Maven classes to be used in the Maven plugin
+is provided at <a href="https://maven.apache.org/plugin-tools/maven-plugin-tools-annotations" class="bare">https://maven.apache.org/plugin-tools/maven-plugin-tools-annotations</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_definition_of_default_phase">Definition of default phase</h3>
+<div class="paragraph">
+<p>The <code>@Mojo</code> annotation provides way of defininig default phase for the plugin being
+executed. Then this information is not needed to be part of the definition of the <code>pom.xml</code>
+(you can omit <code>&lt;phase&gt;</code> element under <code>&lt;execution&gt;</code>).</p>
+</div>
+<div class="paragraph">
+<p>For list of the lifecycles and their phases look at
+<a href="http://www.avajava.com/tutorials/lessons/what-are-the-phases-of-the-maven-default-lifecycle.html" class="bare">http://www.avajava.com/tutorials/lessons/what-are-the-phases-of-the-maven-default-lifecycle.html</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>@Mojo(name = "go-test", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+public class MavenPluginTest extends AbstractMojo {</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;plugin&gt;
+  &lt;groupId&gt;org.apache.maven&lt;/groupId&gt;
+  &lt;artifactId&gt;maven-test-plugin&lt;/artifactId&gt;
+  &lt;version&gt;...&lt;/version&gt;
+  &lt;executions&gt;
+    &lt;execution&gt;
+      &lt;goals&gt;
+        &lt;goal&gt;go-test&lt;/goal&gt;
+      &lt;/goals&gt;
+    &lt;/execution&gt;
+  &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Consult the documentation to check all the annotations offered by Maven annotations artifact and their parameters
+<a href="http://maven.apache.org/developers/mojo-api-specification.html" class="bare">http://maven.apache.org/developers/mojo-api-specification.html</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_class_loading_troubles">Class loading troubles</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I needed to create a plugin which takes a list of paths which will be scanned for
+classes and then loaded. I found that the I need to get a bit into classloading
+scheme of the Maven plugin. You can check the explanation at <a href="http://takari.io/book/91-maven-classloading.html" class="bare">http://takari.io/book/91-maven-classloading.html</a>.</p>
+</div>
+<div class="paragraph">
+<p>My trouble was that <code>Class.forName("cz.chalda.MyClass")</code> was not resolved with the restricted classpath
+enriched with the dependencies taken during project compilation.
+Normally (at least I understand this) the plugin can see dependencies defined in <code>compile</code> scope
+of the plugin project itself. Not the project it&#8217;s referenced in (the project the plugin is executed at).</p>
+</div>
+<div class="paragraph">
+<p>This could be shown with use of <code>PluginDescriptor</code> Maven class. You can verify it with the following code snippet</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>@Parameter( defaultValue = "${plugin}", readonly = true )
+private PluginDescriptor pluginDescriptor;
+
+// -- or --
+
+final PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().get("pluginDescriptor");
+
+// printing the ClassRealm content containing plugin classpath dependencies
+final ClassRealm classRealm = pluginDescriptor.getClassRealm();
+for(URL url: classRealm.getURLs()) getLog().info(" &gt;&gt;&gt; " + url.toString());</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>ClassRealm</code> can be enriched by URL to broad class loading scope</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>final File classes = new File(getProject().getBuild().getOutputDirectory());
+try {
+  classRealm.addURL(classes.toURI().toURL());
+} catch (MalformedURLException e) {
+  getLog().error("Can't create URL from path to project output directory '"
+    + getProject().getBuild().getOutputDirectory() + "'", e)
+}</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you want to get the classpath depenedencies from the project the plugin is executed at,
+you can use the following code snippet</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>@Mojo(name = "go-test", requiresDependencyResolution = ResolutionScope.COMPILE)
+public class MavenPluginTest extends AbstractMojo {
+
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  protected MavenProject project;
+
+  @Override
+  public void execute() throws MojoExecutionException, MojoFailureException {
+
+    // listing the Maven project class path of compile and runtime
+    try {
+        getLog().info(("compile cp: " +
+          this.project.getCompileClasspathElements());
+        getLog().info(("runtime cp: " +
+          this.project.getRuntimeClasspathElements());
+    } catch (DependencyResolutionRequiredException e) {
+        new MojoExecutionException("Dependency resolution failed", e);
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can see I used the <code>@Mojo</code> annotation attribute <code>requiresDependencyResolution</code>
+defining that the depenedencies should be resolved for this plugin. If it&#8217;s not
+used (at least in my experience) the list of the compile class path elements
+will contains only path <code>./target/classes</code> but not the list of the Maven project dependencies
+of <code>compile</code> scope, which was desired.</p>
+</div>
+<div class="paragraph">
+<p>With these I could create my own class loader and particularly say what is the scope of the class loading
+(you can check other notes on this over here <a href="http://blog.semsur-it.com/2011/11/java-class-loader-and-maven-plugin.html" class="bare">http://blog.semsur-it.com/2011/11/java-class-loader-and-maven-plugin.html</a>)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>List&lt;URL&gt; pathUrls = new ArrayList&lt;&gt;();
+for(String mavenCompilePath: project.getCompileClasspathElements()) {
+    currentPathProcessed = mavenCompilePath;
+    pathUrls.add(new File(mavenCompilePath).toURI().toURL());
+}
+
+URL[] urlsForClassLoader = pathUrls.toArray(new URL[pathUrls.size()]);
+getLog().debug("urls for URLClassLoader: " + Arrays.asList(urlsForClassLoader));
+
+// need to define parent classloader which knows all dependencies of the plugin
+classLoader = new URLClassLoader(urlsForClassLoader, MavenPluginTest.class.getClassLoader());</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_note_class_loader_debugging">Note: class loader debugging</h3>
+<div class="paragraph">
+<p>I found it&#8217;s handy to understand what are the resources the particular class loader works with.
+Thus I took inspiration from
+<a href="http://www.java2s.com/Tutorial/Java/0125__Reflection/AnalyzeClassLoaderhierarchyforanygivenobjectorclassloader.htm" class="bare">http://www.java2s.com/Tutorial/Java/0125__Reflection/AnalyzeClassLoaderhierarchyforanygivenobjectorclassloader.htm</a>
+and adjusted for my purposes
+<a href="https://github.com/ochaloup/class-loader-debug/blob/master/src/main/java/cz/chalda/classloader/ClassLoaderUtils.java" class="bare">https://github.com/ochaloup/class-loader-debug/blob/master/src/main/java/cz/chalda/classloader/ClassLoaderUtils.java</a></p>
+</div>
+<div class="paragraph">
+<p>With this you can get printed the tree of the classloaders (up to the parent one) and check what is the classpath
+the class loader works with.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+bear in mind the <em>normal</em> java classloader first ask parent if the resource is known and then it tries to resolve it himself. This is reflected in the printing (ie. you can see the child classloader prints it can work with what the parent classloader is capable too).<br>
+See <a href="https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-really-get-classloaders/2/" class="bare">https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-really-get-classloaders/2/</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The usage of the <code>ClassLoaderUtils</code> class could be in way</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>System.out.printf("%n--%ncontextClassLoader:%s",
+  ClassLoaderUtils.showClassLoaderHierarchy(
+    Thread.currentThread().getContextClassLoader()));
+System.out.printf("%n--%ncontextClassLoader:%s",
+  ClassLoaderUtils.showClassLoaderHierarchy(
+    MavenPluginTest.class.getClassLoader()));</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html</link><guid isPermaLink="true">http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html</guid><category><![CDATA[java]]></category><category><![CDATA[maven]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Sat, 17 Feb 2018 00:00:00 GMT</pubDate></item><item><title><![CDATA[How to work with a docker image to Minishift repository]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
