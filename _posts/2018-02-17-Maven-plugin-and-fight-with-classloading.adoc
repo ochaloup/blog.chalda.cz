@@ -79,7 +79,7 @@ public class MavenPluginTest extends AbstractMojo {
 }
 ```
 
-If you reference your plugin in project to get it executed you will put it to the project `pom.xml` as
+To get executed your plugin in the referenced project you will add this to the `pom.xml`
 
 ```xml
 <build>
@@ -101,8 +101,7 @@ If you reference your plugin in project to get it executed you will put it to th
  </build>
 ```
 
-NOTE: you can define multiple `<execution>` elements (e.g. with different configuration)
-and you can use multiple `<goal>` elements to get them executed
+NOTE: you can define multiple `<execution>` elements (e.g. with different configuration), you can use multiple `<goal>` elements to get them executed
 
 === Plugin parametrized
 
@@ -110,7 +109,7 @@ The plugin can be parametrized by using `@Parameter` annotation. This provides
 way of passing values from the `pom.xml` to the plugin code execution.
 Let's say you want to  provide name of the
 http://www.thinkcode.se/blog/2014/05/21/use-maven-build-directory-in-your-plugin[build directory for your plugin]
-which is resolved for `./target/classes`.
+which is resolved for `./target/classes`. The project executing the plugin defines in `pom.xml`
 
 ```xml
 <plugin>
@@ -131,13 +130,13 @@ which is resolved for `./target/classes`.
 </plugin>
 ```
 
-NOTE: the `<configuration>` element could be part of the `<execution>` too
+NOTE: the `<configuration>` element could be part of the `<execution>` element too
 
 ```
 @Mojo(name = "go-test")
 public class MavenPluginTest extends AbstractMojo {
 
-  @Parameter(
+  @Parameter
   private String buildDirectory;
 
   @Override
@@ -146,22 +145,18 @@ public class MavenPluginTest extends AbstractMojo {
 }
 ```
 
-Here we used the simple `@Parameter`. This annotation has several attributes.
-We can define the default value as the project build folder and even use the Maven variable
-`@Parameter(defaultValue = "${project.build.directory}")`.
+We've used the simple `@Parameter` annotation. This annotation offers several attributes.
+We can define the default value as the project build folder while using in form of Maven variable `@Parameter(defaultValue = "${project.build.directory}")`.
 
-A bit trouble is with multi value parameter where `defaultValue` is not evaluated
-from the Maven variables.
-This `@Parameter(defaultValue = "${project.build.directory}") private String[] buildPaths`
-does not work.
+A bit trouble is with multi value (array type) parameter. The `defaultValue` is not evaluated.
+This `@Parameter(defaultValue = "${project.build.directory}") private String[] buildPaths` does not work.
 We can define the default value by direct assignment
-`@Parameter private String[] buildPaths = new String()["${project.build.directory}"]`
-which in turn is not evaluated from Maven configuration property to its value.
+`@Parameter private String[] buildPaths = new String()["${project.build.directory}"]` which works but it does not evaluate the stig form of the Maven configuration property.
 
 Maven brings several classes that could be used for getting information from the Maven
 execution. One of them is `org.apache.maven.project.MavenProject` that could be
-injected to with `@Parameter` annotation and then queried for such things like build directory.
-Thus one way to solve this issue mentioned above is
+injected to `@Parameter` annotation and then queried for things like build directory.
+One way of solving this is
 
 ```
 @Parameter
@@ -175,7 +170,7 @@ public void execute() throws MojoExecutionException, MojoFailureException {
   if(buildPaths == null) buildPaths
     = new String[] {project.getBuild().getOutputDirectory()};
 
-  getLog().info("provided buildPath is '" + Arrays.asList(buildPaths) + "''");
+  getLog().info("provided buildPath is '" + Arrays.asList(buildPaths) + "'");
 }
 ```
 
@@ -214,7 +209,7 @@ public class MavenPluginTest extends AbstractMojo {
 </plugin>
 ```
 
-Consult the documentation to check all the annotations and its parameters
+Consult the documentation to check all the annotations offered by Maven annotations artifact and their parameters
 http://maven.apache.org/developers/mojo-api-specification.html
 
 == Class loading troubles
@@ -225,10 +220,10 @@ scheme of the Maven plugin. You can check the explanation at http://takari.io/bo
 
 My trouble was that `Class.forName("cz.chalda.MyClass")` was not resolved with the restricted classpath
 enriched with the dependencies taken during project compilation.
-Normally (I hope I can says so :) the plugin can see dependencies defined in `compile` scope
+Normally (at least I understand this) the plugin can see dependencies defined in `compile` scope
 of the plugin project itself. Not the project it's referenced in (the project the plugin is executed at).
 
-This could be shown when resolved from `PluginDescriptor` Maven class. It's shown in the following code snippet
+This could be shown with use of `PluginDescriptor` Maven class. You can verify it with the following code snippet
 
 ```
 @Parameter( defaultValue = "${plugin}", readonly = true )
@@ -273,8 +268,10 @@ public class MavenPluginTest extends AbstractMojo {
 
     // listing the Maven project class path of compile and runtime
     try {
-        getLog().info(("compile cp: " + this.project.getCompileClasspathElements());
-        getLog().info(("runtime cp: " + this.project.getRuntimeClasspathElements());
+        getLog().info(("compile cp: " +
+          this.project.getCompileClasspathElements());
+        getLog().info(("runtime cp: " +
+          this.project.getRuntimeClasspathElements());
     } catch (DependencyResolutionRequiredException e) {
         new MojoExecutionException("Dependency resolution failed", e);
     }
@@ -286,10 +283,10 @@ You can see I used the `@Mojo` annotation attribute `requiresDependencyResolutio
 defining that the depenedencies should be resolved for this plugin. If it's not
 used (at least in my experience) the list of the compile class path elements
 will contains only path `./target/classes` but not the list of the Maven project dependencies
-of `compile` scope which was desired.
+of `compile` scope, which was desired.
 
-With these I could create my own class loader and particularly say what is scope of the class loading
-(you can check notes over here to http://blog.semsur-it.com/2011/11/java-class-loader-and-maven-plugin.html)
+With these I could create my own class loader and particularly say what is the scope of the class loading
+(you can check other notes on this over here http://blog.semsur-it.com/2011/11/java-class-loader-and-maven-plugin.html)
 
 ```
 List<URL> pathUrls = new ArrayList<>();
@@ -305,7 +302,7 @@ getLog().debug("urls for URLClassLoader: " + Arrays.asList(urlsForClassLoader));
 classLoader = new URLClassLoader(urlsForClassLoader, MavenPluginTest.class.getClassLoader());
 ```
 
-=== Note on class loader debugging
+=== Note: class loader debugging
 
 I found it's handy to understand what are the resources the particular class loader works with.
 Thus I took inspiration from
@@ -316,344 +313,16 @@ https://github.com/ochaloup/class-loader-debug/blob/master/src/main/java/cz/chal
 With this you can get printed the tree of the classloaders (up to the parent one) and check what is the classpath
 the class loader works with.
 
-NOTE: bear in mind the _normal_ java classloader first ask parent if the resource is known and then it tries
-to resolve it himself. This is reflected in the printing (ie. you can see the child classloader prints
-it can work with what the parent classloader is capable too).
+NOTE: bear in mind the _normal_ java classloader first ask parent if the resource is known and then it tries to resolve it himself. This is reflected in the printing (ie. you can see the child classloader prints it can work with what the parent classloader is capable too). +
 See https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-really-get-classloaders/2/.
 
 The usage of the `ClassLoaderUtils` class could be in way
 
 ```
 System.out.printf("%n--%ncontextClassLoader:%s",
-  ClassLoaderUtils.showClassLoaderHierarchy(Thread.currentThread().getContextClassLoader()));
+  ClassLoaderUtils.showClassLoaderHierarchy(
+    Thread.currentThread().getContextClassLoader()));
 System.out.printf("%n--%ncontextClassLoader:%s",
-  ClassLoaderUtils.showClassLoaderHierarchy(MavenPluginTest.class.getClassLoader()));
-```
-
-This is a short summary how to start and get it working.
-
-As a first step I would recommend to check the nice short tutorial at
-https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-
-== Archetype scaffolding
-
-If you want started writing a Maven plugin you can use the archetype generator
-
-```bash
-mvn archetype:generate -DgroupId=org.apache.maven -DartifactId=maven-plugin-test -DarchetypeArtifactId=maven-archetype-mojo -DinteractiveMode=false
-```
-
-Maven generates the scaffolder of the Maven plugin project. You can see it makes
-dependency on the `org.apache.maven:maven-plugin-api` in `pom.xml`. The Maven plugin
-class `or.apache.maven.MyMojo` then uses javadoc annotations to define properties
-of the plugin.
-The documentation for this approach could be found at
-https://books.sonatype.com/mvnref-book/reference/writing-plugins-sect-mojo-params.html.
-I haven't written the plugin this way but I changed for using Maven annnotations.
-
-== Maven plugin creation
-
-=== Plugin project dependencies
-
-I took the project and add these dependencies to the `pom.xml`.
-
-```xml
-<!-- basic Maven plugin dependency containing `AbstractMojo` class as parent
-     to all Maven plugin instances -->
-<dependency>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven-plugin-api</artifactId>
-    <version>3.5.2</version>
-    <scope>provided</scope>
-</dependency>
-<!-- annotation used for plugin properties definitions and injecting Maven objects -->
-<dependency>
-    <groupId>org.apache.maven.plugin-tools</groupId>
-    <artifactId>maven-plugin-annotations</artifactId>
-    <version>3.5.1</version>
-    <scope>provided</scope>
-</dependency>
-<!-- Maven project to work with like `MavenProject`, `PluginDescriptor` etc. -->
-<dependency>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven-core</artifactId>
-    <version>3.5.2</version>
-    <scope>provided</scope>
-</dependency>
-```
-
-NOTE: I'm not sure about the correct `scope` but provided works for me thus I've
-  left it in my plugin for now.
-
-=== Source code definition
-
-The Maven plugin consists from one (or several) classes which inherit from class `org.apache.maven.plugin.AbstractMojo`.
-This defines to implement method `execute()` which is called when the plugin is invoked.
-The plugin is introduced by annotation `@Mojo` (_Maven plain Old Java Object_ )
-marking the class as the Maven plugin, assigning the `goal` making it executable.
-You can create multiple Mojo classes in your project and cover more goals.
-
-You can start with like this
-
-```java
-import org.apache.maven.plugin.AbstractMojo;
-
-@Mojo(name = "go-test")
-public class MavenPluginTest extends AbstractMojo {
-
-  @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-    }
-}
-```
-
-If you reference your plugin in project to get it executed you will put it to the project `pom.xml` as
-
-```xml
-<build>
-   <plugins>
-     <plugin>
-       <groupId>org.apache.maven</groupId>
-       <artifactId>maven-test-plugin</artifactId>
-       <version>...</version>
-       <executions>
-         <execution>
-           <phase>process-classes</phase>
-           <goals>
-             <goal>go-test</goal>
-           </goals>
-         </execution>
-       </executions>
-     </plugin>
-   </plugins>
- </build>
-```
-
-NOTE: you can define multiple `<execution>` elements (e.g. with different configuration)
-and you can use multiple `<goal>` elements to get them executed
-
-=== Plugin parametrized
-
-The plugin can be parametrized by using `@Parameter` annotation. This provides
-way of passing values from the `pom.xml` to the plugin code execution.
-Let's say you want to  provide name of the
-http://www.thinkcode.se/blog/2014/05/21/use-maven-build-directory-in-your-plugin[build directory for your plugin]
-which is resolved for `./target/classes`.
-
-```xml
-<plugin>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-test-plugin</artifactId>
-  <version>...</version>
-  <configuration>
-    <buildDirectory>${project.build.directory}</buildDirectory>
-  </configuration>
-  <executions>
-    <execution>
-      <phase>process-classes</phase>
-      <goals>
-        <goal>go-test</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>
-```
-
-NOTE: the `<configuration>` element could be part of the `<execution>` too
-
-```
-@Mojo(name = "go-test")
-public class MavenPluginTest extends AbstractMojo {
-
-  @Parameter(
-  private String buildDirectory;
-
-  @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-  }
-}
-```
-
-Here we used the simple `@Parameter`. This annotation has several attributes.
-We can define the default value as the project build folder and even use the Maven variable
-`@Parameter(defaultValue = "${project.build.directory}")`.
-
-A bit trouble is with multi value parameter where `defaultValue` is not evaluated
-from the Maven variables.
-This `@Parameter(defaultValue = "${project.build.directory}") private String[] buildPaths`
-does not work.
-We can define the default value by direct assignment
-`@Parameter private String[] buildPaths = new String()["${project.build.directory}"]`
-which in turn is not evaluated from Maven configuration property to its value.
-
-Maven brings several classes that could be used for getting information from the Maven
-execution. One of them is `org.apache.maven.project.MavenProject` that could be
-injected to with `@Parameter` annotation and then queried for such things like build directory.
-Thus one way to solve this issue mentioned above is
-
-```
-@Parameter
-private String[] buildPaths;
-
-@Parameter(defaultValue = "${project}", readonly = true, required = true)
-protected MavenProject project;
-
-@Override
-public void execute() throws MojoExecutionException, MojoFailureException {
-  if(buildPaths == null) buildPaths
-    = new String[] {project.getBuild().getOutputDirectory()};
-
-  getLog().info("provided buildPath is '" + Arrays.asList(buildPaths) + "''");
-}
-```
-
-Here I use the `getLog()` method declared in the `AbstractMojo` providing the
-Maven log - driven by Maven execution parameters (e.g. debug is switch on while run `mvn install -X`).
-
-The nice brief summary of the annotations and the Maven classes to be used in the Maven plugin
-is provided at https://maven.apache.org/plugin-tools/maven-plugin-tools-annotations
-
-=== Definition of default phase
-
-The `@Mojo` annotation provides way of defininig default phase for the plugin being
-executed. Then this information is not needed to be part of the definition of the `pom.xml`
-(you can omit `<phase>` element under `<execution>`).
-
-For list of the lifecycles and their phases look at
-http://www.avajava.com/tutorials/lessons/what-are-the-phases-of-the-maven-default-lifecycle.html
-
-```
-@Mojo(name = "go-test", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
-public class MavenPluginTest extends AbstractMojo {
-```
-
-```xml
-<plugin>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>maven-test-plugin</artifactId>
-  <version>...</version>
-  <executions>
-    <execution>
-      <goals>
-        <goal>go-test</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>
-```
-
-Consult the documentation to check all the annotations and its parameters
-http://maven.apache.org/developers/mojo-api-specification.html
-
-== Class loading troubles
-
-I needed to create a plugin which takes a list of paths which will be scanned for
-classes and then loaded. I found that the I need to get a bit into classloading
-scheme of the Maven plugin. You can check the explanation at http://takari.io/book/91-maven-classloading.html.
-
-My trouble was that `Class.forName("cz.chalda.MyClass")` was not resolved with the restricted classpath
-enriched with the dependencies taken during project compilation.
-Normally (I hope I can says so :) the plugin can see dependencies defined in `compile` scope
-of the plugin project itself. Not the project it's referenced in (the project the plugin is executed at).
-
-This could be shown when resolved from `PluginDescriptor` Maven class. It's shown in the following code snippet
-
-```
-@Parameter( defaultValue = "${plugin}", readonly = true )
-private PluginDescriptor pluginDescriptor;
-
-// -- or --
-
-final PluginDescriptor pluginDescriptor = (PluginDescriptor) getPluginContext().get("pluginDescriptor");
-
-// printing the ClassRealm content containing plugin classpath dependencies
-final ClassRealm classRealm = pluginDescriptor.getClassRealm();
-for(URL url: classRealm.getURLs()) getLog().info(" >>> " + url.toString());
-```
-
-[NOTE]
-====
-The `ClassRealm` can be enriched by URL to broad class loading scope
-
-```
-final File classes = new File(getProject().getBuild().getOutputDirectory());
-try {
-  classRealm.addURL(classes.toURI().toURL());
-} catch (MalformedURLException e) {
-  getLog().error("Can't create URL from path to project output directory '"
-    + getProject().getBuild().getOutputDirectory() + "'", e)
-}
-```
-====
-
-If you want to get the classpath depenedencies from the project the plugin is executed at,
-you can use the following code snippet
-
-```
-@Mojo(name = "go-test", requiresDependencyResolution = ResolutionScope.COMPILE)
-public class MavenPluginTest extends AbstractMojo {
-
-  @Parameter(defaultValue = "${project}", readonly = true, required = true)
-  protected MavenProject project;
-
-  @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-
-    // listing the Maven project class path of compile and runtime
-    try {
-        getLog().info(("compile cp: " + this.project.getCompileClasspathElements());
-        getLog().info(("runtime cp: " + this.project.getRuntimeClasspathElements());
-    } catch (DependencyResolutionRequiredException e) {
-        new MojoExecutionException("Dependency resolution failed", e);
-    }
-  }
-}
-```
-
-You can see I used the `@Mojo` annotation attribute `requiresDependencyResolution`
-defining that the depenedencies should be resolved for this plugin. If it's not
-used (at least in my experience) the list of the compile class path elements
-will contains only path `./target/classes` but not the list of the Maven project dependencies
-of `compile` scope which was desired.
-
-With these I could create my own class loader and particularly say what is scope of the class loading
-(you can check notes over here to http://blog.semsur-it.com/2011/11/java-class-loader-and-maven-plugin.html)
-
-```
-List<URL> pathUrls = new ArrayList<>();
-for(String mavenCompilePath: project.getCompileClasspathElements()) {
-    currentPathProcessed = mavenCompilePath;
-    pathUrls.add(new File(mavenCompilePath).toURI().toURL());
-}
-
-URL[] urlsForClassLoader = pathUrls.toArray(new URL[pathUrls.size()]);
-getLog().debug("urls for URLClassLoader: " + Arrays.asList(urlsForClassLoader));
-
-// need to define parent classloader which knows all dependencies of the plugin
-classLoader = new URLClassLoader(urlsForClassLoader, MavenPluginTest.class.getClassLoader());
-```
-
-=== Note on class loader debugging
-
-I found it's handy to understand what are the resources the particular class loader works with.
-Thus I took inspiration from
-http://www.java2s.com/Tutorial/Java/0125__Reflection/AnalyzeClassLoaderhierarchyforanygivenobjectorclassloader.htm
-and adjusted for my purposes
-https://github.com/ochaloup/class-loader-debug/blob/master/src/main/java/cz/chalda/classloader/ClassLoaderUtils.java
-
-With this you can get printed the tree of the classloaders (up to the parent one) and check what is the classpath
-the class loader works with.
-
-NOTE: bear in mind the _normal_ java classloader first ask parent if the resource is known and then it tries
-to resolve it himself. This is reflected in the printing (ie. you can see the child classloader prints
-it can work with what the parent classloader is capable too).
-See https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-really-get-classloaders/2/.
-
-The usage of the `ClassLoaderUtils` class could be in way
-
-```
-System.out.printf("%n--%ncontextClassLoader:%s",
-  ClassLoaderUtils.showClassLoaderHierarchy(Thread.currentThread().getContextClassLoader()));
-System.out.printf("%n--%ncontextClassLoader:%s",
-  ClassLoaderUtils.showClassLoaderHierarchy(MavenPluginTest.class.getClassLoader()));
+  ClassLoaderUtils.showClassLoaderHierarchy(
+    MavenPluginTest.class.getClassLoader()));
 ```
