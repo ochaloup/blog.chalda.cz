@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sat, 17 Feb 2018 06:52:02 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Maven plugin and fight with classloading]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sat, 17 Feb 2018 06:54:36 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Maven plugin and fight with classloading]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -11,13 +11,9 @@ This is a short summary on my takeaways.</p>
 </div>
 <div class="paragraph">
 <p>As first step I would recommend Maven Apache documentation short tutorial at
-<a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" class="bare">https://maven.apache.org/guides/plugin/guide-java-plugin-development.html</a>. And then&#8230;&#8203; <span class="icon"><i class="fa fa-smile-o"></i></span></p>
+<a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" class="bare">https://maven.apache.org/guides/plugin/guide-java-plugin-development.html</a>. And then&#8230;&#8203; <span class="icon"><i class="fa fa-smile-o"></i></span>
+== Archetype scaffolding</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_archetype_scaffolding">Archetype scaffolding</h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>You can start with the Maven archetype generator</p>
 </div>
@@ -418,10 +414,10 @@ See <a href="https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-rea
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">System.out.printf("%n--%ncontextClassLoader:%s",
+<pre class="highlight"><code class="language-java" data-lang="java">System.out.printf("%n--%ncontext class loader hierarchy: %s",
   ClassLoaderUtils.showClassLoaderHierarchy(
     Thread.currentThread().getContextClassLoader()));
-System.out.printf("%n--%ncontextClassLoader:%s",
+System.out.printf("%n--%nplugin class loader hierarchy: %s",
   ClassLoaderUtils.showClassLoaderHierarchy(
     MavenPluginTest.class.getClassLoader()));</code></pre>
 </div>
