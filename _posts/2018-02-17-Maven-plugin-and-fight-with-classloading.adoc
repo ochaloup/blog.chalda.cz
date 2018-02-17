@@ -132,7 +132,7 @@ which is resolved for `./target/classes`. The project executing the plugin defin
 
 NOTE: the `<configuration>` element could be part of the `<execution>` element too
 
-```
+```java
 @Mojo(name = "go-test")
 public class MavenPluginTest extends AbstractMojo {
 
@@ -158,7 +158,7 @@ execution. One of them is `org.apache.maven.project.MavenProject` that could be
 injected to `@Parameter` annotation and then queried for things like build directory.
 One way of solving this is
 
-```
+```java
 @Parameter
 private String[] buildPaths;
 
@@ -189,7 +189,7 @@ executed. Then this information is not needed to be part of the definition of th
 For list of the lifecycles and their phases look at
 http://www.avajava.com/tutorials/lessons/what-are-the-phases-of-the-maven-default-lifecycle.html
 
-```
+```java
 @Mojo(name = "go-test", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class MavenPluginTest extends AbstractMojo {
 ```
@@ -225,7 +225,7 @@ of the plugin project itself. Not the project it's referenced in (the project th
 
 This could be shown with use of `PluginDescriptor` Maven class. You can verify it with the following code snippet
 
-```
+```java
 @Parameter( defaultValue = "${plugin}", readonly = true )
 private PluginDescriptor pluginDescriptor;
 
@@ -242,7 +242,7 @@ for(URL url: classRealm.getURLs()) getLog().info(" >>> " + url.toString());
 ====
 The `ClassRealm` can be enriched by URL to broad class loading scope
 
-```
+```java
 final File classes = new File(getProject().getBuild().getOutputDirectory());
 try {
   classRealm.addURL(classes.toURI().toURL());
@@ -256,7 +256,7 @@ try {
 If you want to get the classpath depenedencies from the project the plugin is executed at,
 you can use the following code snippet
 
-```
+```java
 @Mojo(name = "go-test", requiresDependencyResolution = ResolutionScope.COMPILE)
 public class MavenPluginTest extends AbstractMojo {
 
@@ -288,7 +288,7 @@ of `compile` scope, which was desired.
 With these I could create my own class loader and particularly say what is the scope of the class loading
 (you can check other notes on this over here http://blog.semsur-it.com/2011/11/java-class-loader-and-maven-plugin.html)
 
-```
+```java
 List<URL> pathUrls = new ArrayList<>();
 for(String mavenCompilePath: project.getCompileClasspathElements()) {
     currentPathProcessed = mavenCompilePath;
@@ -318,7 +318,7 @@ See https://zeroturnaround.com/rebellabs/rebel-labs-tutorial-do-you-really-get-c
 
 The usage of the `ClassLoaderUtils` class could be in way
 
-```
+```java
 System.out.printf("%n--%ncontextClassLoader:%s",
   ClassLoaderUtils.showClassLoaderHierarchy(
     Thread.currentThread().getContextClassLoader()));
