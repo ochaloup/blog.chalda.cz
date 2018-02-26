@@ -1,4 +1,637 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes  for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Sat, 17 Feb 2018 07:18:16 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Maven plugin and fight with classloading]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes  for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Mon, 26 Feb 2018 23:36:11 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Docker basics]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/docker-starter.png" alt="docker starter.png">
+</div>
+</div>
+<div class="paragraph">
+<p>There are many articles on how to start and use docker. This one is a meant rather as
+my personal (hopefully complementary) notes.</p>
+</div>
+<div class="paragraph">
+<p>See these nice articles for example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://blog.codepipes.com/containers/docker-for-java-big-picture.html" class="bare">http://blog.codepipes.com/containers/docker-for-java-big-picture.html</a></p>
+</li>
+<li>
+<p><a href="https://zeroturnaround.com/rebellabs/docker-for-java-developers-how-to-sandbox-your-app-in-a-clean-environment" class="bare">https://zeroturnaround.com/rebellabs/docker-for-java-developers-how-to-sandbox-your-app-in-a-clean-environment</a></p>
+</li>
+<li>
+<p><a href="https://zeroturnaround.com/rebellabs/docker-commands-and-best-practices-cheat-sheet" class="bare">https://zeroturnaround.com/rebellabs/docker-commands-and-best-practices-cheat-sheet</a></p>
+</li>
+<li>
+<p><a href="http://blog.thoward37.me/articles/where-are-docker-images-stored" class="bare">http://blog.thoward37.me/articles/where-are-docker-images-stored</a></p>
+</li>
+<li>
+<p><a href="https://vsupalov.com/docker-env-vars" class="bare">https://vsupalov.com/docker-env-vars</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_install_fedora_26">How to install: Fedora 26</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Installing docker on Fedora is straight forward by running <code>dnf install docker</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+in some cases I have got troubles with Fedora docker package - for example
+when starting Oracle XE image from <a href="https://github.com/wnameless/docker-oracle-xe-11g" class="bare">https://github.com/wnameless/docker-oracle-xe-11g</a>.
+I haven&#8217;t solved that by anything else than installing competing <code>docker-ce</code>. See how to install at
+<a href="https://docs.docker.com/install/linux/docker-ce/fedora/" class="bare">https://docs.docker.com/install/linux/docker-ce/fedora/</a>.
+My changes of the Oracle XA image can be seen at <a href="https://github.com/ochaloup/dockerfiles-test/tree/master/oraclexe-wnameless" class="bare">https://github.com/ochaloup/dockerfiles-test/tree/master/oraclexe-wnameless</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Installed <code>docker</code> client does not permit to start containers by ordinary user, only by root.
+For the user <code>chalda</code> being able to start the container I need to create a docker group</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># under account 'chalda'
+whoami
+# printed 'chalda'
+
+# to run nex commands as user 'root'
+su -
+# adding new group to the system
+groupadd docker
+# adding account chalda to docker group
+sudo gpasswd -a chalda docker
+# start/restart docker daemon
+sudo systemctl start docker
+
+# run under 'chalda' and log in with 'chalda' to the just created 'docker' group
+exit
+newgrp docker</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_getting_a_docker_image">Getting a docker image</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Docker container is started from docker image. Image is an immutable snapshot of container.
+When the docker image is started you&#8217;ve got a running docker container.
+For starting the image it has to be available at the local docker cache. Docker cache contains
+pulled docker images and locally built docker images. Usually they&#8217;re stored under <code>/var/lib/docker</code>.
+You can check <a href="https://stackoverflow.com/a/25978888/187035">the storage with the command</a>
+<code>docker info</code> or <code>docker system info</code> (more specifically <code>docker info | grep 'Root Dir'</code>).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you want to check how much space is used by docker on your system you can verify
+with <code>docker system df</code>. To <a href="https://bobcares.com/blog/how-to-clear-docker-cache-and-save-disk-space/2/">remove all the docker images</a>
+and saving the drive space you can use command <code>docker system prune -a</code>
+(see <a href="https://stackoverflow.com/a/45143234/187035">what are dangling images</a>)
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To get the docker image you need either to download it from the remote docker repository - causing
+the image being saved in the local cache. Or build the image from <code>Dockerfile</code>
+(normally includes downloading of images from the remote repository too, the parent docker images
+are delcared by <code>FROM</code> declaration at <code>Dockerfile</code>) - causing the result image is stored in the local cache.</p>
+</div>
+<div class="sect2">
+<h3 id="_pull_image_from_docker_registry">Pull image from docker registry</h3>
+<div class="paragraph">
+<p>For downloading the image from the remote repository serves command <code>docker pull</code>.
+Let&#8217;s say you want to get pulled PostgreSQL then you will do <code>docker pull docker.io/postgres</code>
+or just <code>docker pull postgres</code>. If the image is not found at the local cache it tries
+to be looked in predefined remote repository which is by default the <code>docker.io</code>.
+To check more information about the image residing <em>in the docker.io remote repository</em>
+see at <a href="https://hub.docker.com/_/postgres/" class="bare">https://hub.docker.com/_/postgres/</a>.</p>
+</div>
+<div class="paragraph">
+<p>For more info on naming docker images and pulling them, see my blog post
+<a href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" class="bare">http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html</a>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+if you want to run some specific docker image you can search configured remote repository
+with command <code>docker search</code>. For example to check images named with reference to PostgreSQL
+you can do <code>docker search postgresql</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_build_from_dockerfile">Build from Dockerfile</h3>
+<div class="paragraph">
+<p><code>Dockerfile</code> is a file (a file named <em>Dockerfile</em>) which defines
+a recipe of <a href="https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612">combining existing docker images</a>
+with bash shell commands. Build process generates a new docker image from it.
+To check an example of <code>Dockerfile</code> you can clone my repository <code>git clone <a href="https://github.com/ochaloup/dockerfiles-test.git" class="bare">https://github.com/ochaloup/dockerfiles-test.git</a></code>
+and look into folder <code>cd dockerfiles-test/postgresql</code> where <code>Dockerfile</code> resides.</p>
+</div>
+<div class="paragraph">
+<p><code>docker build</code> command requires path to a directory which contains <code>Dockerfile</code>, it takes it, process the commands in it,
+and creates the docker image. It&#8217;s important to note all commands in the <code>Dockerfile</code> is taken relative
+to the directory where the <code>Dockerfile</code> resides. That&#8217;s important for example in case of the <code>COPY</code> command (it takes files
+from the host and copies them to the docker image) as location is considered appropriately.
+Nevertheless it&#8217;s quite usual to run the command from the folder where
+<a href="https://github.com/ochaloup/dockerfiles-test/blob/master/postgresql/Dockerfile"><code>Dockerfile</code> file resides</a>, a.k.a <code>docker build .</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+as far as I know there is no <code>docker</code> command switch which permits you
+to point to a file named differently and working as the <code>Dockerfile</code> recipe.
+You just need to go with the name <em>Dockerfile</em>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you have the <code>Dockerfile</code> then you use <code>docker build &lt;path&gt;</code> command to get the docker image.
+You can try to run with the example PostgreSQL <code>Dockerfile</code> command <code>docker build .</code>.
+After it is successfully executed you will end up with message like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">Successfully built a93a78b4d156</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>a93a78b4d156</code> is the hash sum (image hash) marking identity of the image. You can use this hash
+as image name to start the container from it. Or you can name the image with human readable name
+<a href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html">by tagging it</a>:
+<code>docker tag a93a78b4d156 mypostgresql</code>.
+Tagging can be done directly at build step too: <code>docker build . -t mypostgresql</code>.</p>
+</div>
+<div class="paragraph">
+<p>More or less we can say a <code>Dockerfile</code> command creates a separate layer.
+Layers are layered one on top of each other (see <code>docker history</code>).
+When the layer is once built, it is saved. For the second time the checksum is verified and
+if it matches built of the layer is not invoked but it&#8217;s taken from the cache.
+If you want to build without using cache data (downloading from scratch, building from scratch)
+you can add parameter <code>--no-cache</code> to <code>docker build</code> command.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you like to check what is "the low-level content" (what is the metadata) of the image, try running <code>docker inspect &lt;hash&gt;</code> command.
+(<code>docker inspect a93a78b4d156</code>). It will show you what are environmental variables bound to the image,
+where the image is located on the drive, what are <a href="https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612">layers it&#8217;s compounded from</a> etc.</p>
+</div>
+<div class="paragraph">
+<p>The other useful command is <code>docker history &lt;hash&gt;</code> (<code>docker history -H --no-trunc a93a78b4d156</code>) which shows
+<em>shell commands</em> the Docker files is built from. It&#8217;s kind of decompilation command from the docker image to the dockerfile.
+The history is shown from the latest at the top and the oldest at the end.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_listing_images_at_your_system">Listing images at your system</h3>
+<div class="paragraph">
+<p>For getting list of the pulled images you use command <code>docker images</code>. Those are images
+available at your machine in the docker local cache.</p>
+</div>
+<div class="paragraph">
+<p>Here don&#8217;t be surprised with the column naming. There is <a href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html">a bit confusion in it</a>.
+The column <em>REPOSITORY</em> shows what we called here an <em>image name</em> which is got when you <em>tag</em> an image.
+The column <em>TAG</em> shows <em>a version</em> of the image.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_docker_container">Running docker container</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If we have a docker image placed at the local machine we can run it <code>docker run &lt;image_name&gt;</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+command <code>docker run</code> can be supplemented not only with the image placed locally
+  but you can use whatever tag. It will be first tried to be pulled from the remote repository
+  before it&#8217;s run.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you run an image (let&#8217;s say <code>docker run mypostgresql</code>) it&#8217;s by default run in foreground
+and it attaches the STDOUT and STDERR to the shell you started it from. You can use multiple
+<code>docker run</code> <a href="https://docs.docker.com/engine/reference/run/#detached-vs-foreground">switches to change the behaviour</a>:</p>
+</div>
+<div class="paragraph">
+<p>As said <code>docker run</code> runs by default in foreground and all information going to STDOUT is shown</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker run mypostgresql
+...
+... a lot of lines of text ...
+...
+PostgreSQL init process complete; ready for start up.
+
+LOG:  database system was shut down at ...
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To run container in background - aka. detached from the shell use <code>-d</code>.
+When run the <code>docker</code> command prints out only the hash of the running docker container.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker run -d  mypostgresql
+1f375bfb9a3f31e88b3290da109ea51815097906c4e15b4cbb4a8c5f9e0a720b</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When running in foreground you can say what are outputs you want to be attached to
+with your shell. This is specified with switch <code>-a</code>. Taking our <code>mypostgresql</code>
+image and run only STDERR being bound to the current shell then there is only
+small number of printed lines you can see (only those printed to the STDERR are shown).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker run -a stderr mypostgresql
+
+WARNING: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+LOG:  database system was shut down at ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There is two important switches for foreground running of the container</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-t</code></dt>
+<dd>
+<p>allocation of pseudo-TTY</p>
+</dd>
+<dt class="hdlist1"><code>-i</code></dt>
+<dd>
+<p>keep STDIN open even if no attached</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>These switches are usually used together as <code>-it</code> and they are both needed
+if run some interactive command - ie. expecting writing commands to the running
+docker container. Such command is for example <code>/bin/bash</code>. Thus for being able
+to write shell commands you need to run <code>docker run -it mypostgresql /bin/bash</code>.
+If you don&#8217;t use <code>-it</code> you won&#8217;t be able to write any command to the started <code>bash</code> command line
+(or the input will be cryptic).</p>
+</div>
+<div class="sect2">
+<h3 id="_changing_dockerfile_cmd">Changing Dockerfile CMD</h3>
+<div class="paragraph">
+<p>What happened when we run <code>docker run -it mypostgresql /bin/bash</code>?</p>
+</div>
+<div class="paragraph">
+<p>We overrode <code>CMD</code> command and changing it for <code>/bin/bash</code>. It means instead of starting
+command <code>potgresql</code> we started command <code>/bin/bash</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+there is no attempt to explain format of the Dockerfile in this blogpost,
+see <a href="https://docs.docker.com/engine/reference/builder/">documentation</a>
+for more information instead
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s make a short sidestep - docker works only with one instance of commands
+<code>CMD</code> and <code>ENTRYPOINT</code>. If there are more of them then only the last one is used.
+<code>ENTRYPOINT</code> defines <em>a prefix</em> for the command to be run (<code>CMD</code>). Let&#8217;s say we have
+following content of the <code>Dockerfile</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">FROM centos
+
+ENTRYPOINT ["cat"]
+ENTRYPOINT ["ls"]
+CMD ["-la"]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you create this simple <code>Dockerfile</code> and you run it the resulting
+is translated to the command <code>ls -la</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker build . -t test
+docker run test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now how is it with that <code>CMD</code> replacing at the command line?
+If we run <code>docker run test -d</code> then <code>CMD</code> of the <code>Dockerfile</code> is replaced by <code>-d</code>
+defined at the command line.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s take a look at the more real <code>Dockerfile</code>.
+This is what happened in case of <code>myposgresql</code> image. Check the output of <code>docker history</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker history --no-trunc mypostgresql | grep 'CMD\|ENTRYPOINT'
+
+e0c7250b6ea3   4 days ago   /bin/sh -c (nop)  CMD ["postgres"]
+&lt;missing&gt;      4 days ago   /bin/sh -c (nop)  ENTRYPOINT ["docker-entrypoint.sh"]
+&lt;missing&gt;      6 days ago   /bin/sh -c (nop)  CMD ["bash"]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If we run <code>docker run -it myposgresql /bin/bash</code> it&#8217;s translated to be running <code>docker-entrypoint.sh /bin/bash</code>
+(instead of <code>docker-entrypoint.sh postgres</code>). If you run with <code>/bin/bash</code> (you are staying in bash of the container)
+you can verify the content of the <code>/docker-entrypoint.sh</code> file and see what happens there
+and what  existence of the <code>postgres</code> parameter (normally provided by <code>CMD ["postgres"]</code>) causes.
+Then tt the end of the entrypoint script there is defined <code>exec "$@"</code> which causes
+our <code>/bin/bash</code> command line cmd parameter  is executed (resulting in running <code>exec /bin/bash</code>).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+you can override <code>ENTRYPOINT</code> from command line by using <code>--entrypoint</code> switch
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_docker_run_command_to_expose_ports">docker run command to expose ports</h3>
+<div class="paragraph">
+<p>If you run only the <code>docker run myposgresql</code> then database is started in the container
+but it&#8217;s not possible to contact it from outside. That&#8217;s where we need to declare
+that port inside of the container should be mapped to the port of the hosting system.
+This is done with parameter <code>-p hosting_port:container_port</code>.</p>
+</div>
+<div class="paragraph">
+<p>Running <code>docker run -p 5432:5432 myposgresql</code> then open port <code>5432</code> at hosting system
+and map it on the container <code>5432</code> port. We can now connect to the database as usual.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_docker_run_and_exited_containers">docker run and exited containers</h3>
+<div class="paragraph">
+<p>You can checked the running containers with command <code>docker ps</code>.
+When you start the container and then stop it (either with <code>CTRL^C</code> or command <code>docker stop</code>)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker run myposgresql
+CTRL^C</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>such container is put to the <em>exited</em> state. Such container is still available in the system (e.g. it still
+occupies the space on the drive) but is stale. You can list all the <em>exited</em> containers
+by running <code>docker ps -a</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can start the <em>exited</em> container  with command <code>docker start</code>.
+To get printed output to the shell you can use <code>-ia</code> switch (attaching STDOUT/STDERR and STDIN)
+like <code>docker start -ia $(docker ps -a | tail -n 1 | sed 's/ .*//')</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+you can delete all exited containers with one-liner like this
+<code>docker rm $(docker ps --all -q -f status=exited)</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Up to that you can create a new image from the <em>exited</em> container with <code>docker commit</code>.
+This gives you for example chance to start failed container with different
+<code>CMD</code> or <code>ENTRYPOINT</code> defined.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>docker commit &lt;sha-exited-container&gt; &lt;new-image-name&gt;
+# starting the image but using shell as entrypoint thus filesystem structure could be verified
+docker run -it --entrypoint /bin/bash NEWIMAGENAME</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_docker_run_omitting_to_save_any_exited_container">docker run omitting to save any exited container</h4>
+<div class="paragraph">
+<p>If you don&#8217;t plan to start the exited container afterwards and you don&#8217;t want
+the exited containers being left at your drive
+after they are stopped then use <code>docker run --rm</code> switch. The stopped container will
+be directly deleted (not going to <em>exited</em> state). Try to run the <code>docker run --rm myposgresql</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_inspecting_a_running_docker_container">Inspecting a running docker container</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can attach yourself to a running docker container using <code>docker exec</code>.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s say you run <code>docker run -d mypostgresql</code>, you get printed the sha of the running image
+(e.g. <em>8550aa320664b46701034b81b1ec0d4cf426cd4540e21ece17894cec52a12afc</em>, or you can
+check it by <code>docker ps</code> and get the shortened version of sha <em>8550aa320664</em>).</p>
+</div>
+<div class="paragraph">
+<p>Now you can run</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>docker exec -it &lt;started container sha&gt; bash</code></dt>
+<dd>
+<p>to get bash for the started container, inspecting it, doing changes etc.</p>
+</dd>
+<dt class="hdlist1"><code>docker exec -u 0 -it &lt;started container sha&gt; bash</code></dt>
+<dd>
+<p>to get bash with root</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>If you want to check only standard output of the container you can use
+<code>docker logs -t &lt;container sha&gt;</code>. This could be applied for running containers
+but for exited ones too.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_removing_images_and_containers_from_the_system">Removing images and containers from the system</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are commands to remove the docker images and containers (when not in use)</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>docker rmi &lt;imagename&gt;</code></dt>
+<dd>
+<p>removing a docker image</p>
+</dd>
+<dt class="hdlist1"><code>docker rm &lt;container_name&gt;</code></dt>
+<dd>
+<p>removing a docker container</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_dockerfile_composition">Dockerfile composition</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I don&#8217;t want to describe how to write a <code>Dockerfile</code> here. I would rather recommend articles</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://kimh.github.io/blog/en/docker/gotchas-in-writing-dockerfile-en" class="bare">http://kimh.github.io/blog/en/docker/gotchas-in-writing-dockerfile-en</a></p>
+</li>
+<li>
+<p><a href="https://til.codes/docker-run-vs-cmd-vs-entrypoint" class="bare">https://til.codes/docker-run-vs-cmd-vs-entrypoint</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>but I would like to mention few points that I was not able to understand when I started with Docker.</p>
+</div>
+<div class="sect2">
+<h3 id="_dockerfile_does_not_support_multiple_inheritance">Dockerfile does not support multiple inheritance</h3>
+<div class="paragraph">
+<p>Docker neither expect nor support multiple inheritance in container composition. If you have a complex
+project structure then it&#8217;s possible you will need to copy&amp;paste the same parts of configuration
+to multiple <code>Dockerfile</code> files. Or you can consider usage some 3rd party tools as for example
+<a href="http://concreate.readthedocs.io" class="bare">http://concreate.readthedocs.io</a> which is used for building JBoss EAP docker images.</p>
+</div>
+<div class="paragraph">
+<p>The tool let you split the project to multiple modules and then combines them into
+one structured <code>Dockerfile</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dockerfile_does_not_support_any_post_start_hooks_by_default">Dockerfile does not support any post-start hooks by default</h3>
+<div class="paragraph">
+<p>Docker does not provide any way to run
+<a href="https://stackoverflow.com/questions/42280792/reuse-inherited-images-cmd-or-entrypoint">some hook like <code>post-start</code> or similar</a>
+(this is where <a href="https://www.openshift.org">OpenShift</a> can help you).</p>
+</div>
+<div class="paragraph">
+<p>As a newcomer I&#8217;ve had a dummy idea - creating my <code>Dockerfile</code>,
+inheriting it from some parent (<code>FROM postgres</code>), letting the parent to start the database
+service and then including some configuration shell script defined at my child <code>Dockerfile</code>.</p>
+</div>
+<div class="paragraph">
+<p>&#8230;&#8203;and that&#8217;s not possible</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Only one <strong>active</strong> <code>CMD</code> and one <code>ENTRYPOINT</code> command in the whole <code>Dockerfile</code> hierarchy.</p>
+</li>
+<li>
+<p>There could be multiple <code>RUN</code> commands but they are executed during <code>Dockerfile</code> building,
+not at the time the docker runs the image.</p>
+</li>
+<li>
+<p>There is often used pattern of <code>ENTRYPOINT</code> creating a wrapper around <code>CMD</code> which
+is defined at the parent image. You would define <code>ENTRYPOINT ["starting-script.sh"]</code> where end
+of the <code>starting-script.sh</code> would define <code>exec $@</code>.
+<a href="https://stackoverflow.com/questions/32255814/what-purpose-does-using-exec-in-docker-entrypoint-scripts-serve">It then executes the CMD</a>
+as parameter of the <code>ENTRYPOINT</code>. As example having</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">CMD ["ls -l"]
+ENTRYPOINT ["starting-script.sh"]</code></pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>the Docker will evaluate it to run: `starting-script.sh "ls -l"`.</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The trouble is that many parent <code>Dockerfile</code> files use <code>ENTRYPOINT</code> and you would then override its functionality,
+(for example it&#8217;s the case of the <code>postgres</code> image - try <code>docker history postgres</code>).</p>
+</li>
+<li>
+<p>Usually each docker image defines own specific way of running the configuration scripts
+after the service is started.
+For example for <code>postgres</code> docker image executes all shell and sql scripts copied to <code>/docker-entrypoint-initdb.d/</code> directory.
+You can check an example at <a href="https://github.com/ochaloup/dockerfiles-test/blob/master/postgresql/Dockerfile" class="bare">https://github.com/ochaloup/dockerfiles-test/blob/master/postgresql/Dockerfile</a>.
+The <code>postgres</code> container runs the scripts after database is started,
+and even it ensures the database is restarted later.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2018/02/27/Docker-basics.html</link><guid isPermaLink="true">http://blog.chalda.cz/2018/02/27/Docker-basics.html</guid><category><![CDATA[docker]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Tue, 27 Feb 2018 00:00:00 GMT</pubDate></item><item><title><![CDATA[Maven plugin and fight with classloading]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
