@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Querying OpenShift API</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Querying OpenShift API">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Querying OpenShift API">
+    <meta property="og:description" content="">
+
+    <!-- <meta name="twitter:site" content="">
+
+<meta name="twitter:creator" content="">
+
+<meta name="google-site-verification" content="">
+
+<meta property="fb:admins" content="">
+ -->
+
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link href="//fonts.googleapis.com/" rel="dns-prefetch">
+    <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
+
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1519815031201"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1519815031201"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1519815031201"/>
+
+
+
+
+    <script type="text/javascript">
+      var ga_ua = 'UA-XXXXX-X';
+      
+      var disqus_shortname = 'example';
+      
+      var enable_pjax = true;
+
+      // Pace Options
+      // ==============
+      window.paceOptions = {
+        catchupTime: 100,
+        minTime: 100,
+        elements: false,
+        restartOnRequestAfter: 500,
+        startOnPageLoad: false
+      }
+
+      // Ghostium Globals
+      // ==============
+      window.GHOSTIUM = {};
+      GHOSTIUM.haveGA = typeof ga_ua !== 'undefined' && ga_ua !== 'UA-XXXXX-X';
+      GHOSTIUM.haveDisqus = typeof disqus_shortname !== 'undefined' && disqus_shortname !== 'example';
+      GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
+    </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1519815031201"></script>
+
+    <link rel="canonical" href="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" />
+    <meta name="referrer" content="origin" />
+    
+    <meta property="og:site_name" content="Chalda&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Querying OpenShift API" />
+    <meta property="og:description" content="OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot; on top of the Kubernetes there are two stable REST APIs base urls. First is of the Kubernetes and second of the OpenShift. These two differs in the a" />
+    <meta property="og:url" content="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" />
+    <meta property="article:published_time" content="2018-02-28T00:00:00.000Z" />
+    <meta property="article:tag" content="openshift" />
+    <meta property="article:tag" content="kubernetes" />
+    <meta property="article:tag" content="api" />
+    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Querying OpenShift API" />
+    <meta name="twitter:description" content="OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot; on top of the Kubernetes there are two stable REST APIs base urls. First is of the Kubernetes and second of the OpenShift. These two differs in the a" />
+    <meta name="twitter:url" content="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "publisher": "Chalda's blog",
+    "author": {
+        "@type": "Person",
+        "name": "chalda",
+        "image": "https://avatars2.githubusercontent.com/u/1104559?v=4",
+        "url": "http://blog.chalda.cz/author/ochaloup/",
+        "sameAs": "https://twitter.com/_chalda"
+    },
+    "headline": "Querying OpenShift API",
+    "url": "http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html",
+    "datePublished": "2018-02-28T00:00:00.000Z",
+    "keywords": "openshift, kubernetes, api",
+    "description": "OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot; on top of the Kubernetes there are two stable REST APIs base urls. First is of the Kubernetes and second of the OpenShift. These two differs in the a"
+}
+    </script>
+
+    <meta name="generator" content="HubPress" />
+    <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog" href="http://blog.chalda.cz/rss/" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/atom-one-dark.min.css">
+    
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </head>
+  <body class="post-template tag-openshift tag-kubernetes tag-api">
+
+    <button data-action="open-drawer" id="drawer-button" class="drawer-button"><i class="fa fa-bars"></i></button>
+    <nav tabindex="-1" class="drawer">
+      <div class="drawer-container">
+        <!--.drawer-search(role="search")-->
+        <ul role="navigation" class="drawer-list">
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" data-pjax>
+              <i class="fa fa-home"></i>Home
+            </a>
+          </li>
+          <!-- <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz" title="Chalda&#x27;s blog" data-pjax>
+              <i class="fa fa-list-alt"></i>All posts
+            </a>
+          </li> -->
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/rss/">
+              <i class="fa fa-rss"></i>Subscribe to Feed
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-divider"></li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/01/01/About-the-blog.html" data-pjax>
+              <i class="fa fa-rocket"></i>About the blog
+            </a>
+          </li>
+          
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Blog-posts-history.html" data-pjax>
+              <i class="fa fa-bolt"></i>Blog history
+            </a>
+          </li>
+          
+          <li class="drawer-list-item">
+            <a href="http://blog.chalda.cz/2017/05/05/Links.html" data-pjax>
+              <i class="fa fa-navicon"></i>Links
+            </a>
+          </li>
+          
+          <!--
+          <li class="drawer-list-divider"></li>
+          <li class="drawer-list-item drawer-list-title">
+            Follow me
+          </li> -->
+          
+          
+          <li class="drawer-list-item">
+            <a href="https://twitter.com/_chalda" title="Twitter" target="_blank">
+              <i class="fa fa-twitter"></i>Twitter
+            </a>
+          </li>
+          <li class="drawer-list-item">
+            <a href="http://github.com/ochaloup" title="Github" target="_blank">
+              <i class="fa fa-github"></i>Github
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="drawer-overlay"></div>
+    <main id="container" role="main" class="container">
+      <div class="surface">
+        <div class="surface-container">
+          <div data-pjax-container class="content">
+            
+<section class="wrapper wrapper-post">
+  <div class="wrapper-container">
+    <article itemscope itemtype="http://schema.org/BlogPosting" role="article" class="post post tag-openshift tag-kubernetes tag-api">
+        <section class="post-container">
+          <header class="post-header">
+            <ul class="post-meta-list">
+              <li class="post-meta-item">
+                <time datetime="2018-02-28" itemprop="datePublished">
+                  12 hours ago
+                </time>
+              </li>
+                <li class="post-meta-item">
+                  <span class="tags"><i class="fa fa-tags"></i>
+                      <span>
+                      <a href="http://blog.chalda.cz/tag/openshift/">openshift</a>, <a href="http://blog.chalda.cz/tag/kubernetes/">kubernetes</a>, <a href="http://blog.chalda.cz/tag/api/">api</a></span>
+                  </span>
+                </li>
+              <li class="post-meta-item">
+                <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
+              </li>
+            </ul>
+            <h1 itemprop="name headline" class="post-title"><a href="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" itemprop="url" data-pjax title="Querying OpenShift API">Querying OpenShift API</a></h1>
+            <!--h2 itemprop="about" class="post-subtitle"></h2-->
+          </header>
+          <aside class="post-side">
+            <div class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <a href="http://blog.chalda.cz" class="post-author-name">
+                  chalda
+                </a>
+                <p class="post-author-bio"></p>
+              </div>
+            </div>
+          </aside>
+          <div itemprop="articleBody" class="post-body">
+            <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShift offers <a href="https://docs.openshift.com/container-platform/latest/rest_api/">REST API</a>
+to obtain information about mostly all aspects
+of the OpenShift instance. As the OpenShift is "an extension" on top of the Kubernetes
+there are two stable REST APIs base urls. First is of the
+<a href="https://docs.openshift.com/container-platform/latest/rest_api/kubernetes_v1.html">Kubernetes</a>
+and second of the <a href="https://docs.openshift.com/container-platform/latest/rest_api/openshift_v1.html">OpenShift</a>.
+These two differs in the <em>a base</em> URL where for Kubernetes you use <code>/api/v1</code>
+while for OpenShift it&#8217;s <code>/oapi/v1</code>.</p>
+</div>
+<div class="paragraph">
+<p>The <a href="https://docs.openshift.com/container-platform/latest/rest_api/">documenation</a> provides
+nice description of the concept and then there are three detailed blog posts on the topic
+(<a href="https://blog.openshift.com/kubernetes-deep-dive-api-server-part-1/">part #1</a>,
+ <a href="https://blog.openshift.com/kubernetes-deep-dive-api-server-part-2/">part #2</a>,
+ <a href="https://blog.openshift.com/kubernetes-deep-dive-api-server-part-3a/">part #3</a>).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_querying_api">Querying API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The query needs to point to some resource to be viewed or updated, while each resource
+is defined to be protected by <a href="https://docs.openshift.com/container-platform/3.7/admin_guide/manage_rbac.html">OpenShift RBAC</a>.
+We need to provide authenticate data which is part of the HTTP header <code>Authorization: Bearer &lt;token&gt;</code>.
+When running with <code>curl</code> the request is as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -k \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Accept: application/json' \
+  https://${ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pod</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s query for getting of all pods from project (declared as <em>NAMESPACE</em>)
+while using Kubernetes API (<em>/api</em>). We declares using non-HTTPS connection with
+<code>-k</code> command switch. If <code>-k</code> not used we need to declare certificate for connection
+with switch <code>--cacert</code>. We also declare we want to get response in json format (<em>application/json</em>).
+The supported variants are currently <em>application/json</em>, <em>application/yaml</em>, <em>application/vnd.kubernetes.protobuf</em>.</p>
+</div>
+<div class="paragraph">
+<p>The documentation on each API operation is quite detailed and for example in our
+example when talking about listing the pod you can check what&#8217;s written at
+<a href="https://docs.openshift.org/latest/rest_api/api/v1.Pod.html" class="bare">https://docs.openshift.org/latest/rest_api/api/v1.Pod.html</a></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If <code>TOKEN</code> is not provided then the request is assigned to account <code>system:anonymous</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_query_from_out_of_the_cluster">Query from out of the cluster</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s call REST API from outside of Minishift.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># getting where to connect with security token
+ENDPOINT=$(minishift ip):8443
+TOKEN=$(oc whoami -t)
+NAMESPACE=$(oc project -q)
+
+# kubernetes /api to get list of pods
+curl -k \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Accept: application/json' \
+  https://${ENDPOINT}/api/v1/namespaces/$NAMESPACE/pods
+
+# openshift /oapi to get current user
+# aplication/json is default format to be received
+curl -k \
+  -H "Authorization: Bearer $TOKEN" \
+  "https://${ENDPOINT}/oapi/v1/users/~"</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_query_from_inside_of_the_cluster_in_a_service">Query from inside of the cluster in a service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>What if we want to call the REST API from one of our services (from a code inside of a pod).
+Then the OpenShift environment baked the <code>TOKEN</code> value for us into the running container
+(the token is <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account">auto-mounted</a>).
+There is <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account">even the certificate</a>
+useful for the HTTPS connection. The endpoint we talk to is
+<code>kubernetes.default.svc</code> or <code>openshift.default.svc</code>.</p>
+</div>
+<div class="paragraph">
+<p>To test it, let&#8217;s take a pod and ssh to it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">oc get pods -o name
+&gt; pods/eap71-openshift-1-3vhh0
+&gt; pods/eap71-openshift-1-d2sg6
+
+oc rsh eap71-openshift-1-d2sg6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We are now logged inside of the pod and we can run the <code>curl</code> REST API call.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># getting token from the filesystem in the docker container
+ENDPOINT=openshift.default.svc
+TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+NAMESPACE="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
+CERT='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+
+# using TLS connection with crt file defined
+curl --cacert $CERT \
+    -H "Authorization: Bearer $TOKEN" \
+    https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/pods</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_permisions_to_the_openshift_objects">Permisions to the OpenShift objects</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you have tried this you can get <code>Forbidden</code> error like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Failure",
+  "message": "User \"system:serviceaccount:myproject:default\" cannot list pods in project \"myproject\"",
+  "reason": "Forbidden",
+  "details": {
+    "kind": "pods"
+  },
+  "code": 403
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is because the pod uses service account <code>system:serviceaccount:&lt;namespace&gt;:default</code>
+(in our case it&#8217;s <code>system:serviceaccount:myproject:default</code>,
+more specifically it&#8217;s the <code>serviceaccount</code> named <code>default</code> in namespace <code>myproject</code>)
+and this account does not have permissions to list the pods under the <code>myproject</code> namespace.</p>
+</div>
+<div class="paragraph">
+<p>You can check what the <a href="https://docs.openshift.com/container-platform/3.7/admin_guide/manage_rbac.html">RBAC documentation</a>
+tells about it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># checking what are resources the system:serviceaccount:&lt;namespace&gt;:default has permission to list
+oc policy can-i --list --user system:serviceaccount:myproject:default
+# checking if we can list pods in particular
+oc policy can-i list pods --user system:serviceaccount:myproject:default
+# checking who has permission to list the pods
+oc policy who-can list pods
+
+# adding role 'view' to the system account (-z) named 'default'
+# see https://docs.openshift.com/container-platform/latest/architecture/additional_concepts/authorization.html#roles
+oc policy add-role-to-user view -z default
+# -- or in similar fashion
+oc policy add-role-to-user view system:serviceaccount:myproject:default
+
+# when permssions added this return 'yes'
+oc policy can-i list pods --user system:serviceaccount:myproject:default</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+for more granular permission settings (e.g. you don&#8217;t want to use the role <em>view</em>
+which permits to get/list all resources under the namespace, not only pods) check
+<a href="https://docs.openshift.com/container-platform/latest/admin_guide/manage_rbac.html#creating-local-role" class="bare">https://docs.openshift.com/container-platform/latest/admin_guide/manage_rbac.html#creating-local-role</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+you can query for the service account token using <code>oc describe secret default</code>
+or for getting only the token as string use <code>oc serviceaccounts get-token default</code>
+(see <a href="https://docs.openshift.com/container-platform/latest/dev_guide/service_accounts.html#using-a-service-accounts-credentials-externally" class="bare">https://docs.openshift.com/container-platform/latest/dev_guide/service_accounts.html#using-a-service-accounts-credentials-externally</a>)
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_fabric8_java_client">Using fabric8 java client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Fabric8 <a href="https://github.com/fabric8io/kubernetes-client">provides java client</a> to work
+with the Kubernetes/OpenShift API. At the starts it&#8217;s enough to add the Maven dependency</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.fabric8&lt;/groupId&gt;
+  &lt;artifactId&gt;openshift-client&lt;/artifactId&gt;
+  &lt;version&gt;3.0.3&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and you can start to use the provided java api in your project. The nice thing is that the client
+is quite auto-magic - you don&#8217;t do any further configuration and you use default constructor without parameters.
+For example if called from inside of the pod it will find the service account token on its own
+and use it for processing the API call.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">try (OpenShiftClient client = new DefaultOpenShiftClient()) {
+    System.out.println("Client opened is: " + client);
+    client.pods().list().getItems().stream().forEach(
+      p -&gt; System.out.println("pod: " + p));
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+          </div>
+          <footer class="post-footer">
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person" class="post-author">
+                <a href="http://blog.chalda.cz" class="post-author-avatar">
+                  <img itemprop="image" src="https://avatars2.githubusercontent.com/u/1104559?v&#x3D;4" alt="chalda">
+                </a>
+              <div class="post-author-info">
+                <h4 class="post-footer-heading">Written By</h4>
+                <a href="http://blog.chalda.cz" itemprop="url" class="post-author-name">
+                  <span itemprop="name">chalda</span>
+                </a>
+                <p itemprop="description" class="post-author-bio"></p>
+                  <p class="post-author-website">
+                    <a href="https://twitter.com/_chalda" rel="nofollow">https://twitter.com/_chalda</a>
+                  </p>
+                <p class="post-info">
+                  <b class="post-info-title">Published on</b>
+                  <time class="post-date">February 28, 2018</time>
+                </p>
+              </div>
+            </div>
+            <div class="post-social">
+              <h4 class="post-footer-heading">Spread the word</h4>
+              <a href="#" data-action="share-twitter"><i class="fa fa-fw fa-lg fa-twitter"></i></a>
+              <a href="#" data-action="share-facebook"><i class="fa fa-fw fa-lg fa-facebook"></i></a>
+              <a href="#" data-action="share-gplus"><i class="fa fa-fw fa-lg fa-google-plus"></i></a>
+            </div>
+          </footer>
+        </section>
+      <section itemprop="comment" class="post-comments">
+        <div id="disqus_thread"></div>
+      </section>
+    </article>
+
+    <footer role="contentinfo" class="footer">
+      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2018. All Rights Reserved.</small></p>
+      <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
+      <p><small>Adapted by <a href="https://twitter.com/mgreau">Maxime Gréau</a></small></p>
+      <p><small>Published with <a href="http://hubpress.io">HubPress</a></small></p>
+    </footer>
+  </div>
+</section>
+
+
+<section class="post-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+  var disqus_shortname = 'blog-chalda-cz'; // required: replace example with your forum shortname
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js?v="></script> <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js?v="></script> 
+      <script type="text/javascript">
+        jQuery( document ).ready(function() {
+          // change date with ago
+          jQuery('ago.ago').each(function(){
+            var element = jQuery(this).parent();
+            element.html( moment(element.text()).fromNow());
+          });
+        });
+
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1519815031201"></script>
+
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-91848308-1', 'auto');
+    ga('send', 'pageview');
+
+    </script>
+
+  </body>
+</html>
