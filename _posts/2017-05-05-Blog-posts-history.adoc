@@ -5,6 +5,7 @@
 
 === 2018
 
+* [2018-02-28] http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html
 * [2018-02-27] http://blog.chalda.cz/2018/02/27/Docker-basics.html
 * [2018-02-17] http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html
 * [2018-01-27] http://chalda.cz/presentations/byteman-workshop/slides.html[Byteman workshop for DevConf.cz 2018], https://github.com/ochaloup/byteman-workshop
