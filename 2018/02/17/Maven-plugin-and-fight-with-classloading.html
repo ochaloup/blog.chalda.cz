@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1519815261447"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1519815261447"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1519815261447"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1520256268832"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1520256268832"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1520256268832"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1519815261447"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1520256268832"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html" />
     <meta name="referrer" content="origin" />
@@ -78,7 +78,7 @@
     <meta property="og:site_name" content="Chalda&#x27;s blog" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Maven plugin and fight with classloading" />
-    <meta property="og:description" content="I wanted to write a Maven plugin with no experience on it. This is a short summary on my takeaways. As first step I would recommend Maven Apache documentation short tutorial at https://maven.apache.org/guides/plugin/guide-java-plugin-development.html. And then&amp;#8230;&amp;#8203;  &#x3D;&#x3D; Archetype scaffolding You can start with" />
+    <meta property="og:description" content="I wanted to write a Maven plugin with no experience on it. This is a short summary on my takeaways. As first step I would recommend Maven Apache documentation short tutorial at https://maven.apache.org/guides/plugin/guide-java-plugin-development.html. And then&amp;#8230;&amp;#8203;  Table of Contents Archetype scaffolding Maven" />
     <meta property="og:url" content="http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html" />
     <meta property="article:published_time" content="2018-02-17T00:00:00.000Z" />
     <meta property="article:tag" content="java" />
@@ -86,7 +86,7 @@
     
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Maven plugin and fight with classloading" />
-    <meta name="twitter:description" content="I wanted to write a Maven plugin with no experience on it. This is a short summary on my takeaways. As first step I would recommend Maven Apache documentation short tutorial at https://maven.apache.org/guides/plugin/guide-java-plugin-development.html. And then&amp;#8230;&amp;#8203;  &#x3D;&#x3D; Archetype scaffolding You can start with" />
+    <meta name="twitter:description" content="I wanted to write a Maven plugin with no experience on it. This is a short summary on my takeaways. As first step I would recommend Maven Apache documentation short tutorial at https://maven.apache.org/guides/plugin/guide-java-plugin-development.html. And then&amp;#8230;&amp;#8203;  Table of Contents Archetype scaffolding Maven" />
     <meta name="twitter:url" content="http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html" />
     
     <script type="application/ld+json">
@@ -105,7 +105,7 @@
     "url": "http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html",
     "datePublished": "2018-02-17T00:00:00.000Z",
     "keywords": "java, maven",
-    "description": "I wanted to write a Maven plugin with no experience on it. This is a short summary on my takeaways. As first step I would recommend Maven Apache documentation short tutorial at https://maven.apache.org/guides/plugin/guide-java-plugin-development.html. And then&amp;#8230;&amp;#8203;  &#x3D;&#x3D; Archetype scaffolding You can start with"
+    "description": "I wanted to write a Maven plugin with no experience on it. This is a short summary on my takeaways. As first step I would recommend Maven Apache documentation short tutorial at https://maven.apache.org/guides/plugin/guide-java-plugin-development.html. And then&amp;#8230;&amp;#8203;  Table of Contents Archetype scaffolding Maven"
 }
     </script>
 
@@ -196,7 +196,7 @@
             <ul class="post-meta-list">
               <li class="post-meta-item">
                 <time datetime="2018-02-17" itemprop="datePublished">
-                  11 days ago
+                  17 days ago
                 </time>
               </li>
                 <li class="post-meta-item">
@@ -239,9 +239,32 @@ This is a short summary on my takeaways.</p>
 </div>
 <div class="paragraph">
 <p>As first step I would recommend Maven Apache documentation short tutorial at
-<a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" class="bare">https://maven.apache.org/guides/plugin/guide-java-plugin-development.html</a>. And then&#8230;&#8203; <span class="icon"><i class="fa fa-smile-o"></i></span>
-== Archetype scaffolding</p>
+<a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" class="bare">https://maven.apache.org/guides/plugin/guide-java-plugin-development.html</a>. And then&#8230;&#8203; <span class="icon"><i class="fa fa-smile-o"></i></span></p>
 </div>
+<div id="toc" class="toc">
+<div id="toctitle" class="title">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_archetype_scaffolding">Archetype scaffolding</a></li>
+<li><a href="#_maven_plugin_creation">Maven plugin creation</a>
+<ul class="sectlevel2">
+<li><a href="#_plugin_project_dependencies">Plugin project dependencies</a></li>
+<li><a href="#_source_code_definition">Source code definition</a></li>
+<li><a href="#_plugin_parametrized">Plugin parametrized</a></li>
+<li><a href="#_definition_of_default_phase">Definition of default phase</a></li>
+</ul>
+</li>
+<li><a href="#_class_loading_troubles">Class loading troubles</a>
+<ul class="sectlevel2">
+<li><a href="#_note_class_loader_debugging">Note: class loader debugging</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_archetype_scaffolding">Archetype scaffolding</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>You can start with the Maven archetype generator</p>
 </div>
@@ -731,7 +754,7 @@ System.out.printf("%n--%nplugin class loader hierarchy: %s",
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1519815261447"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1520256268832"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

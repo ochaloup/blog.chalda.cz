@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1519815261441"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1519815261441"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1519815261441"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1520256268827"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1520256268827"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1520256268827"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1519815261441"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1520256268827"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/02/27/Docker-basics.html" />
     <meta name="referrer" content="origin" />
@@ -195,7 +195,7 @@
             <ul class="post-meta-list">
               <li class="post-meta-item">
                 <time datetime="2018-02-27" itemprop="datePublished">
-                  a day ago
+                  7 days ago
                 </time>
               </li>
                 <li class="post-meta-item">
@@ -255,6 +255,34 @@ my personal (hopefully complementary) notes.</p>
 </li>
 <li>
 <p><a href="https://vsupalov.com/docker-env-vars" class="bare">https://vsupalov.com/docker-env-vars</a></p>
+</li>
+</ul>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle" class="title">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_how_to_install_fedora_26">How to install: Fedora 26</a></li>
+<li><a href="#_getting_a_docker_image">Getting a docker image</a>
+<ul class="sectlevel2">
+<li><a href="#_pull_image_from_docker_registry">Pull image from docker registry</a></li>
+<li><a href="#_build_from_dockerfile">Build from Dockerfile</a></li>
+<li><a href="#_listing_images_at_your_system">Listing images at your system</a></li>
+</ul>
+</li>
+<li><a href="#_running_docker_container">Running docker container</a>
+<ul class="sectlevel2">
+<li><a href="#_changing_dockerfile_cmd">Changing Dockerfile CMD</a></li>
+<li><a href="#_docker_run_command_to_expose_ports">docker run command to expose ports</a></li>
+<li><a href="#_docker_run_and_exited_containers">docker run and exited containers</a></li>
+</ul>
+</li>
+<li><a href="#_inspecting_a_running_docker_container">Inspecting a running docker container</a></li>
+<li><a href="#_removing_images_and_containers_from_the_system">Removing images and containers from the system</a></li>
+<li><a href="#_dockerfile_composition">Dockerfile composition</a>
+<ul class="sectlevel2">
+<li><a href="#_dockerfile_does_not_support_multiple_inheritance">Dockerfile does not support multiple inheritance</a></li>
+<li><a href="#_dockerfile_does_not_support_any_post_start_hooks_by_default">Dockerfile does not support any post-start hooks by default</a></li>
+</ul>
 </li>
 </ul>
 </div>
@@ -937,7 +965,7 @@ and even it ensures the database is restarted later.</p>
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1519815261441"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1520256268827"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

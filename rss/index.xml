@@ -1,5 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Wed, 28 Feb 2018 10:54:21 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Querying OpenShift API]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for  not  being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Mon, 05 Mar 2018 13:24:28 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Querying OpenShift API]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
+<div id="toc" class="toc">
+<div id="toctitle" class="title">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_querying_api">Querying API</a></li>
+<li><a href="#_query_from_out_of_the_cluster">Query from out of the cluster</a></li>
+<li><a href="#_query_from_inside_of_the_cluster_in_a_service">Query from inside of the cluster in a service</a></li>
+<li><a href="#_permisions_to_the_openshift_objects">Permisions to the OpenShift objects</a></li>
+<li><a href="#_using_fabric8_java_client">Using fabric8 java client</a></li>
+</ul>
+</div>
 <div class="paragraph">
 <p>OpenShift offers <a href="https://docs.openshift.com/container-platform/latest/rest_api/">REST API</a>
 to obtain information about mostly all aspects
@@ -275,6 +285,34 @@ my personal (hopefully complementary) notes.</p>
 </li>
 <li>
 <p><a href="https://vsupalov.com/docker-env-vars" class="bare">https://vsupalov.com/docker-env-vars</a></p>
+</li>
+</ul>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle" class="title">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_how_to_install_fedora_26">How to install: Fedora 26</a></li>
+<li><a href="#_getting_a_docker_image">Getting a docker image</a>
+<ul class="sectlevel2">
+<li><a href="#_pull_image_from_docker_registry">Pull image from docker registry</a></li>
+<li><a href="#_build_from_dockerfile">Build from Dockerfile</a></li>
+<li><a href="#_listing_images_at_your_system">Listing images at your system</a></li>
+</ul>
+</li>
+<li><a href="#_running_docker_container">Running docker container</a>
+<ul class="sectlevel2">
+<li><a href="#_changing_dockerfile_cmd">Changing Dockerfile CMD</a></li>
+<li><a href="#_docker_run_command_to_expose_ports">docker run command to expose ports</a></li>
+<li><a href="#_docker_run_and_exited_containers">docker run and exited containers</a></li>
+</ul>
+</li>
+<li><a href="#_inspecting_a_running_docker_container">Inspecting a running docker container</a></li>
+<li><a href="#_removing_images_and_containers_from_the_system">Removing images and containers from the system</a></li>
+<li><a href="#_dockerfile_composition">Dockerfile composition</a>
+<ul class="sectlevel2">
+<li><a href="#_dockerfile_does_not_support_multiple_inheritance">Dockerfile does not support multiple inheritance</a></li>
+<li><a href="#_dockerfile_does_not_support_any_post_start_hooks_by_default">Dockerfile does not support any post-start hooks by default</a></li>
+</ul>
 </li>
 </ul>
 </div>
@@ -891,9 +929,32 @@ This is a short summary on my takeaways.</p>
 </div>
 <div class="paragraph">
 <p>As first step I would recommend Maven Apache documentation short tutorial at
-<a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" class="bare">https://maven.apache.org/guides/plugin/guide-java-plugin-development.html</a>. And then&#8230;&#8203; <span class="icon"><i class="fa fa-smile-o"></i></span>
-== Archetype scaffolding</p>
+<a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" class="bare">https://maven.apache.org/guides/plugin/guide-java-plugin-development.html</a>. And then&#8230;&#8203; <span class="icon"><i class="fa fa-smile-o"></i></span></p>
 </div>
+<div id="toc" class="toc">
+<div id="toctitle" class="title">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_archetype_scaffolding">Archetype scaffolding</a></li>
+<li><a href="#_maven_plugin_creation">Maven plugin creation</a>
+<ul class="sectlevel2">
+<li><a href="#_plugin_project_dependencies">Plugin project dependencies</a></li>
+<li><a href="#_source_code_definition">Source code definition</a></li>
+<li><a href="#_plugin_parametrized">Plugin parametrized</a></li>
+<li><a href="#_definition_of_default_phase">Definition of default phase</a></li>
+</ul>
+</li>
+<li><a href="#_class_loading_troubles">Class loading troubles</a>
+<ul class="sectlevel2">
+<li><a href="#_note_class_loader_debugging">Note: class loader debugging</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_archetype_scaffolding">Archetype scaffolding</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>You can start with the Maven archetype generator</p>
 </div>
