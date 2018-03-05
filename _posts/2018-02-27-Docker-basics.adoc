@@ -18,6 +18,8 @@ See these nice articles for example:
 * http://blog.thoward37.me/articles/where-are-docker-images-stored
 * https://vsupalov.com/docker-env-vars
 
+toc::[]
+
 == How to install: Fedora 26
 
 Installing docker on Fedora is straight forward by running `dnf install docker`

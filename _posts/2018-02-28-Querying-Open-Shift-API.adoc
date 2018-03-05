@@ -5,6 +5,8 @@
 :published_at: 2018-02-28
 :icons: font
 
+toc::[]
+
 OpenShift offers https://docs.openshift.com/container-platform/latest/rest_api/[REST API]
 to obtain information about mostly all aspects
 of the OpenShift instance. As the OpenShift is "an extension" on top of the Kubernetes

@@ -12,6 +12,9 @@ This is a short summary on my takeaways.
 
 As first step I would recommend Maven Apache documentation short tutorial at
 https://maven.apache.org/guides/plugin/guide-java-plugin-development.html. And then... icon:smile-o[]
+
+toc::[]
+
 == Archetype scaffolding
 
 You can start with the Maven archetype generator
