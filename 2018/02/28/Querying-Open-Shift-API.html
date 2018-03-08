@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1520512056460"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1520512056460"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1520512056460"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1520512193678"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1520512193678"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1520512193678"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1520512056460"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1520512193678"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" />
     <meta name="referrer" content="origin" />
@@ -78,7 +78,7 @@
     <meta property="og:site_name" content="Chalda&#x27;s blog" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Querying OpenShift API" />
-    <meta property="og:description" content="Table of Contents Querying API Query from out of the cluster Query from inside of the cluster in a service Permisions to the OpenShift objects Using fabric8 java client OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot;" />
+    <meta property="og:description" content="OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot; on top of the Kubernetes there are two stable REST APIs base urls. First is of the Kubernetes and second of the OpenShift. These two differs in the a" />
     <meta property="og:url" content="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" />
     <meta property="article:published_time" content="2018-02-28T00:00:00.000Z" />
     <meta property="article:tag" content="openshift" />
@@ -87,7 +87,7 @@
     
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Querying OpenShift API" />
-    <meta name="twitter:description" content="Table of Contents Querying API Query from out of the cluster Query from inside of the cluster in a service Permisions to the OpenShift objects Using fabric8 java client OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot;" />
+    <meta name="twitter:description" content="OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot; on top of the Kubernetes there are two stable REST APIs base urls. First is of the Kubernetes and second of the OpenShift. These two differs in the a" />
     <meta name="twitter:url" content="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" />
     
     <script type="application/ld+json">
@@ -106,7 +106,7 @@
     "url": "http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html",
     "datePublished": "2018-02-28T00:00:00.000Z",
     "keywords": "openshift, kubernetes, api",
-    "description": "Table of Contents Querying API Query from out of the cluster Query from inside of the cluster in a service Permisions to the OpenShift objects Using fabric8 java client OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot;"
+    "description": "OpenShift offers REST API to obtain information about mostly all aspects of the OpenShift instance. As the OpenShift is &quot;an extension&quot; on top of the Kubernetes there are two stable REST APIs base urls. First is of the Kubernetes and second of the OpenShift. These two differs in the a"
 }
     </script>
 
@@ -229,16 +229,6 @@
           <div itemprop="articleBody" class="post-body">
             <div id="preamble">
 <div class="sectionbody">
-<div id="toc" class="toc">
-<div id="toctitle" class="title">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#_querying_api">Querying API</a></li>
-<li><a href="#_query_from_out_of_the_cluster">Query from out of the cluster</a></li>
-<li><a href="#_query_from_inside_of_the_cluster_in_a_service">Query from inside of the cluster in a service</a></li>
-<li><a href="#_permisions_to_the_openshift_objects">Permisions to the OpenShift objects</a></li>
-<li><a href="#_using_fabric8_java_client">Using fabric8 java client</a></li>
-</ul>
-</div>
 <div class="paragraph">
 <p>OpenShift offers <a href="https://docs.openshift.com/container-platform/latest/rest_api/">REST API</a>
 to obtain information about mostly all aspects
@@ -255,6 +245,21 @@ nice description of the concept and then there are three detailed blog posts on 
 (<a href="https://blog.openshift.com/kubernetes-deep-dive-api-server-part-1/">part #1</a>,
  <a href="https://blog.openshift.com/kubernetes-deep-dive-api-server-part-2/">part #2</a>,
  <a href="https://blog.openshift.com/kubernetes-deep-dive-api-server-part-3a/">part #3</a>).</p>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle" class="title">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_querying_api">Querying API</a></li>
+<li><a href="#_query_from_out_of_the_cluster">Query from out of the cluster</a></li>
+<li><a href="#_query_from_inside_of_the_cluster_in_a_service">Query from inside of the cluster in a service</a></li>
+<li><a href="#_permisions_to_the_openshift_objects">Permisions to the OpenShift objects</a>
+<ul class="sectlevel2">
+<li><a href="#_role_definition_in_the_openshift_template">Role definition in the OpenShift template</a></li>
+<li><a href="#_role_definition_with_a_service_account_in_the_openshift_template">Role definition with a service account in the OpenShift template</a></li>
+</ul>
+</li>
+<li><a href="#_using_fabric8_java_client">Using fabric8 java client</a></li>
+</ul>
 </div>
 </div>
 </div>
@@ -450,6 +455,243 @@ or for getting only the token as string use <code>oc serviceaccounts get-token d
 </tr>
 </table>
 </div>
+<div class="sect2">
+<h3 id="_role_definition_in_the_openshift_template">Role definition in the OpenShift template</h3>
+<div class="paragraph">
+<p>What if you want to define permissions to list pods directly in templates that defines <code>DeploymentConfig</code>
+or you just use the template to declare roles? Yes, that&#8217;s possible quite easily. Let&#8217;s check
+examples of such template.</p>
+</div>
+<div class="paragraph">
+<p>First let&#8217;s deploy a pod that we can test the permissions later on. We can use PostgreSQL database
+and run command (<a href="https://access.redhat.com/documentation/en-us/openshift_enterprise/3.2/html/using_images/database-images#configuration-and-usage-2" class="bare">https://access.redhat.com/documentation/en-us/openshift_enterprise/3.2/html/using_images/database-images#configuration-and-usage-2</a>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">oc new-app \
+    -e POSTGRESQL_USER=test \
+    -e POSTGRESQL_PASSWORD=test \
+    -e POSTGRESQL_DATABASE=test \
+    registry.access.redhat.com/rhscl/postgresql-94-rhel7</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and you can check what OpenShift objects were created after this command was executed <code>oc get all | grep 'postgresql\|NAME'</code>.
+We can delete all the OpenShift objects filtered by name <em>'postgresql'</em> like this: <code>oc delete $(oc get all | grep postgresql | awk '{print $1}')</code>.
+Now take the following json template and import it to the OpenShift: <code>oc create -f &lt;path-to-file&gt;</code>.
+The next step is deploy the template with <code>oc new-app --template=role-testing</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Namespace",
+            "description": "Namespace the service account default will be permitted to list pods",
+            "name": "NAMESPACE",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Role",
+            "metadata": {
+                "name": "pods-listing"
+            },
+            "rules": [
+                {
+                    "apiGroups": null,
+                    "attributeRestrictions": null,
+                    "resources": ["pods"],
+                    "verbs": ["list"]
+                }
+            ]
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "default",
+                "annotations": {
+                    "description": "Default service account"
+                }
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "default",
+                    "namespace": "${NAMESPACE}"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "pods-listing",
+                "namespace": "${NAMESPACE}"
+            }
+        }
+    ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This template adds specific role with permission to <code>list</code> <code>pods</code> for service account <code>default</code>.
+You can check the running pod with <code>oc get pod</code> and <code>oc rsh &lt;pod_name&gt;</code> to one of the running.
+You should be able to list pods as <code>default</code> system account was enriched with role <code>pod-listing</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_role_definition_with_a_service_account_in_the_openshift_template">Role definition with a service account in the OpenShift template</h3>
+<div class="paragraph">
+<p>Redefinition of permission of the service account <code>default</code> is really not a best practice. All the pods started
+under the namespace are assinged (if not said differently) to the <code>default</code> service account.
+That way you provide more rights than it&#8217;s necessary. It&#8217;s better to define new
+service account which then will be linked to the container defined in section <code>DeploymentConfig</code> of the template.</p>
+</div>
+<div class="paragraph">
+<p>Here we define PostgreSQL container linking service account <code>listing-pod</code> with parameter <code>serviceAccountName</code>.
+You need to do the same for importing and deploying the template <code>oc create -f &lt;file.json&gt;; oc new-app --template=service-account-role-testing</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "service-account-role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Namespace",
+            "description": "Namespace the service account default will be permitted to list pods",
+            "name": "NAMESPACE",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Role",
+            "metadata": {
+                "name": "listing-pod-role"
+            },
+            "rules": [
+                {
+                    "apiGroups": null,
+                    "attributeRestrictions": null,
+                    "resources": ["pods"],
+                    "verbs": ["list"]
+                }
+            ]
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "ServiceAccount",
+            "metadata": {
+                "name": "listing-pod"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "listing-pod"
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "listing-pod",
+                    "namespace": "${NAMESPACE}"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "listing-pod-role",
+                "namespace": "${NAMESPACE}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "name": "postgresql-94-rhel7"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "postgresql-94-rhel7"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "postgresql-94-rhel7",
+                        "labels": {
+                            "app": "postgresql-94-rhel7",
+                            "deploymentconfig": "postgresql-94-rhel7"
+                        }
+                    },
+                    "spec": {
+                        "serviceAccountName": "listing-pod",
+                        "containers": [
+                            {
+                                "name": "postgresql-94-rhel7",
+                                "env": [
+                                    {
+                                        "name": "POSTGRESQL_DATABASE",
+                                        "value": "test"
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_PASSWORD",
+                                        "value": "test"
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_USER",
+                                        "value": "test"
+                                    }
+                                ],
+                                "ports": [
+                                    {
+                                        "containerPort": 5432,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "test": false,
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "postgresql-94-rhel7"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "postgresql:9.4",
+                                "namespace": "openshift"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -563,7 +805,7 @@ and use it for processing the API call.</p>
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1520512056460"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1520512193678"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
