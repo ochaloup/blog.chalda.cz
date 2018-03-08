@@ -158,6 +158,232 @@ NOTE: you can query for the service account token using `oc describe secret defa
 or for getting only the token as string use `oc serviceaccounts get-token default`
 (see https://docs.openshift.com/container-platform/latest/dev_guide/service_accounts.html#using-a-service-accounts-credentials-externally)
 
+=== Role definition in the OpenShift template
+
+What if you want to define permissions to list pods directly in templates that defines `DeploymentConfig`
+or you just use the template to declare roles? Yes, that's possible quite easily. Let's check
+examples of such template.
+
+First let's deploy a pod that we can test the permissions later on. We can use PostgreSQL database
+and run command (https://access.redhat.com/documentation/en-us/openshift_enterprise/3.2/html/using_images/database-images#configuration-and-usage-2):
+
+```bash
+oc new-app \
+    -e POSTGRESQL_USER=test \
+    -e POSTGRESQL_PASSWORD=test \
+    -e POSTGRESQL_DATABASE=test \
+    registry.access.redhat.com/rhscl/postgresql-94-rhel7
+```
+
+and you can check what OpenShift objects were created after this command was executed `oc get all | grep 'postgresql\|NAME'`. 
+We can delete all the OpenShift objects filtered by name _'postgresql'_ like this: `oc delete $(oc get all | grep postgresql | awk '{print $1}')`.
+Now take the following json template and import it to the OpenShift: `oc create -f <path-to-file>`.
+The next step is deploy the template with `oc new-app --template=role-testing`.
+
+```json
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Namespace",
+            "description": "Namespace the service account default will be permitted to list pods",
+            "name": "NAMESPACE",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Role",
+            "metadata": {
+                "name": "pods-listing"
+            },
+            "rules": [
+                {
+                    "apiGroups": null,
+                    "attributeRestrictions": null,
+                    "resources": ["pods"],
+                    "verbs": ["list"]
+                }
+            ]
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "default",
+                "annotations": {
+                    "description": "Default service account"
+                }
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "default",
+                    "namespace": "${NAMESPACE}"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "pods-listing",
+                "namespace": "${NAMESPACE}"
+            }
+        }
+    ]
+}
+```
+
+This template adds specific role with permission to `list` `pods` for service account `default`.
+You can check the running pod with `oc get pod` and `oc rsh <pod_name>` to one of the running.
+You should be able to list pods as `default` system account was enriched with role `pod-listing`.
+
+=== Role definition with a service account in the OpenShift template
+
+Redefinition of permission of the service account `default` is really not a best practice. All the pods started
+under the namespace are assinged (if not said differently) to the `default` service account.
+That way you provide more rights than it's necessary. It's better to define new
+service account which then will be linked to the container defined in section `DeploymentConfig` of the template.
+
+Here we define PostgreSQL container linking service account `listing-pod` with parameter `serviceAccountName`.
+You need to do the same for importing and deploying the template `oc create -f <file.json>; oc new-app --template=service-account-role-testing`.
+
+```json
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "service-account-role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Namespace",
+            "description": "Namespace the service account default will be permitted to list pods",
+            "name": "NAMESPACE",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Role",
+            "metadata": {
+                "name": "listing-pod-role"
+            },
+            "rules": [
+                {
+                    "apiGroups": null,
+                    "attributeRestrictions": null,
+                    "resources": ["pods"],
+                    "verbs": ["list"]
+                }
+            ]
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "ServiceAccount",
+            "metadata": {
+                "name": "listing-pod"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "listing-pod"
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "listing-pod",
+                    "namespace": "${NAMESPACE}"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "listing-pod-role",
+                "namespace": "${NAMESPACE}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "name": "postgresql-94-rhel7"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "postgresql-94-rhel7"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "postgresql-94-rhel7",
+                        "labels": {
+                            "app": "postgresql-94-rhel7",
+                            "deploymentconfig": "postgresql-94-rhel7"
+                        }
+                    },
+                    "spec": {
+                        "serviceAccountName": "listing-pod",
+                        "containers": [
+                            {
+                                "name": "postgresql-94-rhel7",
+                                "env": [
+                                    {
+                                        "name": "POSTGRESQL_DATABASE",
+                                        "value": "test"
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_PASSWORD",
+                                        "value": "test"
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_USER",
+                                        "value": "test"
+                                    }
+                                ],
+                                "ports": [
+                                    {
+                                        "containerPort": 5432,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "test": false,
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "postgresql-94-rhel7"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "postgresql:9.4",
+                                "namespace": "openshift"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
+```
+
 == Using fabric8 java client
 
 Fabric8 https://github.com/fabric8io/kubernetes-client[provides java client] to work
