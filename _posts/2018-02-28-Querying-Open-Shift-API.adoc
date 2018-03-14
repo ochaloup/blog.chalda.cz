@@ -290,8 +290,10 @@ metadata:
 rules:
 - apiGroups: null
   attributeRestrictions: null
-  resources: ["pods"]
-  verbs: ["list"]
+  resources:
+  - pods
+  verbs:
+  - list
 EOF
 ====
 
