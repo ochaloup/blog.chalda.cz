@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1521104052231"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1521104052231"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1521104052231"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1521104233380"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1521104233380"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1521104233380"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1521104052231"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1521104233380"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/02/27/Docker-basics.html" />
     <meta name="referrer" content="origin" />
@@ -367,6 +367,21 @@ and saving the drive space you can use command <code>docker system prune -a</cod
 the image being saved in the local cache. Or build the image from <code>Dockerfile</code>
 (normally includes downloading of images from the remote repository too, the parent docker images
 are delcared by <code>FROM</code> declaration at <code>Dockerfile</code>) - causing the result image is stored in the local cache.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+I&#8217;m using here <em>old</em> version of docker cli command prescription. For example I use here <code>docker pull</code>,
+<code>docker build</code>. In new better structured way you will say <code>docker image</code> (as you work with image) and then
+command <code>docker image build</code> or <code>docker image pull</code>.+
+But in general it&#8217;s only aliases. The functionality of <code>docker build</code> and <code>docker image build</code> is the same.
+</td>
+</tr>
+</table>
 </div>
 <div class="sect2">
 <h3 id="_pull_image_from_docker_registry">Pull image from docker registry</h3>
@@ -965,7 +980,7 @@ and even it ensures the database is restarted later.</p>
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1521104052231"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1521104233380"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
