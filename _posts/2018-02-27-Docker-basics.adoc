@@ -72,9 +72,10 @@ the image being saved in the local cache. Or build the image from `Dockerfile`
 are delcared by `FROM` declaration at `Dockerfile`) - causing the result image is stored in the local cache.
 
 NOTE: I'm using here _old_ version of docker cli command prescription. For example I use here `docker pull`,
-`docker build`. In new better structured way you will say `docker image` (as you work with image) and then
-command `docker image build` or `docker image pull`.+
-But in general it's only aliases. The functionality of `docker build` and `docker image build` is the same.
+`docker build`. In the new better structured way you will say first what resource you work with - ie. here with the `image`
+thus you use `docker image` and then you add the command. For example:
+`docker image build` or `docker image pull`. +
+In fact both ways are only aliases. The functionality of `docker build` and `docker image build` is the same.
 
 === Pull image from docker registry
 
