@@ -150,6 +150,8 @@ oc policy add-role-to-user view system:serviceaccount:myproject:default
 
 # if you want to check what are all permissions in the cluster (handy to check available resources too)
 oc describe clusterrolebinding
+# to get information about service accounts (abbreviated to 'sa')
+oc describe sa
 
 # when permssions added this return 'yes'
 oc policy can-i list pods --user system:serviceaccount:myproject:default
