@@ -133,6 +133,8 @@ You can check what the https://docs.openshift.com/container-platform/3.7/admin_g
 tells about it.
 
 ```bash
+# you will probably need to have admin privileges to do the following steps
+oc login -u system:admin
 # checking what are resources the system:serviceaccount:<namespace>:default has permission to list
 oc policy can-i --list --user system:serviceaccount:myproject:default
 # checking if we can list pods in particular
