@@ -207,11 +207,18 @@ From that I redirected the configuration of the `OPTIONS` variable to file `/etc
 OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'
 ```
 
-NOTE: docker restart could be needed in way
+[NOTE]
+====
+restart of the docker deamon is needed when the configuration files were changed
+
+_if you do not run `daemon-reload` you will get message:
+Warning: docker.service changed on disk. Run 'systemctl daemon-reload' to reload units._
+
 ```
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
+====
 
 
 ==== Other OSes and docker registry configuration

@@ -1,0 +1,6 @@
+= Asciidoctor and reveal.js: awesome presentation stack
+:hp-tags: presentation, asciidoctor, revel.js
+:toc: macro
+:release: 1.0
+:published_at: 2018-03-10
+:icons: font
