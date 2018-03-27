@@ -302,6 +302,25 @@ rules:
   verbs:
   - list
 EOF
+```
+```bash
+cat <<EOF | oc create -f -
+apiVersion: v1
+kind: RoleBinding
+metadata:
+  name: pods-listing-binding
+  annotations:
+    description: "Default service account"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ochaloup
+roleRef:
+  kind: Role
+  name: pods-listing
+  namespace: ochaloup
+EOF
+```
 ====
 
 This template adds specific role with permission to `list` `pods` for service account `default`.
