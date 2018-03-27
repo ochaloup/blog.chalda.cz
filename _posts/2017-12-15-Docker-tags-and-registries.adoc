@@ -207,6 +207,9 @@ From that I redirected the configuration of the `OPTIONS` variable to file `/etc
 OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'
 ```
 
+WARN: be sure you define `ExecStart` with `$OPTIONS` as they are configured in the properties file
+      but needs to be passed to the docker daemon startup
+
 [NOTE]
 ====
 restart of the docker deamon is needed when the configuration files were changed
@@ -219,6 +222,8 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 ====
+
+NOTE: to check if insecure registries are configured correctly try `docker info | grep -A 5 Insecure Registries:`
 
 
 ==== Other OSes and docker registry configuration
