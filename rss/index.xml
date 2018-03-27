@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not  being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 15 Mar 2018 09:00:44 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Querying OpenShift API]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 27 Mar 2018 18:40:27 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Querying OpenShift API]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>OpenShift offers <a href="https://docs.openshift.com/container-platform/latest/rest_api/">REST API</a>
@@ -181,7 +181,9 @@ tells about it.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># checking what are resources the system:serviceaccount:&lt;namespace&gt;:default has permission to list
+<pre class="highlight"><code class="language-bash" data-lang="bash"># you will probably need to have admin privileges to do the following steps
+oc login -u system:admin
+# checking what are resources the system:serviceaccount:&lt;namespace&gt;:default has permission to list
 oc policy can-i --list --user system:serviceaccount:myproject:default
 # checking if we can list pods in particular
 oc policy can-i list pods --user system:serviceaccount:myproject:default
@@ -193,6 +195,11 @@ oc policy who-can list pods
 oc policy add-role-to-user view -z default
 # -- or in similar fashion
 oc policy add-role-to-user view system:serviceaccount:myproject:default
+
+# if you want to check what are all permissions in the cluster (handy to check available resources too)
+oc describe clusterrolebinding
+# to get information about service accounts (abbreviated to 'sa')
+oc describe sa
 
 # when permssions added this return 'yes'
 oc policy can-i list pods --user system:serviceaccount:myproject:default</code></pre>
@@ -376,6 +383,26 @@ rules:
   - pods
   verbs:
   - list
+EOF</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">cat &lt;&lt;EOF | oc create -f -
+apiVersion: v1
+kind: RoleBinding
+metadata:
+  name: pods-listing-binding
+  annotations:
+    description: "Default service account"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ochaloup
+roleRef:
+  kind: Role
+  name: pods-listing
+  namespace: ochaloup
 EOF</code></pre>
 </div>
 </div>
@@ -2225,6 +2252,10 @@ ExecStart=/usr/bin/dockerd $OPTIONS
 <pre class="highlight"><code class="language-bash" data-lang="bash">OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>WARN: be sure you define <code>ExecStart</code> with <code>$OPTIONS</code> as they are configured in the properties file
+      but needs to be passed to the docker daemon startup</p>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -2232,16 +2263,34 @@ ExecStart=/usr/bin/dockerd $OPTIONS
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-docker restart could be needed in way
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>restart of the docker deamon is needed when the configuration files were changed</p>
+</div>
+<div class="paragraph">
+<p><em>if you do not run <code>daemon-reload</code> you will get message:
+Warning: docker.service changed on disk. Run 'systemctl daemon-reload' to reload units.</em></p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code>sudo systemctl daemon-reload
 sudo systemctl restart docker</code></pre>
 </div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+to check if insecure registries are configured correctly try <code>docker info | grep -A 5 Insecure Registries:</code>
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">

@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1521104444682"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1521104444682"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1521104444682"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1522176027249"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1522176027249"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1522176027249"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1521104444682"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1522176027249"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" />
     <meta name="referrer" content="origin" />
@@ -197,7 +197,7 @@
             <ul class="post-meta-list">
               <li class="post-meta-item">
                 <time datetime="2018-02-28" itemprop="datePublished">
-                  15 days ago
+                  a month ago
                 </time>
               </li>
                 <li class="post-meta-item">
@@ -410,7 +410,9 @@ tells about it.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># checking what are resources the system:serviceaccount:&lt;namespace&gt;:default has permission to list
+<pre class="highlight"><code class="language-bash" data-lang="bash"># you will probably need to have admin privileges to do the following steps
+oc login -u system:admin
+# checking what are resources the system:serviceaccount:&lt;namespace&gt;:default has permission to list
 oc policy can-i --list --user system:serviceaccount:myproject:default
 # checking if we can list pods in particular
 oc policy can-i list pods --user system:serviceaccount:myproject:default
@@ -422,6 +424,11 @@ oc policy who-can list pods
 oc policy add-role-to-user view -z default
 # -- or in similar fashion
 oc policy add-role-to-user view system:serviceaccount:myproject:default
+
+# if you want to check what are all permissions in the cluster (handy to check available resources too)
+oc describe clusterrolebinding
+# to get information about service accounts (abbreviated to 'sa')
+oc describe sa
 
 # when permssions added this return 'yes'
 oc policy can-i list pods --user system:serviceaccount:myproject:default</code></pre>
@@ -605,6 +612,26 @@ rules:
   - pods
   verbs:
   - list
+EOF</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">cat &lt;&lt;EOF | oc create -f -
+apiVersion: v1
+kind: RoleBinding
+metadata:
+  name: pods-listing-binding
+  annotations:
+    description: "Default service account"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ochaloup
+roleRef:
+  kind: Role
+  name: pods-listing
+  namespace: ochaloup
 EOF</code></pre>
 </div>
 </div>
@@ -877,7 +904,7 @@ and use it for processing the API call.</p>
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1521104444682"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1522176027249"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
