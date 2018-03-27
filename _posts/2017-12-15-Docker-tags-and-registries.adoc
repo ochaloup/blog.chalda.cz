@@ -207,8 +207,8 @@ From that I redirected the configuration of the `OPTIONS` variable to file `/etc
 OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'
 ```
 
-WARN: be sure you define `ExecStart` with `$OPTIONS` as they are configured in the properties file
-      but needs to be passed to the docker daemon startup
+WARNING: be sure you define `ExecStart` with `$OPTIONS` as they are configured in the properties file
+    but needs to be passed to the docker daemon startup
 
 [NOTE]
 ====
