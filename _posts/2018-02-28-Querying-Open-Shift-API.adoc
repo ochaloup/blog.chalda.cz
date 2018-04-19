@@ -20,6 +20,9 @@ nice description of the concept and then there are three detailed blog posts on 
  https://blog.openshift.com/kubernetes-deep-dive-api-server-part-2/[part #2],
  https://blog.openshift.com/kubernetes-deep-dive-api-server-part-3a/[part #3]).
 
+The blogpost about use the API on OpenShift blog could be seen at
+https://blog.openshift.com/kubernetes-application-operator-basics
+
 toc::[]
 
 == Querying API
