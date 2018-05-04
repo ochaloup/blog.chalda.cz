@@ -1,0 +1,67 @@
+= Vim plugin to work with text highlighting
+:hp-tags: plugin, vim
+:toc: macro
+:release: 1.0
+:published_at: 2018-05-04
+:icons: font
+
+image::articles/vim-syntax-match-plugin.png[]
+
+Are you Vim user and have you ever investigated long server logs with multiple
+identifiers needed to be tracked?
+
+This happens to me quite often with WildFly and transaction identifiers.
+Thus I was searching how to make my life easier in this respect. I found
+that colorizing referred parts of the log helps me to follow and understand
+what has happened.
+
+Vim provides  `match` command (and its alternatives
+`2match` and `3match`). You say what color to use and what text to mark with the color.
+You do it in way `:match <color> /<pattern>/`. The example would be for `:match DiffAdd /2018-[^ ]*`.
+This expression colorize text starting with `2018-` up to the space in the text
+with color named `DiffAdd`. You can search for available colors when you write
+`:highlight` (shortcut as `:hi`). And you can define your own color with
+`:hi <new-color-name> <terminal-type>=<color-code>` (see details at `:help hi`).
+As an example `:hi yellow guibg=#dfff87 ctermbg=192` where we define a color name `yellow`
+to colorize background with color of code `#dfff87` and `192` respectively.
+Check the color codes for example here https://jonasjacek.github.io/colors/.
+
+image::articles/content/vim-match-command.png[]
+
+But this is restricted only to three text patterns to be highlighted. If you need
+more you can define your own arbitrary syntax match rules with `:syntax match DiffAdd /2018-[^ ]*`.
+This sounds fine but it requires more text typing than I liked. And I feel another pain point
+- when I closed the log file and wanted to get back to investigation after a while
+all the highlighting was lost.
+
+I decided to create a Vim plugin which addresses my objections and makes my life easier.
+You can find it at https://github.com/ochaloup/vim-syntax-match
+
+If you install it and wish to get highlighted the mentioned pattern you can write
+only `:Y 2018-[^ ]*`.
+
+What it brings?
+
+* text highlighting shortcuts for several colors, like `:Y <pattern>` for yellow background or
+  `:GF <pattern>` for green foreground
+* saving the existing highlighting pattern to be loaded next time the file is opened
+  (works with `.txt` and `.log` files)
+
+Check all the helper commands at the https://github.com/ochaloup/vim-syntax-match#helper-commands[README file]
+and you can read how https://github.com/ochaloup/vim-syntax-match#how-works-internally[this works in details there too].
+
+== How to install
+
+See guidelines at the `README` file https://github.com/ochaloup/vim-syntax-match#how-to-install.
+In short you need to have installed http://www.vim.org/scripts/script.php?script_id=2332[pathogen plugin]
+and then just clone the https://github.com/ochaloup/vim-syntax-match[vim syntax match] respository
+under folder `.vim/bundle`.
+
+== Tips
+
+* Do you know that you can open a secondary file as a vertical Vim window having
+  those to being scrolled together? Try `:vsplit <path-to-file>` and `:set scrollbind`.
+  Alternatively use plugin user command `:SCB`
+* Do you know Vim can export the opened file as HTML page where highligting is applied?
+  Try to run `:Tohtml`. Alternatively use the plugin user command `:TOHtmlWithLines`
+  which adds _clicable_ line numbers on top of the output provided by `:Tohtml`.
