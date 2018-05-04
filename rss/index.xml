@@ -1,4 +1,103 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 27 Mar 2018 18:40:27 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Querying OpenShift API]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 04 May 2018 07:18:51 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Vim plugin to work with text highlighting]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/vim-syntax-match-plugin.png" alt="vim syntax match plugin.png">
+</div>
+</div>
+<div class="paragraph">
+<p>Are you Vim user and have you ever investigated long server logs with multiple
+identifiers needed to be tracked?</p>
+</div>
+<div class="paragraph">
+<p>This happens to me quite often with WildFly and transaction identifiers.
+Thus I was searching how to make my life easier in this respect. I found
+that colorizing referred parts of the log helps me to follow and understand
+what has happened.</p>
+</div>
+<div class="paragraph">
+<p>Vim provides  <code>match</code> command (and its alternatives
+<code>2match</code> and <code>3match</code>). You say what color to use and what text to mark with the color.
+You do it in way <code>:match &lt;color&gt; /&lt;pattern&gt;/</code>. The example would be for <code>:match DiffAdd /2018-[^ ]*</code>.
+This expression colorize text starting with <code>2018-</code> up to the space in the text
+with color named <code>DiffAdd</code>. You can search for available colors when you write
+<code>:highlight</code> (shortcut as <code>:hi</code>). And you can define your own color with
+<code>:hi &lt;new-color-name&gt; &lt;terminal-type&gt;=&lt;color-code&gt;</code> (see details at <code>:help hi</code>).
+As an example <code>:hi yellow guibg=#dfff87 ctermbg=192</code> where we define a color name <code>yellow</code>
+to colorize background with color of code <code>#dfff87</code> and <code>192</code> respectively.
+Check the color codes for example here <a href="https://jonasjacek.github.io/colors/" class="bare">https://jonasjacek.github.io/colors/</a>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/content/vim-match-command.png" alt="vim match command.png">
+</div>
+</div>
+<div class="paragraph">
+<p>But this is restricted only to three text patterns to be highlighted. If you need
+more you can define your own arbitrary syntax match rules with <code>:syntax match DiffAdd /2018-[^ ]*</code>.
+This sounds fine but it requires more text typing than I liked. And I feel another pain point
+- when I closed the log file and wanted to get back to investigation after a while
+all the highlighting was lost.</p>
+</div>
+<div class="paragraph">
+<p>I decided to create a Vim plugin which addresses my objections and makes my life easier.
+You can find it at <a href="https://github.com/ochaloup/vim-syntax-match" class="bare">https://github.com/ochaloup/vim-syntax-match</a></p>
+</div>
+<div class="paragraph">
+<p>If you install it and wish to get highlighted the mentioned pattern you can write
+only <code>:Y 2018-[^ ]*</code>.</p>
+</div>
+<div class="paragraph">
+<p>What it brings?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>text highlighting shortcuts for several colors, like <code>:Y &lt;pattern&gt;</code> for yellow background or
+<code>:GF &lt;pattern&gt;</code> for green foreground</p>
+</li>
+<li>
+<p>saving the existing highlighting pattern to be loaded next time the file is opened
+(works with <code>.txt</code> and <code>.log</code> files)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Check all the helper commands at the <a href="https://github.com/ochaloup/vim-syntax-match#helper-commands">README file</a>
+and you can read how <a href="https://github.com/ochaloup/vim-syntax-match#how-works-internally">this works in details there too</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_install">How to install</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See guidelines at the <code>README</code> file <a href="https://github.com/ochaloup/vim-syntax-match#how-to-install" class="bare">https://github.com/ochaloup/vim-syntax-match#how-to-install</a>.
+In short you need to have installed <a href="http://www.vim.org/scripts/script.php?script_id=2332">pathogen plugin</a>
+and then just clone the <a href="https://github.com/ochaloup/vim-syntax-match">vim syntax match</a> respository
+under folder <code>.vim/bundle</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tips">Tips</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Do you know that you can open a secondary file as a vertical Vim window having
+those to being scrolled together? Try <code>:vsplit &lt;path-to-file&gt;</code> and <code>:set scrollbind</code>.
+Alternatively use plugin user command <code>:SCB</code></p>
+</li>
+<li>
+<p>Do you know Vim can export the opened file as HTML page where highligting is applied?
+Try to run <code>:Tohtml</code>. Alternatively use the plugin user command <code>:TOHtmlWithLines</code>
+which adds <em>clicable</em> line numbers on top of the output provided by <code>:Tohtml</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2018/05/04/Vim-plugin-to-work-with-text-highlighting.html</link><guid isPermaLink="true">http://blog.chalda.cz/2018/05/04/Vim-plugin-to-work-with-text-highlighting.html</guid><category><![CDATA[plugin]]></category><category><![CDATA[vim]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Fri, 04 May 2018 00:00:00 GMT</pubDate></item><item><title><![CDATA[Querying OpenShift API]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
 <p>OpenShift offers <a href="https://docs.openshift.com/container-platform/latest/rest_api/">REST API</a>
