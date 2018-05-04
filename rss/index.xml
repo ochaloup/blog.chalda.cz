@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 04 May 2018 07:18:51 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Vim plugin to work with text highlighting]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 04 May 2018 07:37:16 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Vim plugin to work with text highlighting]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -6,9 +6,13 @@
 </div>
 </div>
 <div class="paragraph">
-<p>Are you Vim user and have you ever investigated long server logs with multiple
-identifiers needed to be tracked?</p>
+<p>Are you Vim user and have you ever investigated long server logs with multiple identifiers needed to be tracked? Check out my plugin <a href="https://github.com/ochaloup/vim-syntax-match">Vim syntax match</a> that can help you with it.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_topic_background">Topic background</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>This happens to me quite often with WildFly and transaction identifiers.
 Thus I was searching how to make my life easier in this respect. I found
@@ -39,6 +43,11 @@ This sounds fine but it requires more text typing than I liked. And I feel anoth
 - when I closed the log file and wanted to get back to investigation after a while
 all the highlighting was lost.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_vim_synax_match_plugin">Vim synax match plugin</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>I decided to create a Vim plugin which addresses my objections and makes my life easier.
 You can find it at <a href="https://github.com/ochaloup/vim-syntax-match" class="bare">https://github.com/ochaloup/vim-syntax-match</a></p>
