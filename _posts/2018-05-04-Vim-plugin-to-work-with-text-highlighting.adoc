@@ -7,8 +7,9 @@
 
 image::articles/vim-syntax-match-plugin.png[]
 
-Are you Vim user and have you ever investigated long server logs with multiple
-identifiers needed to be tracked?
+Are you Vim user and have you ever investigated long server logs with multiple identifiers needed to be tracked? Check out my plugin https://github.com/ochaloup/vim-syntax-match[Vim syntax match] that can help you with it.
+
+== Topic background
 
 This happens to me quite often with WildFly and transaction identifiers.
 Thus I was searching how to make my life easier in this respect. I found
@@ -33,6 +34,8 @@ more you can define your own arbitrary syntax match rules with `:syntax match Di
 This sounds fine but it requires more text typing than I liked. And I feel another pain point
 - when I closed the log file and wanted to get back to investigation after a while
 all the highlighting was lost.
+
+== Vim synax match plugin
 
 I decided to create a Vim plugin which addresses my objections and makes my life easier.
 You can find it at https://github.com/ochaloup/vim-syntax-match
