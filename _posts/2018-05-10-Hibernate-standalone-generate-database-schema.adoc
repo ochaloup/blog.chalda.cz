@@ -20,6 +20,8 @@ What the preconditions were
 * write and query data while the data structure is pretty simple
 
 
+CODE EXAMPLE: https://github.com/ochaloup/hibernate-standalone
+
 
 
 * SQL for PostgreSQL to query all tables:
