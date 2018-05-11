@@ -1,0 +1,33 @@
+= How to generate schema when writing Hibernate standalone app
+:hp-tags: jpa, database, hibernate
+:toc: macro
+:release: 1.0
+:published_at: 2018-05-10
+:icons: font
+
+image::articles/hibernate-standalone.png[]
+
+The motivation for this post was an attempt to use Hibernate as abstraction library
+that is easily capable to work with different databases without need to direct
+compile the code against particular jdbc driver.
+
+What the preconditions were
+
+* output is standalone java application
+* code to be independent on jdbc driver
+* being able to generate database schema independently on specific SQL syntax
+  particular for each database type
+* write and query data while the data structure is pretty simple
+
+
+
+
+* SQL for PostgreSQL to query all tables:
+* SELECT *  FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = 'public' ORDER BY table_type, table_name
+*
+* Sources:
+* https://antoniogoncalves.org/2014/12/11/generating-database-schemas-with-jpa-2-1/
+* http://java-in-code.blogspot.cz/2016/08/native-hibernate-configuration-although.html
+* https://docs.jboss.org/hibernate/orm/5.2/userguide/html_single/chapters/bootstrap/Bootstrap.html
+* https://vladmihalcea.com/how-to-bootstrap-jpa-programmatically-without-the-persistence-xml-configuration-file/
+*/
