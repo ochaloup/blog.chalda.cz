@@ -1,4 +1,299 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten ]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 14 Jun 2018 13:01:33 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Vim plugin to work with text highlighting]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten ]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 14 Jun 2018 13:02:38 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[OpenShift ConfigMaps to store data from pods]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/config_maps.png" alt="config maps.png">
+</div>
+</div>
+<div class="paragraph">
+<p>If you search for information about <code>ConfigMap</code> in <a href="https://www.openshift.com">OpenShift</a> or <a href="https://kubernetes.io">Kubernetes</a>
+then you find it&#8217;s a mechanism to abstract your application from configuration.
+<code>ConfigMap</code> is then way to define configuration values (usually in form of a <code>yaml</code> file)
+while the configuration is then injected to the running application which can utilize
+the information in for it likes.</p>
+</div>
+<div class="paragraph">
+<p>There is not many information that the <code>ConfigMap</code> primitives can be used
+from inside of the pod (and from the application itself) to persist data
+which is then available via OpenShift API calls.</p>
+</div>
+<div class="paragraph">
+<p><em>see more details about OpenShift API calls at article <a href="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html" class="bare">http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html</a></em></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>As the first step is good to scan the documentation pages from
+<a href="https://docs.openshift.com/enterprise/3.2/dev_guide/configmaps.html">OpenShift</a>
+or <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap">Kubernetes</a>
+to get overview of the usage.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configmap_creation">ConfigMap creation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To create a simple ConfigMap object let&#8217;s use the <code>oc</code> command while naming the
+it <code>special-config</code> and filling it with two keys (<code>special.how</code>, <code>special.type</code>)
+and matched values.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ oc create configmap special-config --from-literal=special.how=very --from-literal=special.type=charm</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can use the <code>oc create</code> to get the <code>ConfigMap</code> being created from json data format.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">cat &lt;&lt;EOF | oc create -f -
+{
+  "kind": "ConfigMap",
+  "apiVersion": "v1",
+  "metadata": {
+      "name": "special-config"
+   }
+}
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When using the <code>oc</code> command we can utilize argument <code>describe</code> to find
+the content of just created ConfigMap <code>special-config</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$ oc describe cm special-config
+
+Name:         special-config
+Namespace:    myproject
+Labels:       &lt;none&gt;
+Annotations:  &lt;none&gt;
+
+Data
+====
+special.how:
+----
+very
+special.type:
+----
+charm
+Events:  &lt;none</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To get the same information by querying OpenShift API we will call</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ENDPOINT=$(minishift ip):8443
+TOKEN=$(oc whoami -t)
+NAMESPACE=$(oc project -q)
+CONFIG_MAP_NAME=special-config
+
+curl -k -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output will be similar to this</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "kind": "ConfigMap",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "special-config",
+    "namespace": "myproject",
+    "selfLink": "/api/v1/namespaces/myproject/configmaps/special-config",
+    ...
+  },
+  "data": {
+    "special.how": "very",
+    "special.type": "charm"
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_making_changes_in_the_configmap">Making changes in the ConfigMap</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As said we can not only query <code>ConfigMap</code> data but we can write them too.
+Here we use the <code>PUT</code> operation wile we re-write all data saved in the <code>special-config</code>
+<code>ConfigMap</code> and replace them with data from <code>json</code> we&#8217;re providing.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PUT -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  -H 'Content-Type: application/json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;'EOF'
+{
+"kind": "ConfigMap",
+"apiVersion": "v1",
+"metadata": {
+    "name": "special-config"
+ },
+ "data": {
+    "Samwise": "Gamgee",
+    "Rosie": "Cotton"
+ }
+}
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is good but what if we don&#8217;t want just override the content of the existing
+<code>ConfigMap</code> but we would like to add new data or change the value of a single existing key.</p>
+</div>
+<div class="paragraph">
+<p>Here we got to the point to find out there are strategies that could be used
+while working with the <code>ConfigMaps</code>. We can patch the existing <code>ConfigMaps</code>
+by, surprisingly, calling with method <code>PATH</code> and defining <code>Content-Type</code>.
+We can use either merge strategy <code>application/merge-patch+json</code> or patch
+strategy <code>application/json-patch+json</code>. For the summary of the approaches I like
+article at <a href="http://erosb.github.io/post/json-patch-vs-merge-patch" class="bare">http://erosb.github.io/post/json-patch-vs-merge-patch</a>.</p>
+</div>
+<div class="paragraph">
+<p>With <code>merge-patch</code> we use <code>PATCH</code> with json format (as we used with <code>PUT</code> above)
+but the <code>ConfigMap</code> will be merged (instead of replaced).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  -H 'Content-Type: application/merge-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
+{
+  "kind": "ConfigMap",
+  "apiVersion": "v1",
+  "metadata": {
+      "name": "special-config"
+   },
+   "data": {
+      "Rosie": "Gamgee"
+   }
+}
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After executing this the patch the data will look</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">"data": {
+  "Rosie": "Gamgee",
+  "Samwise": "Gamgee"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the <code>json-patch</code> is needed to define what is operation to be processed
+over the particular key. Let&#8217;s make the value removal while changing the other one.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  -H 'Content-Type: application/json-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
+[
+  {
+    "op": "replace",
+    "path": "/data/Samwise",
+    "value": "Baggins"
+  },
+  {
+    "op": "remove",
+    "path": "/data/Rosie"
+  }
+]
+EOF</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_authorization">Authorization</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For you can update the <code>ConfigMap</code> from inside of the pod, the service account
+the pod is running at has to be permitted to do changes in the <code>ConfigMap</code>.
+You should create a new service account with such permissions and configure
+your pod to run with that service account. Here is an example of the configuration
+json which defines a new service account and declares it to be of role <code>edit</code>
+which provides permissions to make changes (to edit) most of the things in the
+current namespace (project). Of course you can define permissions in more granular way.</p>
+</div>
+<div class="paragraph">
+<p>For importing it you can use <code>oc create -f &lt;path-to-file-with-this-json&gt;</code> and then
+applying imported template by <code>oc new-app --template=role-testing</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Application name",
+            "name": "APPLICATION_NAME",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "ServiceAccount",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-sa"
+            }
+        },
+        {
+          "kind": "ConfigMap",
+          "apiVersion": "v1",
+          "metadata": {
+              "name": "special-config"
+           },
+          "data": {}
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-role-binding"
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "${APPLICATION_NAME}-sa"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "edit"
+            }
+        }
+    ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html</link><guid isPermaLink="true">http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html</guid><category><![CDATA[OpenShift]]></category><category><![CDATA[kubernetes]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Thu, 14 Jun 2018 00:00:00 GMT</pubDate></item><item><title><![CDATA[Vim plugin to work with text highlighting]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
