@@ -1,4 +1,4 @@
-= OpenShift ConfigMaps to store data from pods
+= OpenShift ConfigMaps to store application data from the pod
 :hp-tags: OpenShift, kubernetes
 :toc: macro
 :release: 1.0
@@ -11,7 +11,7 @@ If you search for information about `ConfigMap` in https://www.openshift.com[Ope
 then you find it's a mechanism to abstract your application from configuration.
 `ConfigMap` is then way to define configuration values (usually in form of a `yaml` file)
 while the configuration is then injected to the running application which can utilize
-the information in for it likes.
+the information as it likes.
 
 There is not many information that the `ConfigMap` primitives can be used
 from inside of the pod (and from the application itself) to persist data
@@ -113,7 +113,8 @@ Here we use the `PUT` operation wile we re-write all data saved in the `special-
 
 ```bash
 curl -k -X PUT -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<'EOF'
+  -H 'Content-Type: application/json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<'EOF'
 {
 "kind": "ConfigMap",
 "apiVersion": "v1",
@@ -139,11 +140,12 @@ strategy `application/json-patch+json`. For the summary of the approaches I like
 article at http://erosb.github.io/post/json-patch-vs-merge-patch.
 
 With `merge-patch` we use `PATCH` with json format (as we used with `PUT` above)
-but the `ConfigMap` will be merged (instead of replaced).
+and the `ConfigMap` will be merged (instead of replaced).
 
 ```bash
 curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/merge-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<EOF
+  -H 'Content-Type: application/merge-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<EOF
 {
   "kind": "ConfigMap",
   "apiVersion": "v1",
@@ -157,7 +159,7 @@ curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application
 EOF
 ```
 
-After executing this the patch the data will look
+After executing this the patch the data will look like
 
 ```json
 "data": {
@@ -171,7 +173,8 @@ over the particular key. Let's make the value removal while changing the other o
 
 ```bash
 curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/json-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<EOF
+  -H 'Content-Type: application/json-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<EOF
 [
   {
     "op": "replace",
@@ -194,7 +197,8 @@ You should create a new service account with such permissions and configure
 your pod to run with that service account. Here is an example of the configuration
 json which defines a new service account and declares it to be of role `edit`
 which provides permissions to make changes (to edit) most of the things in the
-current namespace (project). Of course you can define permissions in more granular way.
+current namespace (project). Of course you can define permissions
+http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html#_permisions_to_the_openshift_objects[in more granular way].
 
 For importing it you can use `oc create -f <path-to-file-with-this-json>` and then
 applying imported template by `oc new-app --template=role-testing`.
@@ -250,3 +254,4 @@ applying imported template by `oc new-app --template=role-testing`.
     ]
 }
 ```
+
