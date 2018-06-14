@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1522176027294"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1522176027294"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1522176027294"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1528981293439"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1528981293439"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1528981293439"/>
 
 
 
@@ -70,7 +70,7 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1522176027294"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1528981293439"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html" />
     <meta name="referrer" content="origin" />
@@ -196,7 +196,7 @@
             <ul class="post-meta-list">
               <li class="post-meta-item">
                 <time datetime="2017-12-15" itemprop="datePublished">
-                  3 months ago
+                  6 months ago
                 </time>
               </li>
                 <li class="post-meta-item">
@@ -512,9 +512,18 @@ ExecStart=/usr/bin/dockerd $OPTIONS
 <pre class="highlight"><code class="language-bash" data-lang="bash">OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>WARN: be sure you define <code>ExecStart</code> with <code>$OPTIONS</code> as they are configured in the properties file
-      but needs to be passed to the docker daemon startup</p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+be sure you define <code>ExecStart</code> with <code>$OPTIONS</code> as they are configured in the properties file
+    but needs to be passed to the docker daemon startup
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -654,7 +663,7 @@ to check if insecure registries are configured correctly try <code>docker info |
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1522176027294"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1528981293439"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
