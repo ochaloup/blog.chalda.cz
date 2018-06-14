@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 14 Jun 2018 13:03:41 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[OpenShift ConfigMaps to store data from pods]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten ]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 14 Jun 2018 13:11:06 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[OpenShift ConfigMaps to store application data from the pod]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -10,7 +10,7 @@
 then you find it&#8217;s a mechanism to abstract your application from configuration.
 <code>ConfigMap</code> is then way to define configuration values (usually in form of a <code>yaml</code> file)
 while the configuration is then injected to the running application which can utilize
-the information in for it likes.</p>
+the information as it likes.</p>
 </div>
 <div class="paragraph">
 <p>There is not many information that the <code>ConfigMap</code> primitives can be used
@@ -140,7 +140,8 @@ Here we use the <code>PUT</code> operation wile we re-write all data saved in th
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PUT -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;'EOF'
+  -H 'Content-Type: application/json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;'EOF'
 {
 "kind": "ConfigMap",
 "apiVersion": "v1",
@@ -169,12 +170,13 @@ article at <a href="http://erosb.github.io/post/json-patch-vs-merge-patch" class
 </div>
 <div class="paragraph">
 <p>With <code>merge-patch</code> we use <code>PATCH</code> with json format (as we used with <code>PUT</code> above)
-but the <code>ConfigMap</code> will be merged (instead of replaced).</p>
+and the <code>ConfigMap</code> will be merged (instead of replaced).</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/merge-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
+  -H 'Content-Type: application/merge-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
 {
   "kind": "ConfigMap",
   "apiVersion": "v1",
@@ -189,7 +191,7 @@ EOF</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>After executing this the patch the data will look</p>
+<p>After executing this the patch the data will look like</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -206,7 +208,8 @@ over the particular key. Let&#8217;s make the value removal while changing the o
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/json-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
+  -H 'Content-Type: application/json-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
 [
   {
     "op": "replace",
@@ -233,7 +236,8 @@ You should create a new service account with such permissions and configure
 your pod to run with that service account. Here is an example of the configuration
 json which defines a new service account and declares it to be of role <code>edit</code>
 which provides permissions to make changes (to edit) most of the things in the
-current namespace (project). Of course you can define permissions in more granular way.</p>
+current namespace (project). Of course you can define permissions
+<a href="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html#_permisions_to_the_openshift_objects">in more granular way</a>.</p>
 </div>
 <div class="paragraph">
 <p>For importing it you can use <code>oc create -f &lt;path-to-file-with-this-json&gt;</code> and then

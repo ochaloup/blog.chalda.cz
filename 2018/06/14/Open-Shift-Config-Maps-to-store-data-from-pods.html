@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>OpenShift ConfigMaps to store data from pods</title>
+    <title>OpenShift ConfigMaps to store application data from the pod</title>
 
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
@@ -16,11 +16,11 @@
     <meta name="description" content="">
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="OpenShift ConfigMaps to store data from pods">
+    <meta name="twitter:title" content="OpenShift ConfigMaps to store application data from the pod">
     <meta name="twitter:description" content="">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="OpenShift ConfigMaps to store data from pods">
+    <meta property="og:title" content="OpenShift ConfigMaps to store application data from the pod">
     <meta property="og:description" content="">
 
     <!-- <meta name="twitter:site" content="">
@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1528981421524"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1528981421524"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1528981421524"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1528981866172"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1528981866172"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1528981866172"/>
 
 
 
@@ -70,14 +70,14 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1528981421524"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1528981866172"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html" />
     <meta name="referrer" content="origin" />
     
     <meta property="og:site_name" content="Chalda&#x27;s blog" />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="OpenShift ConfigMaps to store data from pods" />
+    <meta property="og:title" content="OpenShift ConfigMaps to store application data from the pod" />
     <meta property="og:description" content="If you search for information about ConfigMap in OpenShift or Kubernetes then you find it&amp;#8217;s a mechanism to abstract your application from configuration. ConfigMap is then way to define configuration values (usually in form of a yaml file) while the configuration is then injected to the running application" />
     <meta property="og:url" content="http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html" />
     <meta property="article:published_time" content="2018-06-14T00:00:00.000Z" />
@@ -85,7 +85,7 @@
     <meta property="article:tag" content="kubernetes" />
     
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="OpenShift ConfigMaps to store data from pods" />
+    <meta name="twitter:title" content="OpenShift ConfigMaps to store application data from the pod" />
     <meta name="twitter:description" content="If you search for information about ConfigMap in OpenShift or Kubernetes then you find it&amp;#8217;s a mechanism to abstract your application from configuration. ConfigMap is then way to define configuration values (usually in form of a yaml file) while the configuration is then injected to the running application" />
     <meta name="twitter:url" content="http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html" />
     
@@ -101,7 +101,7 @@
         "url": "http://blog.chalda.cz/author/ochaloup/",
         "sameAs": "https://twitter.com/_chalda"
     },
-    "headline": "OpenShift ConfigMaps to store data from pods",
+    "headline": "OpenShift ConfigMaps to store application data from the pod",
     "url": "http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html",
     "datePublished": "2018-06-14T00:00:00.000Z",
     "keywords": "OpenShift, kubernetes",
@@ -209,7 +209,7 @@
                 <a href="#disqus_thread" data-disqus-identifier="">Comments</a>
               </li>
             </ul>
-            <h1 itemprop="name headline" class="post-title"><a href="http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html" itemprop="url" data-pjax title="OpenShift ConfigMaps to store data from pods">OpenShift ConfigMaps to store data from pods</a></h1>
+            <h1 itemprop="name headline" class="post-title"><a href="/" itemprop="url" data-pjax title="OpenShift ConfigMaps to store application data from the pod">OpenShift ConfigMaps to store application data from the pod</a></h1>
             <!--h2 itemprop="about" class="post-subtitle"></h2-->
           </header>
           <aside class="post-side">
@@ -238,7 +238,7 @@
 then you find it&#8217;s a mechanism to abstract your application from configuration.
 <code>ConfigMap</code> is then way to define configuration values (usually in form of a <code>yaml</code> file)
 while the configuration is then injected to the running application which can utilize
-the information in for it likes.</p>
+the information as it likes.</p>
 </div>
 <div class="paragraph">
 <p>There is not many information that the <code>ConfigMap</code> primitives can be used
@@ -368,7 +368,8 @@ Here we use the <code>PUT</code> operation wile we re-write all data saved in th
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PUT -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;'EOF'
+  -H 'Content-Type: application/json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;'EOF'
 {
 "kind": "ConfigMap",
 "apiVersion": "v1",
@@ -397,12 +398,13 @@ article at <a href="http://erosb.github.io/post/json-patch-vs-merge-patch" class
 </div>
 <div class="paragraph">
 <p>With <code>merge-patch</code> we use <code>PATCH</code> with json format (as we used with <code>PUT</code> above)
-but the <code>ConfigMap</code> will be merged (instead of replaced).</p>
+and the <code>ConfigMap</code> will be merged (instead of replaced).</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/merge-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
+  -H 'Content-Type: application/merge-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
 {
   "kind": "ConfigMap",
   "apiVersion": "v1",
@@ -417,7 +419,7 @@ EOF</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>After executing this the patch the data will look</p>
+<p>After executing this the patch the data will look like</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -434,7 +436,8 @@ over the particular key. Let&#8217;s make the value removal while changing the o
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
-  -H 'Content-Type: application/json-patch+json' https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
+  -H 'Content-Type: application/json-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME &lt;&lt;EOF
 [
   {
     "op": "replace",
@@ -461,7 +464,8 @@ You should create a new service account with such permissions and configure
 your pod to run with that service account. Here is an example of the configuration
 json which defines a new service account and declares it to be of role <code>edit</code>
 which provides permissions to make changes (to edit) most of the things in the
-current namespace (project). Of course you can define permissions in more granular way.</p>
+current namespace (project). Of course you can define permissions
+<a href="http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html#_permisions_to_the_openshift_objects">in more granular way</a>.</p>
 </div>
 <div class="paragraph">
 <p>For importing it you can use <code>oc create -f &lt;path-to-file-with-this-json&gt;</code> and then
@@ -600,7 +604,7 @@ applying imported template by <code>oc new-app --template=role-testing</code>.</
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1528981421524"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1528981866172"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
