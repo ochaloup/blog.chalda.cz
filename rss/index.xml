@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 22 Jun 2018 06:21:46 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[OpenShift ConfigMaps to store application data from the pod]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog ]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog </title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 22 Jun 2018 06:22:55 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[OpenShift ConfigMaps to store application data from the pod]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -351,7 +351,7 @@ when I closed the file. I longed for the tool which preserves the colors for me.
 <h2 id="_vim_synax_match_plugin">Vim synax match plugin</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>As I haven&#8217;t found any I decided to created a Vim plugin adressing all my desires on my own.</p>
+<p>As I haven&#8217;t found any I decided to created a Vim plugin adressing all my desires.</p>
 </div>
 <div class="paragraph">
 <p>And you can find it at <a href="https://github.com/ochaloup/vim-syntax-match" class="bare">https://github.com/ochaloup/vim-syntax-match</a></p>
@@ -4760,23 +4760,19 @@ There is another article talking about this topic
 <p>And that should be it.</p>
 </div>
 <div class="paragraph">
-<p>There is still a motivation for doing that, sure. Few reasons said solely selfish.</p>
+<p>What about the motivation for doing that?</p>
 </div>
 <div class="paragraph">
 <p>First one is showing that I like what I&#8217;m doing and this passion could potentialy help somebody.
-The kick of for me thinking about such thing was
-<a href="https://vimeo.com/99516367">presentation Jurgen Appelo at GeeCon 2014</a>. I watched several
-other presentations from Jurgen afterwards but this one somehow influenced thinking of me.</p>
+The kick off for me to think about starting the blog was
+<a href="https://vimeo.com/99516367">presentation Jurgen Appelo at GeeCon 2014</a>. I&#8217;ve watched several
+other presentations from Jurgen before and after but this particularly hit me.</p>
 </div>
 <div class="paragraph">
 <p>The second is my infinite fight with recording knowledge. I usualy read something and
-I forget what that thing was about after few weeks. If not used in short period of time then
-it goes to <code>/dev/null</code> black hole.
-I found out that putting down few notes summarized in my own words helps me
-in this endeavour. Plus it works as kind of time machine to get back in time
-to understand what I was thinking to understand <span class="icon"><i class="fa fa-smile-o"></i></span>.</p>
-</div>
-<div class="paragraph">
-<p>Yeap, the only trouble is that writing such notes take a good amount of time.
-But most probably it&#8217;s worthy.</p>
+I forget what that thing was about after few weeks. All simply goes to  the <code>/dev/null</code> black hole.
+I found out that putting down notes helping me to summarize the key message while
+helping me to remember at least some part of the topic.
+And it&#8217;s kind of time machine fro me being able to get back in time
+to understand what I was thinking before <span class="icon"><i class="fa fa-smile-o"></i></span>.</p>
 </div>]]></description><link>http://blog.chalda.cz/2017/01/01/About-the-blog.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/01/01/About-the-blog.html</guid><category><![CDATA[blog]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Sun, 01 Jan 2017 00:00:00 GMT</pubDate></item></channel></rss>
