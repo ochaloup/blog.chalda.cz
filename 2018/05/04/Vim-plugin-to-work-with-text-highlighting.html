@@ -38,9 +38,9 @@
     <link href="//fonts.googleapis.com/" rel="dns-prefetch">
     <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400&subset=latin,latin-ext" rel="stylesheet">
 
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1528981928730"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1528981928730"/>
-    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1528981928730"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/main.min.css?v=1529648148079"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/custom.css?v=1529648148079"/>
+    <link rel="stylesheet" href="//blog.chalda.cz/themes/ghostium/assets/css/asciidoctor-foundation.css?v=1529648148079"/>
 
 
 
@@ -70,12 +70,12 @@
       GHOSTIUM.enablePjax = typeof enable_pjax !== 'undefined' ? enable_pjax : true;
     </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1528981928730"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/head-scripts.min.js?v=1529648148079"></script>
 
     <link rel="canonical" href="http://blog.chalda.cz/2018/05/04/Vim-plugin-to-work-with-text-highlighting.html" />
     <meta name="referrer" content="origin" />
     
-    <meta property="og:site_name" content="Chalda&#x27;s blog" />
+    <meta property="og:site_name" content="Chalda&#x27;s blog " />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Vim plugin to work with text highlighting" />
     <meta property="og:description" content="Are you Vim user and have you ever investigated long server logs with multiple identifiers needed to be tracked? Check out my plugin Vim syntax match that can help you with it. Topic background This happens to me quite often with WildFly and transaction identifiers. Thus I was searching how" />
@@ -93,7 +93,7 @@
 {
     "@context": "http://schema.org",
     "@type": "Article",
-    "publisher": "Chalda's blog",
+    "publisher": "Chalda's blog ",
     "author": {
         "@type": "Person",
         "name": "chalda",
@@ -110,7 +110,7 @@
     </script>
 
     <meta name="generator" content="HubPress" />
-    <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog" href="http://blog.chalda.cz/rss/" />
+    <link rel="alternate" type="application/rss+xml" title="Chalda&#x27;s blog " href="http://blog.chalda.cz/rss/" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/atom-one-dark.min.css">
     
         <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
@@ -129,7 +129,7 @@
             </a>
           </li>
           <!-- <li class="drawer-list-item">
-            <a href="http://blog.chalda.cz" title="Chalda&#x27;s blog" data-pjax>
+            <a href="http://blog.chalda.cz" title="Chalda&#x27;s blog " data-pjax>
               <i class="fa fa-list-alt"></i>All posts
             </a>
           </li> -->
@@ -196,7 +196,7 @@
             <ul class="post-meta-list">
               <li class="post-meta-item">
                 <time datetime="2018-05-04" itemprop="datePublished">
-                  a month ago
+                  2 months ago
                 </time>
               </li>
                 <li class="post-meta-item">
@@ -250,7 +250,7 @@ what has happened.</p>
 <div class="paragraph">
 <p>Vim provides  <code>match</code> command (and its alternatives
 <code>2match</code> and <code>3match</code>). You say what color to use and what text to mark with the color.
-You do it in way <code>:match &lt;color&gt; /&lt;pattern&gt;/</code>. The example would be for <code>:match DiffAdd /2018-[^ ]*</code>.
+You do it in way <code>:match &lt;color&gt; /&lt;pattern&gt;/</code>. The example would be for <code>:match DiffAdd /2018-[^ ]*/</code>.
 This expression colorize text starting with <code>2018-</code> up to the space in the text
 with color named <code>DiffAdd</code>. You can search for available colors when you write
 <code>:highlight</code> (shortcut as <code>:hi</code>). And you can define your own color with
@@ -266,10 +266,13 @@ Check the color codes for example here <a href="https://jonasjacek.github.io/col
 </div>
 <div class="paragraph">
 <p>But this is restricted only to three text patterns to be highlighted. If you need
-more you can define your own arbitrary syntax match rules with <code>:syntax match DiffAdd /2018-[^ ]*</code>.
-This sounds fine but it requires more text typing than I liked. And I feel another pain point
-- when I closed the log file and wanted to get back to investigation after a while
-all the highlighting was lost.</p>
+more you can define your own arbitrary syntax match rules with <code>:syntax match DiffAdd /2018-[^ ]*/</code>.
+This sounds fine but it requires more text typing than I liked.</p>
+</div>
+<div class="paragraph">
+<p>The second pain point that I feel was loosing all the knowledge connected with the hightligting
+the important parts of the texts (in my case they were identifiers in the server log)
+when I closed the file. I longed for the tool which preserves the colors for me.</p>
 </div>
 </div>
 </div>
@@ -277,15 +280,13 @@ all the highlighting was lost.</p>
 <h2 id="_vim_synax_match_plugin">Vim synax match plugin</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>I decided to create a Vim plugin which addresses my objections and makes my life easier.
-You can find it at <a href="https://github.com/ochaloup/vim-syntax-match" class="bare">https://github.com/ochaloup/vim-syntax-match</a></p>
+<p>As I haven&#8217;t found any I decided to created a Vim plugin adressing all my desires on my own.</p>
 </div>
 <div class="paragraph">
-<p>If you install it and wish to get highlighted the mentioned pattern you can write
-only <code>:Y 2018-[^ ]*</code>.</p>
+<p>And you can find it at <a href="https://github.com/ochaloup/vim-syntax-match" class="bare">https://github.com/ochaloup/vim-syntax-match</a></p>
 </div>
 <div class="paragraph">
-<p>What it brings?</p>
+<p>What it offers? As it was said:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -295,13 +296,18 @@ only <code>:Y 2018-[^ ]*</code>.</p>
 </li>
 <li>
 <p>saving the existing highlighting pattern to be loaded next time the file is opened
-(works with <code>.txt</code> and <code>.log</code> files)</p>
+(automatically works with <code>.txt</code> and <code>.log</code> files)</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Check all the helper commands at the <a href="https://github.com/ochaloup/vim-syntax-match#helper-commands">README file</a>
-and you can read how <a href="https://github.com/ochaloup/vim-syntax-match#how-works-internally">this works in details there too</a>.</p>
+<p>If you install it and wish to get highlighted the pattern introduced in the initial section of this blogpost,
+you can write just(!) <code>:Y 2018-[^ ]*</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you want to know what all the shortcuts the plugin offers don&#8217;t hesitate to check
+the helper commands at the <a href="https://github.com/ochaloup/vim-syntax-match#helper-commands">README file</a>
+and you can read all the details how the plugin works at <a href="https://github.com/ochaloup/vim-syntax-match#how-works-internally" class="bare">https://github.com/ochaloup/vim-syntax-match#how-works-internally</a>.</p>
 </div>
 </div>
 </div>
@@ -309,10 +315,13 @@ and you can read how <a href="https://github.com/ochaloup/vim-syntax-match#how-w
 <h2 id="_how_to_install">How to install</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>See guidelines at the <code>README</code> file <a href="https://github.com/ochaloup/vim-syntax-match#how-to-install" class="bare">https://github.com/ochaloup/vim-syntax-match#how-to-install</a>.
-In short you need to have installed <a href="http://www.vim.org/scripts/script.php?script_id=2332">pathogen plugin</a>
+<p>In short you need to have installed <a href="http://www.vim.org/scripts/script.php?script_id=2332">pathogen plugin</a>
 and then just clone the <a href="https://github.com/ochaloup/vim-syntax-match">vim syntax match</a> respository
 under folder <code>.vim/bundle</code>.</p>
+</div>
+<div class="paragraph">
+<p>For whole installation guidelines see
+<code>README</code> file at <a href="https://github.com/ochaloup/vim-syntax-match#how-to-install" class="bare">https://github.com/ochaloup/vim-syntax-match#how-to-install</a>.</p>
 </div>
 </div>
 </div>
@@ -370,7 +379,7 @@ which adds <em>clicable</em> line numbers on top of the output provided by <code
     </article>
 
     <footer role="contentinfo" class="footer">
-      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog</span>. 2018. All Rights Reserved.</small></p>
+      <p><small>Copyright &copy; <span itemprop="copyrightHolder">Chalda&#x27;s blog </span>. 2018. All Rights Reserved.</small></p>
       <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
       <p><small>Adapted by <a href="https://twitter.com/mgreau">Maxime Gréau</a></small></p>
       <p><small>Published with <a href="http://hubpress.io">HubPress</a></small></p>
@@ -413,7 +422,7 @@ which adds <em>clicable</em> line numbers on top of the output provided by <code
         hljs.initHighlightingOnLoad();
       </script>
 
-    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1528981928730"></script>
+    <script src="//blog.chalda.cz/themes/ghostium/assets/js/foot-scripts.min.js?v=1529648148079"></script>
 
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

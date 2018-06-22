@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Thu, 14 Jun 2018 13:12:08 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[OpenShift ConfigMaps to store application data from the pod]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog ]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog </title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Fri, 22 Jun 2018 06:15:48 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[OpenShift ConfigMaps to store application data from the pod]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -321,7 +321,7 @@ what has happened.</p>
 <div class="paragraph">
 <p>Vim provides  <code>match</code> command (and its alternatives
 <code>2match</code> and <code>3match</code>). You say what color to use and what text to mark with the color.
-You do it in way <code>:match &lt;color&gt; /&lt;pattern&gt;/</code>. The example would be for <code>:match DiffAdd /2018-[^ ]*</code>.
+You do it in way <code>:match &lt;color&gt; /&lt;pattern&gt;/</code>. The example would be for <code>:match DiffAdd /2018-[^ ]*/</code>.
 This expression colorize text starting with <code>2018-</code> up to the space in the text
 with color named <code>DiffAdd</code>. You can search for available colors when you write
 <code>:highlight</code> (shortcut as <code>:hi</code>). And you can define your own color with
@@ -337,10 +337,13 @@ Check the color codes for example here <a href="https://jonasjacek.github.io/col
 </div>
 <div class="paragraph">
 <p>But this is restricted only to three text patterns to be highlighted. If you need
-more you can define your own arbitrary syntax match rules with <code>:syntax match DiffAdd /2018-[^ ]*</code>.
-This sounds fine but it requires more text typing than I liked. And I feel another pain point
-- when I closed the log file and wanted to get back to investigation after a while
-all the highlighting was lost.</p>
+more you can define your own arbitrary syntax match rules with <code>:syntax match DiffAdd /2018-[^ ]*/</code>.
+This sounds fine but it requires more text typing than I liked.</p>
+</div>
+<div class="paragraph">
+<p>The second pain point that I feel was loosing all the knowledge connected with the hightligting
+the important parts of the texts (in my case they were identifiers in the server log)
+when I closed the file. I longed for the tool which preserves the colors for me.</p>
 </div>
 </div>
 </div>
@@ -348,15 +351,13 @@ all the highlighting was lost.</p>
 <h2 id="_vim_synax_match_plugin">Vim synax match plugin</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>I decided to create a Vim plugin which addresses my objections and makes my life easier.
-You can find it at <a href="https://github.com/ochaloup/vim-syntax-match" class="bare">https://github.com/ochaloup/vim-syntax-match</a></p>
+<p>As I haven&#8217;t found any I decided to created a Vim plugin adressing all my desires on my own.</p>
 </div>
 <div class="paragraph">
-<p>If you install it and wish to get highlighted the mentioned pattern you can write
-only <code>:Y 2018-[^ ]*</code>.</p>
+<p>And you can find it at <a href="https://github.com/ochaloup/vim-syntax-match" class="bare">https://github.com/ochaloup/vim-syntax-match</a></p>
 </div>
 <div class="paragraph">
-<p>What it brings?</p>
+<p>What it offers? As it was said:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -366,13 +367,18 @@ only <code>:Y 2018-[^ ]*</code>.</p>
 </li>
 <li>
 <p>saving the existing highlighting pattern to be loaded next time the file is opened
-(works with <code>.txt</code> and <code>.log</code> files)</p>
+(automatically works with <code>.txt</code> and <code>.log</code> files)</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Check all the helper commands at the <a href="https://github.com/ochaloup/vim-syntax-match#helper-commands">README file</a>
-and you can read how <a href="https://github.com/ochaloup/vim-syntax-match#how-works-internally">this works in details there too</a>.</p>
+<p>If you install it and wish to get highlighted the pattern introduced in the initial section of this blogpost,
+you can write just(!) <code>:Y 2018-[^ ]*</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you want to know what all the shortcuts the plugin offers don&#8217;t hesitate to check
+the helper commands at the <a href="https://github.com/ochaloup/vim-syntax-match#helper-commands">README file</a>
+and you can read all the details how the plugin works at <a href="https://github.com/ochaloup/vim-syntax-match#how-works-internally" class="bare">https://github.com/ochaloup/vim-syntax-match#how-works-internally</a>.</p>
 </div>
 </div>
 </div>
@@ -380,10 +386,13 @@ and you can read how <a href="https://github.com/ochaloup/vim-syntax-match#how-w
 <h2 id="_how_to_install">How to install</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>See guidelines at the <code>README</code> file <a href="https://github.com/ochaloup/vim-syntax-match#how-to-install" class="bare">https://github.com/ochaloup/vim-syntax-match#how-to-install</a>.
-In short you need to have installed <a href="http://www.vim.org/scripts/script.php?script_id=2332">pathogen plugin</a>
+<p>In short you need to have installed <a href="http://www.vim.org/scripts/script.php?script_id=2332">pathogen plugin</a>
 and then just clone the <a href="https://github.com/ochaloup/vim-syntax-match">vim syntax match</a> respository
 under folder <code>.vim/bundle</code>.</p>
+</div>
+<div class="paragraph">
+<p>For whole installation guidelines see
+<code>README</code> file at <a href="https://github.com/ochaloup/vim-syntax-match#how-to-install" class="bare">https://github.com/ochaloup/vim-syntax-match#how-to-install</a>.</p>
 </div>
 </div>
 </div>
