@@ -30,7 +30,7 @@ Check the color codes for example here https://jonasjacek.github.io/colors/.
 image::articles/content/vim-match-command.png[]
 
 But this is restricted only to three text patterns to be highlighted. If you need
-more you can define your own arbitrary syntax match rules with `:syntax match DiffAdd /2018-[^ ]*`.
+more you can define your own arbitrary syntax match rules with `:syntax match DiffAdd /2018-[^ ]*/`.
 This sounds fine but it requires more text typing than I liked. And I feel another pain point
 - when I closed the log file and wanted to get back to investigation after a while
 all the highlighting was lost.
