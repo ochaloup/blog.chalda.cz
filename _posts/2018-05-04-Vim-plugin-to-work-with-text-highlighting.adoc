@@ -39,7 +39,7 @@ when I closed the file. I longed for the tool which preserves the colors for me.
 
 == Vim synax match plugin
 
-As I haven't found any I decided to created a Vim plugin adressing all my desires on my own.
+As I haven't found any I decided to created a Vim plugin adressing all my desires.
 
 And you can find it at https://github.com/ochaloup/vim-syntax-match
 

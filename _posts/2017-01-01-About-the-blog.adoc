@@ -12,19 +12,17 @@ What is this about?
 And that should be it.
 
 
-There is still a motivation for doing that, sure. Few reasons said solely selfish.
+What about the motivation for doing that? 
 
 First one is showing that I like what I'm doing and this passion could potentialy help somebody.
-The kick of for me thinking about such thing was
-https://vimeo.com/99516367[presentation Jurgen Appelo at GeeCon 2014]. I watched several
-other presentations from Jurgen afterwards but this one somehow influenced thinking of me.
+The kick off for me to think about starting the blog was
+https://vimeo.com/99516367[presentation Jurgen Appelo at GeeCon 2014]. I've watched several
+other presentations from Jurgen before and after but this particularly hit me. 
 
 The second is my infinite fight with recording knowledge. I usualy read something and
-I forget what that thing was about after few weeks. If not used in short period of time then
-it goes to `/dev/null` black hole.
-I found out that putting down few notes summarized in my own words helps me
-in this endeavour. Plus it works as kind of time machine to get back in time
-to understand what I was thinking to understand icon:smile-o[].
+I forget what that thing was about after few weeks. All simply goes to  the `/dev/null` black hole.
+I found out that putting down notes helping me to summarize the key message while
+helping me to remember at least some part of the topic.
+And it's kind of time machine fro me being able to get back in time
+to understand what I was thinking before icon:smile-o[].
 
-Yeap, the only trouble is that writing such notes take a good amount of time.
-But most probably it's worthy.
