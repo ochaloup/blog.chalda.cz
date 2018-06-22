@@ -18,7 +18,7 @@ what has happened.
 
 Vim provides  `match` command (and its alternatives
 `2match` and `3match`). You say what color to use and what text to mark with the color.
-You do it in way `:match <color> /<pattern>/`. The example would be for `:match DiffAdd /2018-[^ ]*`.
+You do it in way `:match <color> /<pattern>/`. The example would be for `:match DiffAdd /2018-[^ ]*/`.
 This expression colorize text starting with `2018-` up to the space in the text
 with color named `DiffAdd`. You can search for available colors when you write
 `:highlight` (shortcut as `:hi`). And you can define your own color with
