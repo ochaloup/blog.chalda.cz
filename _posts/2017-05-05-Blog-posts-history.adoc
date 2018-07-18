@@ -5,6 +5,10 @@
 
 === 2018
 
+* [2018-07-18] http://blog.chalda.cz/2018/07/18/How-to-generate-schema-when-writing-Hibernate-standalone-app.html
+* [2018-06-28] http://jbossts.blogspot.com/2018/06/narayana-commit-markable-resource.html
+* [2018-06-14] http://blog.chalda.cz/2018/06/14/Open-Shift-Config-Maps-to-store-data-from-pods.html
+* [2018-05-04] http://blog.chalda.cz/2018/05/04/Vim-plugin-to-work-with-text-highlighting.html
 * [2018-02-28] http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html
 * [2018-02-27] http://blog.chalda.cz/2018/02/27/Docker-basics.html
 * [2018-02-17] http://blog.chalda.cz/2018/02/17/Maven-plugin-and-fight-with-classloading.html
