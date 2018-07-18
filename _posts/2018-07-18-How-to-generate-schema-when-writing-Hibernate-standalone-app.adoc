@@ -2,63 +2,63 @@
 :hp-tags: jpa, database, hibernate
 :toc: macro
 :release: 1.0
-:published_at: 2018-07-18
+:published_at: 2018-05-10
 :icons: font
 
 image::articles/hibernate-standalone.png[]
 
 Recently I played with http://hibernate.org[Hibernate] as I need a really simple application that would be capable
-to write and read dat from database while it would be portable for use with JDBC drivers
+to write and read data from the database while it would be portable for use with JDBC drivers
 from different vendors. I didn't want to write an abstract
 layer which would be dependent on particular JDBC driver and need to be recompiled with each.
-I just wanted to add a driver on the classpath, change a property and let it running.
+I just wanted to add a driver on the classpath, change a property and let it run.
 No recompilation.
 And it's what the Hibernate solved for me at the end.
 
-Up to that point I wanted Hibernate to create database schema. My was pretty simple
-thus the entity could be scanned and created based on its attributes automatically.
+On top of that, I wanted Hibernate to create the database schema. Mine is pretty simple
+thus the entity could be scanned and created based on its attributes.
 
-More precisely what I wanted to get
+More precisely what I wanted
 
 * a standalone java application
 * code being independent on specific JDBC driver
 * generating database schema independently on specific SQL syntax. Normally the `CREATE`
-  command could differ database from database.
+  the command could differ database from the database.
 * being able to influence database name before starting of the java application
   (e.g. by some descriptor or system property)
 * saving and querying data to/from the database
 
 == Two possible solution with the Hibernate
 
-While elaborating with Hibernate I found two way how to achieve what was my goal.
+While elaborating with Hibernate I found two way how to achieve my goal.
 
 The first way was using JPA with `persistence.xml` definition of database connection properties
-and entity used as schema. Then use https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html[javax.persistence.Persistence]
-and ask for the schema generation.
+and entity used as schema. Then asking https://docs.oracle.com/javaee/7/api/javax/persistence/package-summary.html[javax.persistence.Persistence]
+to generate the schema.
 
-The second was using Hibernate API programatically creating
+The second was using Hibernate API programmatically creating
 https://github.com/hibernate/hibernate-orm/blob/master/hibernate-core/src/main/java/org/hibernate/boot/registry/StandardServiceRegistryBuilder.java[service registry builder]
 and using https://github.com/hibernate/hibernate-orm/blob/master/hibernate-core/src/main/java/org/hibernate/tool/hbm2ddl/SchemaExport.java[schema exporter]
 to generate the schema.
 
 The demand for dynamically changing the table name was done by implementing
 https://docs.jboss.org/hibernate/orm/5.2/javadocs/org/hibernate/boot/model/naming/PhysicalNamingStrategy.html[naming strategy]
-that adding suffix to the original table name. This approach was taken in both
-cases. In one the strategy to be used was defined in the `persistence.xml` and using property
-`hibernate.physical_naming_strategy` while in second case the strategy was provided
+that adding a suffix to the original table name. This approach was taken in both
+cases. In one the strategy to be used as defined in the `persistence.xml` and using property
+`hibernate.physical_naming_strategy` while in the second case the strategy was provided
 to the `MetadataBuilder`.
 
 === Running code example
 
-Let's take a look at the both approaches in some more details. I played with the approaches
-at project https://github.com/ochaloup/hibernate-standalone.
+I played with the both approaches
+under the project https://github.com/ochaloup/hibernate-standalone.
 
 If you want to run the example you need to
 
 . get the repo `git clone https://github.com/ochaloup/hibernate-standalone`
-. package it. Maven is configured to create fat jar containing hibernate library.
-  `mvn clean package`
-. get the JDBC driver (expected you will use the PostgreSQL one: https://jdbc.postgresql.org/)
+  (use the correct branch to work with either `jpa-and-xml` or `hibernate-programatic-approach`)
+. package it (maven is configured to create fat jar containing hibernate library): `mvn clean package`
+. get the JDBC driver (expected you will use the PostgreSQL one: https://jdbc.postgresql.org)
 . run PostgreSQL database (you can use docker to run it:
   `docker run -p 5432:5432 --rm  -ePOSTGRES_USER=test -e POSTGRES_PASSWORD=test postgres:9.4 -c max-prepared-transactions=110 -c log-statement=all`)
 . start the java program at root `cd hibernate-standalone`
@@ -76,28 +76,28 @@ SELECT *  FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND tab
 == JPA persistence.xml approach
 
 This approach could be investigated at the branch
-https://github.com/ochaloup/hibernate-standalone/tree/jpa-and-xml/.
+https://github.com/ochaloup/hibernate-standalone/tree/jpa-and-xml.
 
 The all connection configuration is defined in the
 https://github.com/ochaloup/hibernate-standalone/blob/jpa-and-xml/src/main/resources/META-INF/persistence.xml[`persistence.xml`] file.
 Here we define connection properties for the database, the dialect which defines how to query for the JDBC driver
-and there is defined table naming strategy if needed.
+and there is a defined table naming strategy if needed.
 
-The example then uses descriptor file `hibernate.hbm.xml` which defines `<entity-mapping>` attribute.
+The example then uses the descriptor file `hibernate.hbm.xml` which defines `<entity-mapping>` attribute.
 This configuration file is placed in the root of the project and is referred in the `persistence.xml`
-with absolute path of `./`. That means when run `java -cp ... <program-name>` the program
-will expect the mapping file at place the java is run at.\+
+with the absolute path of `./`. That means when running `java -cp ... <program-name>` the program
+will expect the mapping file at the place the java is run at.\+
 That's why the mapping file is placed at the root and defines different table name for you too
-(up to the fact of existence of the naming strategy).
+(up to the fact of the existence of the naming strategy).
 
-For interest the example contains the mapping file
+For interest, the example contains the mapping file
 https://github.com/ochaloup/hibernate-standalone/blob/jpa-and-xml/src/main/resources/META-INF/hibernate.hbm.xml.out[hibernate.hbm.xml.out]
-containing whole mapping of the entity but with table name redefinition.
+containing the whole mapping of the entity but with table name redefinition.
 
-The logic of creating database schema and the entity save and load is hidden under class
+The logic of creating the database schema and the entity save and the load is hidden in the class
 https://github.com/ochaloup/hibernate-standalone/blob/jpa-and-xml/src/main/java/cz/chalda/Main.java[cz.chalda.Main].
 There you can see the usage of `javax.persistence.Persistence` to generate the database schema
-and then to get the `PersistenceUnit` for being able to save and load entity.
+and then to get the `PersistenceUnit` for being able to save and load the entity.
 
 
 == Programmatic hibernate approach
@@ -105,12 +105,12 @@ and then to get the `PersistenceUnit` for being able to save and load entity.
 This approach could be investigated at the branch
 https://github.com/ochaloup/hibernate-standalone/tree/hibernate-programatic-approach.
 
-There is no configuration files in this case. We all configure at
+There is no configuration files in this case. We configure all at
 https://github.com/ochaloup/hibernate-standalone/blob/hibernate-programatic-approach/src/main/java/cz/chalda/Main.java[cz.chalda.Main] file.
 
-The connection is configured via `StandardServiceRegistryBuilder` and there is defined
+The connection is configured via `StandardServiceRegistryBuilder` and it is defined
 credentials and the dialect too.
-Next is usage of the `MetadataBuilder` class which offers registration for enhancement of the
+Next is the usage of the `MetadataBuilder` class which offers registration for enhancement of the
 `PhysicalNamingStrategyStandard` to change table name with suffix.
 The last part is using `SchemaExport` for database schema creation
 while metadata is used again for getting `SessionFactory` and `Session`
@@ -118,8 +118,11 @@ for being able to create and update the database data.
 
 == Summary
 
-Thanks for attention. For both approaches to run standalone java app with Hibernate
-to save time to develop integration layer to different JDBC drivers.
+Thanks for attention.
+
+Both approaches offer a way to run a standalone java app with Hibernate
+to save time to develop an integration layer to different JDBC drivers
+while showing some Hibernate extension points to be used for further application tuning.
 
 == Sources
 
@@ -130,3 +133,4 @@ Some sources used during the case investigation are here
 * https://docs.jboss.org/hibernate/orm/5.2/userguide/html_single/chapters/bootstrap/Bootstrap.html
 * https://vladmihalcea.com/how-to-bootstrap-jpa-programmatically-without-the-persistence-xml-configuration-file
 * https://www.javahelps.com/2015/07/hibernate-hello-world-using-xml-mapping.html
+
