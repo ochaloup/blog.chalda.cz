@@ -23,6 +23,6 @@ The second is my infinite fight with recording knowledge. I usualy read somethin
 I forget what that thing was about after few weeks. All simply goes to  the `/dev/null` black hole.
 I found out that putting down notes helping me to summarize the key message while
 helping me to remember at least some part of the topic.
-And it's kind of time machine fro me being able to get back in time
-to understand what I was thinking before icon:smile-o[].
+And it's kind of time machine for me being able to get back in time
+to understand what I was thinking some time before icon:smile-o[].
 
