@@ -69,7 +69,8 @@ If you want to run the example you need to
 You can watch names of all tables at PostgreSQL with query
 
 ```
-SELECT *  FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = 'public' ORDER BY table_type, table_name;
+SELECT *  FROM information_schema.tables WHERE table_type = 'BASE TABLE'
+  AND table_schema = 'public' ORDER BY table_type, table_name;
 ```
 ====
 
