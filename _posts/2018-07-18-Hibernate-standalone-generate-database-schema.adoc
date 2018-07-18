@@ -2,7 +2,7 @@
 :hp-tags: jpa, database, hibernate
 :toc: macro
 :release: 1.0
-:published_at: 2018-05-10
+:published_at: 2018-07-18
 :icons: font
 
 image::articles/hibernate-standalone.png[]
