@@ -1,0 +1,635 @@
+= Vim script notes
+:hp-tags: vim, plugin, scripting
+:toc: macro
+:release: 1.0
+:published_at: 2018-07-20
+:icons: font
+
+image::articles/vim-script.png[]
+
+I longed for a tool which helps me while manually investigating server logs
+and as I can't find any I decided to create a small Vim plugin
+https://github.com/ochaloup/vim-syntax-match[which highlights text].
+Getting to the state of having the plugin forced me to learn basics of
+the Vim scripting language. +
+Here I'm going to summarize few findings.
+
+== Starting with the Vim script
+
+There are many articles on the internet teaching about Vim script.
+I found nice in particular these two series:
+
+icon:bookmark[] http://www.ibm.com/developerworks/library/l-vim-script-1 +
+icon:bookmark[] http://learnvimscriptthehardway.stevelosh.com
+
+== How to load and run a function
+
+Ok, I want to write my script, how to get it running?
+
+My steps are creating a new vim script source code file
+where I put the code - normally I would create a function.
+At the next step I use command to load the code from the script in the openedVim window.
+I use command `:source <file path>` for loading the code and
+`:call <function name>` to execute the function.
+
+Let's say you have the function as defined below saved in the file at `/tmp/test.function.vim`.
+
+```vim
+function! ListBuffers()
+  let buffers = filter(range(1, bufnr('$')), 'bufexists(v:val)')
+  for buffer in buffers
+    if getbufvar(buffer, "&filetype") == 'help'
+      " this is a 'help' buffer, skipping
+      continue
+    endif
+    " ec is short version for command echo
+    ec 'Having an opened buffer: ' . buffer
+  endfor
+endfunction
+```
+
+NOTE: notice use of the `!` at the end of the  `function` declaration. This says
+  that function redefinition will override the existing function with the same name.
+  If you do not add the `!` then the Vim will not load the function and only
+  shouts at you that error happened.
+
+The function goes over all opened buffers
+and print their name with echo command. It will skip to print name of the buffer of type `'help'`.
+
+When you have the function saved in the file can load and execute it.
+
+```vim
+" shortened version of :source command is :so
+:source /tmp/test.function.vim
+" shortened version of :call command is :cal
+:call ListBuffers()
+```
+
+[NOTE]
+====
+If you want to get printed function return value you can use `:echo` command
+in our case the return value is 0
+
+```vim
+" shortedned version of :echo command is :ec
+:echo ListBuffers()
+```
+
+There is more echo commands than only the `:echo`. Let's mention `:echoerr` which
+prints to error output. Or `:echomsg` which interpret expressions.
+====
+
+NOTE: if you have opened a empty Vim window there will be printed only number `1`.
+  To open another buffer (to get at least printed numbers `1` and `2`) run open command
+  with path to a file `:o /tmp/something`.
+
+This is fine. Now I can start to tune my function. But it's a bit cumbersome
+to write `:so` and `:cal` for any change in the script.
+What about map these commands to a keyboard shortcuts? In the following example
+if I press `;s` the source is loaded from the file and after pressing `;b`
+the function listing buffers is invoked.
+
+```vim
+:nmap ;s :source /tmp/test.function.vim<CR>
+:nmap ;b :call ListBuffers()<CR>
+:nmap <silent> ;= :call ListBuffers()<CR>
+```
+
+* `<CR>` means `literal carriage return` which is needed when function should be executed
+  (it replaces hitting ``<enter>` when you write it at the Vim command line)
+* `<silent>` causes that _nmap_ mapping not to echo any command it's executing,
+  in our case where the function just prints to the command line using `silent` won't make any difference
+
+NOTE: Let me know of any better way in this to comments.
+
+=== A little bit more about key mapping in vim
+
+When mapping keys in the insert mode the command has to be put between `<C-R>=` and `<CR>`.
+`<C-R>=` tells Vim to insert the result of evaluating what follows the function parenthesis `()``,
+`<CR>` tells Vim to actually evaluate the preceding expression.
+For example you can map to insert current date at place the cursor stands
+when you double press the `Ctrl+D` in the insert mode like
+
+```vim
+" double CTRL+D prints date into the place of cursor
+:imap <silent> <C-D><C-D> <C-R>=strftime("%e %b %Y")<CR>
+" double CTRL+T prints time into the place of cursor
+:imap <silent> <C-T><C-T> <C-R>=strftime("%l:%M %p")<CR>
+" CTRL+Y prints output of the function 'ListBuffers' at the place of the cursor
+:imap <silent> <C-Y> <C-R><C-R>=ListBuffers()<CR>
+```
+
+`<C-R>`::
+abbreviation for `Ctrl+R` is not the same as `<CR>` (`literal carriage return`)
+`<C-R><C-R>`::
+it inserts the result of the subsequent expression as if it had been directly typed,
+which means that any special characters within the result retain their special meanings and behavior
+
+Few more notes
+
+* For being able to run some functions that needs to escape from the insert mode you need to use `C-O` (`:help i_CTRL-O`)
+  ```
+  let cursor_back = "\<C-O>:call setpos('.'," . string(cursorpos) . ")\<CR>"
+  ```
+* For mapping `TAB` use `inoremap` (see `:help i_CTRL-R`).
+  The `inoremap` is a form of the `imap`. It's used as the returned characters could also contain a TAB character.
+  That means if `TAB` is returned it won't invoked the mapped function again.
+
+See more about mapping at
+link:http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)[Vim mapping keys wiki page].
+
+=== General notes on Vim scripting
+
+* To show messages printed during the execution try `:messages` (shortened to `:mes`).
+* For writing functions check quick tutorial at http://learnvimscriptthehardway.stevelosh.com/chapters/23.html
+* The Vim uses symbol `.` for the strings concatenation.
+* Comments are used with `"` (double-quote)
+* String in Vim script can be declared within `"` too. If you want to use comment but vim script expects
+  `"` for the string declaration then use `|"` (`vertical bar` + `double-qoute`) as separator.
+
+Each statement ends with end of line. if needed a statement over more lines use `backslash` at the start of the line, e.g.
+
+[source, vim]
+----
+call SetName(
+\  first_name,
+\  second_name
+\)
+----
+
+or more statements could be put one by one with separating them with `vertical bar` (`|`)
+
+[source, vim]
+----
+echo "Starting..." | call ListBuffers() | echo "Done"
+----
+
+A strange thing (at least for me) is existence of the prefixed variables in the Vim.
+If you won't use the prefix they do not work for you as you would expect.
+See below or check list of prefixes at https://codeyarns.com/2010/11/26/how-to-view-variables-in-vim.
+
+
+=== Notes on functions writing a text to the opened document
+
+* For adding a text to the current line you can use function `setline`.
+  `:call setline(line('.'), getline('.') . ' hello')` which adds text ' hello' to the end of the current line
+
+* For pasting a new line to the position of the particular row you can use function `append`.
+`:call append(line('.'), "new line to be added at the bottom of the current line")`
+
+
+== Cheatsheet on Vim scripting language
+
+=== Variables
+
+.Variables types
+[options="header"]
+|================================================================
+|type      |example
+|scalar    | `let height = 165`
+|list      | `let interests = [ 'Cinema', 'Literature', 101 ]`
+|dictionary| `let phone     = { 'cell':5551017346, 'work':'?' }`
+|================================================================
+
+[WARNING]
+====
+Variable types, once assigned, are permanent and strictly enforced at runtime:
+E.g. `let interests = 'unknown' " Error: variable type mismatch`
+====
+
+.Scopes and prefix meanings
+[options="header"]
+|================================================================
+|Prefix    |Meaning
+|`g:varname` |The variable is global
+|`s:varname` |The variable is local to the current script file
+|`w:varname` |The variable is local to the current editor window
+|`t:varname` |The variable is local to the current editor tab
+|`b:varname` |The variable is local to the current editor buffer
+|`l:varname` |The variable is local to the current function
+|`a:varname` |The variable is a parameter of the current function
+|`v:varname` |The variable is one that Vim predefines
+|================================================================
+
+.Pseudovariables
+[options="header"]
+|================================================================
+|Prefix      |Meaning
+|`&varname `   |A Vim option (local option if defined, otherwise global)
+|`&l:varname`  |A local Vim option
+|`&g:varname`  |A global Vim option
+|`@varname `   |A Vim register
+|`$varname`    |An environment variable
+|================================================================
+
+
+=== Operators
+
+.Pseudovariables
+[options="header"]
+|================================================================
+|Operation                       |Operator syntax
+|Assignment                      |`let var=expr`
+|Numeric-add-and-assign          |`let var+=expr`
+|Numeric-subtract-and-assign     |`let var-=expr`
+|String-concatenate-and-assign   |`let var.=expr`
+|Ternary operator                |`bool?expr-if-true:expr-if-false`
+|Logical OR                      |`bool||bool`
+|Logical AND                     |`bool&&bool`
+|Numeric or string equality      |`expr==expr`
+|String case insensitive eq      |`expr==?expr`
+|String case sensitive eq        |`expr==#expr`
+|Numeric or string inequality    |`expr!=expr`
+|Numeric or string greater-then  |`expr>expr`
+|Numeric or string gr-or-eq      |`expr>=expr`
+|Numeric or string less than     |`expr<expr`
+|Numeric or string l-or-eq       |`expr<=expr`
+|Numeric addition                |`num+num`
+|Numeric subtraction             |`num-num`
+|String concatenation            |`str.str`
+|Numeric multiplication          |`num*num`
+|Numeric division                |`num/num`
+|Numeric modulus                 |`num%num`
+|Convert to number               |`+num`
+|Numeric negation                |`-num`
+|Logical NOT                     |`!bool`
+|Parenthetical precedence        |`(expr)`
+|================================================================
+
+
+* numeric only(!) numeric value zero is false in a boolean context; otherwise in ay case (any non-zero numeric value is considered true
+* when a string is used as a boolean, it is first converted to an integer, and then evaluated for truth
+** for emptiness is needed to be used a function: `empty(a_string)`
+* comparators always perform *numeric comparison* (unless both operands are strings). In particular, if one operand is a string and the other a number, the string will be converted to a number.
+* `let ident='Vim'`
+** `ident == 0`     always numeric equality - always true (string 'Vim' converted to number 0)
+** `ident == '0'`   uses string equality if ident contains string but numeric equality if ident contains number
+* case sentistive/insensitive could  be used with any comparators (`<#` less-than case sensitive)
+** string comparision honor the settings of vim's `ignorecase` option normally - the `#` and `?` will force behavior of comparision that we want
+
+
+==== Floating point operations
+
+Floating point has to be explicitly marked. Floating point arithmetic comes to Vim from Vim 7.2 and later.
+
+[source,vim]
+----
+let filecount = 234
+
+echo filecount/100   |" echoes 2
+echo filecount/100.0 |" echoes 2.34
+----
+
+=== Code structure/Syntax
+
+==== IF syntax
+
+```vim
+if left_width >= 0
+    let max_align_col = max([max_align_col, left_width])
+    ...
+endif
+```
+
+==== FOR syntax
+
+```vim
+for linetext in getline(firstline, lastline)
+    " working with text on the line
+    ...
+endfor
+```
+
+```vim
+for linenum in range(firstline, lastline)
+    " working with line numbers
+    ...
+```
+
+==== Iterating over nested list
+
+```vim
+for [name, rank, serial] in list_of_lists
+    echo rank . ' ' . name . '(' . serial . ')'
+endfor
+```
+
+==== Ternary operator
+
+```vim
+return completion . (restore ? cursor_back : "")
+```
+
+==== If with regexp (if statement, conditionals)
+
+```vim
+if curr_line =~ '\k' . curr_pos_pat
+  return "\<C-N>"
+endif
+```
+
+==== Elif statement (elseif statement)
+
+```vim
+if 0
+ echom "if"
+elseif "nope!"
+ echom "elseif"
+else
+ echom "finally!"
+endif``
+```
+
+==== Try/catch
+
+```vim
+" mkdir can throw E739 error when is unable to create the requested directory
+try
+    call mkdir( required_dir, 'p' )
+catch
+    echo "Can't create directory " . required_dir
+endtry
+```
+
+==== Lists
+
+===== List creation could be
+
+```vim
+let data = [1,2,3,4,5,6,"seven"]
+```
+
+And various manipulation on it - e.g. indices less than zero, which then count backward from the end of the list:
+`let data[-1] .=  ' samurai'`
+
+===== List comparision
+
+* operator `=` compares values (all values are the same but could be in different containers)
+* operator `is` compares identity (aliases the same container)
+
+===== Nested list
+
+```vim
+let pow = [
+\   [ 1, 0, 0, 0  ],
+\   [ 1, 1, 1, 1  ],
+\]
+" and later...
+echo pow[x][y]
+```
+
+===== List concatenation
+
+```vim
+let activities = ['sleep', 'eat'] + ['game', 'drink']
+let activities += ['code']
+```
+
+====== Sublist
+
+```vim
+let weekdays = week[1:5]
+```
+
+* list assigment to a variable is assigment of pointer/reference. For having copy use function `copy()` or `deepcopy()`.
+
+NOTE: For info on existing list functions see chapter on helpful functions
+
+====== Filter and map functionality
+
+That's specific functionality of work on list. `Filter` filters values and `map` applies some function on each value of the list.
+
+* `let positive_only = filter(copy(list_of_numbers), 'v:val >= 0')`
+* `let increased_numbers = map(copy(list_of_numbers), 'v:val + 10')`
+
+==== Dictionaries
+
+======  Basics
+
+```vim
+let seen = {}   " Haven't seen anything yet
+let daytonum = { 'Sun':0, 'Mon':1, 'Tue':2, 'Wed':3, 'Thu':4, 'Fri':5, 'Sat':6 }
+let day = daytonum['Sun']
+```
+
+====== For loop
+
+```vim
+for [next_key, next_val] in items(dict)
+    let result = process(next_val)
+    echo "Result for " next_key " is " result
+endfor
+```
+
+====== Remove
+
+```vim
+remove(dictionary, 'key')
+unlet dictionary['key']  "command unlet used
+```
+
+====== Filter and map on dictionaries
+
+```vim
+" remove any entry whose value is the same as its key...
+call fil://jenkins.mw.lab.eng.bos.redhat.com/hudson/job/eap-70-jbossts-crashrec-txpropag-backcompatible-tests-jpa-db-matrix/23/s0.user=crashrec
+ds0.pass=crashrec
+ds0.db.name=crashrec
+ter(diagnosis, 'v:key != v:val')
+" map walks through each value, aliases it to v:val, evaluates the expression in the string, and replaces the value with the result of that expression
+call map( names, 'toupper(v:val[0]) . tolower(v:val[1:])' )
+```
+
+=== Functions declaration
+
+* `function <name>()` declares fuction, name has to be unique, parentheses can contain arguments of function
+* `function! <name>()` declares function when name of it exists is overridden (reloaded)
+* function ends with expression `endfunction`
+* function name has to start with capital letter or with `s:` which declares it as local for the current script file
+
+Function could be scoped as properties can. E.g. `function s:<name>()` says that function is visible only in scope of current script file (see `s:`).
+
+[IMPORTANT]
+====
+In difference from other scripting languages you can't ignore return value of function. If function returns anything you need to use it - ie. `let a = s:fuctionname()`. Or you can use
+`echo` command like `echo s:functionname()`.
+====
+
+If function does not return anything then you can invoke it by calling through `call` like `call s:functionname()`.
+
+==== Function arguments
+
+`function name(param, param2)`
+
+You can access to parameters by name or by position. In both cases you need to use prefix `a:` for get value.
+
+```vim
+function printme(text)
+  echo a:text
+  echo a:1
+endfunction
+```
+
+NOTE: if position argument used then `a:0` contains number of arguments passed to the method.
+
+For undefined number of arguments you will use `...` like `function CommentBlock(comment, ...)`. Now you can access to comment as `a:comment` and any other argument is accesible
+via position parameter declaration. You can check number of argument `let introducer =  a:0 >= 1  ?  a:1  :  "//"`.
+
+Normally is function called in scope of current line. You can define scope that function work at - ie. `5,$call CommentBlock` will call _CommentBlock_ function for each line.
+
+If we want to have special tools for handling range we can say that range attributes won't be considered and function will called just once `function DeAmperfyAll() range`.
+The word `range` says to call function only once. Then there is added special parameters `a:firstline` and `a:lastline` that says the range that user called with.
+We can use it for example `for linenum in range(a:firstline, a:lastline)`
+
+If visual mode is used then function for the range of the visual block could be used as `Vip:call DeAmperfyAll()`.
+
+=== Interesting out-of-the-box functions
+
+To help and to see what functions we can use
+`:help functions` and listing `:help function-list`
+
+|===
+|`echo`           |internal statement showing a string (result of function) on line at bottom of window
+|`exists()`       |says if particular property is declared/exists - e.g. `exists('b:backup_count')`
+|`input()`        |ask user to write a text and that is returned from the function
+|`virtcol()`      |returns on-screen column (or "virtual column"), '.' argument specifies that you want the column number of the current cursor position
+|`getpos()`       |returns position of cursor - for current line it's `getpos('.')`
+|`setpos()`       |setting position of cursor
+|`search()`       |function to look backwards through the file from the cursor position, search(regexp pattern to find, configuration string - e.g. `bnW` means _search backwards but not to move the cursor nor to wrap the search_,
+                  if search fails returns 0; or flags `nW` search downwards and returns -1 if search hit the end of file
+|`getfontname()`  |shows guifont name, works only for gvim, font name could be set with `:set guifont=Monospace\ 20` or on win `:set guifont=Monospace:h20`
+|`getline()`      |returns line defined with number - getline(line_number)
+|`setline()`      |brother of `getline()` but it repaces text at passed line and changes to particular text `setline('.', 'hello')` - this changes text on current line for phrase 'hello'
+|`line()`         |returns line number e.g. `line('.')` returns number of the current line or `line('$')` returns number of last line of the text
+|`matchstr()`     |returns part of the string that matches pattern - ie. matchstr(string_to_check, target_pattern) - returns that part of the string where target pattern matches, ie. matchstr('abc', 'b.') returns 'bc'
+|`match()`        |tries to match a character from text defined by regexp - ie. `match(linetext, '\s*', ASSIGN_OP)` returns -1 if does not match assigment operation character in the text
+|`matchlist()`    |returns a list of all the fields captured by the regex - ie. `matchlist(linetext, regexp)`
+|`substitute()`   |substitutes text - `substitute(text_of_line, regexp_to_find_on_the_line, replacement_string, flags/tags)`
+|`max([..,..])`   |returns bigger number from a list (see below)
+|`strlen()`       |returns length of a string
+|`printf()`       |printing text in reformated way specified by formatter
+|`execute`        |used to evaluate a string as if it were a Vimscript command
+|`silent! execute`|executing regexp stuff - e.g. `silent ! execute "'[,']s/" . signature . '/\= ' . replacement . '/'`
+|`expand()`       |expanding expression, expansion could be modified (see `:h expand`), for example "head" of file path of currently opened file filepath:  `expand("%:h")`
+|`isdirectory()`  |is requested path directory which exists
+|`mkdir()`        |creating directory, flags could be used `mkdir(dir_path, 'p')` where flag `p` means create parent dir if not exists
+|`confirm()`      |asking user for confirmation, it will gives options for user in way of `confirm("is that ok?", "yes\nno")` and returns 1 or 2
+|`exit`           |inner command that exits function or so
+|`system('date')` |returns current date
+|`` |
+|===
+
+
+==== List functions
+|===
+|`copy()`        |providing shallow copy of a list (as normally assigning a list to different property means only referencing the same pointer)
+|`deepcopy()`    |providing deep copy of a list
+|`len()`         |length of list
+|`empty()`       |is list empty?, the same as `len(a_list) == 0`
+|`max()/min()`   |maximum or minimum from list of numbers
+|`index()`       |index of first occurrence of value or pattern in list, is `index(list, value)`, uses `==` comparision
+|`match()`       |index of first occurrence of value or pattern in list, is `match(list, pattern)`, uses `=~` comparision
+|`range()`       |generating list of numbers in some range e.g. `range(min,max,step)`
+|`split()`       |split to sequence of word ie. `split(text, delimiter_pattern)`
+|`join()`        |joining list values
+|`insert()`      |
+|`add()`         |
+|`extend()`      |
+|`remove()`      |remove({list},{index}) removes item from the list and returns it
+|`sort()`        |
+|`reverse()`     |
+|===
+
+==== Dictionary functions
+|===
+|`keys()`        |list of keys from dictionary
+|`values()`      |list of values from dictionary
+|`has_key()`     |say if particular dictionary has a key
+|`items()`       |list of lists where each sublist contains 'key' and 'value' of the dictionary item
+|`extend()`      |adding other dictionary to a dictionary
+|`remove()`      |remove key from dictionary
+|`unlet`         |remove from dictionary (_inner command, not a function_)
+|`empty()`       |true if no entries at all
+|`len()`         |how many entries?
+|`count()`       |how many values are equal to str?
+|`max()`         |find largest value of any entry
+|`min()`         |find smallest value of any entry
+|`call map()`    |transform values by eval'ing string
+|`echo string()` |print dictionary as key/value pairs
+|===
+
+
+==== Vim events
+
+To get info about what are accesible events that could be used for hooks run `:help autocmd-events` or for detailed `:help autocmd-events-abc`.
+
+Mechanism of interception of events is known as `autocommand`.
+
+```vim
+autocmd  EventName  filename_pattern   :command
+autocmd  EventName,EventName2,...  filename_pattern   :command
+autocmd  EventName  filename_pattern   :silent command
+```
+
+* EventName is one of help page `:help autocmd-events`, if more events are specified the autocmd will be invoked for any of them
+* filename_pattern is similar to bash pattern see `:help autocmd-patterns`
+* command is any valid vim command (colon at the start of command is optional but recommended)
+** Vim normally displays a notification after command completes. To disable that annoyance `silent` could be used
+
+Autocommands could be grouped and then worked together
+
+```vim
+augroup GROUPNAME
+    " autocommand specifications here ...
+augroup END
+```
+
+Deactivation with `autocmd!` command
+
+```vim
+" generic syntax
+autocmd!  [group]  [EventName [filename_pattern]]
+
+" deactivate whole group not depending on event name
+autocmd!  Unfocussed      *      *.txt
+" deactivate whole group not concerning file type
+autocmd!  Unfocussed
+```
+
+`autocmd!` itself deactivates from current group and is useful for doing cleanup before settings group autocommands.
+Adding an autocmd! to the start of every group is important because autocommands do not statically declare event handlers; they dynamically create them.
+
+```vim
+augroup Unfocussed
+    autocmd!
+
+    autocmd  FocusLost  *.txt   :call Autosave()
+    ...
+augroup END
+```
+
+Another useful set of events are BufWritePre, FileWritePre, and FileAppendPre. These `Pre` events are queued just before your Vim session writes a buffer back to disk (as a result of a command such as :write, :update, or :saveas).
+For all three types of events, Vim sets the special line-number aliases `'[` and `']` to the range of lines being written. For example usage for `s`
+
+```vim
+'[,']s/^This file last updated: \zs.*/\= strftime("%c") /
+```
+
+=== User commands
+
+`:help user-commands`
+
+Simple example how user can create his own command is (user command has to start with capital letter) `command Showme echo 'hello'`
+
+For command that will call a function and pass arguments do
+
+```
+command! -nargs=1 MyCommand call s:MyFunc(<f-args>)
+command! -nargs=1 Showme echo <f-args>
+```
+
+For quoting arguments use (as seen above for echo we can do it easier without `execute` command being used but this is for showing how that could be)
+
+```
+:command! -nargs=1 FW execute "echo" string(<q-args>)
+```
