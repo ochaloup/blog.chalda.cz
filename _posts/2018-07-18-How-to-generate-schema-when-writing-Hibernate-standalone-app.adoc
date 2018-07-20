@@ -48,7 +48,7 @@ cases. In one the strategy to be used as defined in the `persistence.xml` and us
 `hibernate.physical_naming_strategy` while in the second case the strategy was provided
 to the `MetadataBuilder`.
 
-=== Running code example
+=== Running the code example
 
 I played with the both approaches
 under the project https://github.com/ochaloup/hibernate-standalone.
