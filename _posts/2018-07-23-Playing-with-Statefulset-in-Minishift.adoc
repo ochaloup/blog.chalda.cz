@@ -1,0 +1,249 @@
+= Playing with Statefulset in Minishift
+:hp-tags: minishift, openshift, statefulset
+:toc: macro
+:release: 1.0
+:published_at: 2018-07-23
+:icons: font
+
+image::articles/minishift-stateful.png[]
+
+The point of this article is to put down few notes about StatefulSets.
+
+The content is about deploying the demo application
+https://blog.openshift.com/kubernetes-statefulset-in-action.
+on the https://github.com/minishift/minishift[Minishift].
+And the next step is looking at the OpenShift Statefulset drain controller as presented
+https://medium.com/@marko.luksa/graceful-scaledown-of-stateful-apps-in-kubernetes-2205fc556ba9[in the article of Marko Lukša].
+
+== StatefulSets and requirements
+
+https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations[As the documentation says]
+the StatefulSet is `a workload API object used to manage stateful applications`.
+It's capable to manage pods in desired way useful for application which needs to pertain state.
+What was interesting for me was the fact
+https://blog.yugabyte.com/orchestrating-stateful-apps-with-kubernetes-statefulsets-ce3a4a9dfd7e[the StatefulSet is operates under the same pattern as any other `Controller`]
+which are
+https://kubernetes.io/docs/concepts/workloads/controllers/deployment[Deployment]
+and the default https://kubernetes.io/docs/concepts/workloads/controllers/replicaset[ReplicationSet].
+
+StatefulSet provides several
+https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#using-statefulsets[guarantees]
+(strict naming and ordering, stable persistent storage, unique network identifier) but brings several
+https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations[limitations].
+From the perspective of the testing application I would mention
+ * need to the storage being provisioned with
+   https://kubernetes.io/docs/concepts/storage/storage-classes[storage class]
+ * need to define https://kubernetes.io/docs/concepts/services-networking/service/#headless-services[headless service]
+
+== My first steps on Minishift: Kubernetes StatefulSet In Action
+
+The blog post https://blog.openshift.com/kubernetes-statefulset-in-action[Kubernetes StatefulSet In Action] perfectly
+describes all steps needed for running the demo app `mehdb` at Kubernetes but I have
+few doubts how about OpenShift.
+
+First there is said that for StatefulSet I need a `StorageClass` to provide `PersistentVolume`.
+If you clone the https://github.com/mhausenblas/mehdb[mehdb repository]
+you can find https://github.com/mhausenblas/mehdb/blob/master/app.yaml#L45[in the application yaml declaration]
+requirements of having defined `ebs storage class`.
+
+NOTE: the storage class definition is not needed. The Minishift dynamically provides
+  the `PersistentVolume`(PV) when claimed with PersistentVolumeClaim(`PVC`)
+  and it's necessary just to remove the line from the `app.yaml` file of the `mehdb` demo application.
+
+=== Storage class declaration
+
+I thought it's really necessary thus I go through defining the `StorageClass` from the existing
+`PersistentVolumes` defined by the Minishift as describe in article
+https://docs.openshift.org/latest/install_config/storage_examples/storage_classes_legacy.html[Using Storage Classes for Existing Legacy Storage].
+
+Minishift from the version 1.5 (or something) declares and dynamically provides PersistentVolumes
+named `pv0001` to `pv0100`. You need to be with admin privileges to be permitted to check it
+(expecting your Minishift instance
+https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift[is already running]).
+
+```bash
+# log in as the administrator
+oc login -u system:admin
+# listing available persistent volumes
+oc get pv
+```
+
+For being able to connect the `StorageClass` with the existing `PersistentVolume`
+we delclare the `StorageClass` with https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner[no provisioner].
+
+```bash
+cat <<EOF | oc create -f -
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: ebs
+provisioner: no-provisioning
+parameters:
+EOF
+```
+
+We can now bound the existing `PeristentVolume` with the `StorageClass`.
+https://blog.openshift.com/working-openshift-configurations[There is nice blogpost]
+about changing existing OpenShift objects.
+
+You can either use `edit` command.
+
+```bash
+# priting the PV object named 'pv0001'
+oc get pv/pv0001 -o yaml
+# edit the object
+oc edit pv/pv0001
+# edit the yaml file to contain content like
+# ...
+#  persistentVolumeReclaimPolicy: Recycle
+#  storageClassName: ebs
+# status:
+#  phase: Available
+# ...
+```
+
+Or you can update only the spec of the object while calling `patch`.
+
+```bash
+oc patch pv/pv0001 --patch '{"spec":{"storageClassName": "ebs"}}'
+```
+
+=== Without storage class declaration
+
+As mentioned in note above the storage class declaration is not needed in the end.
+I was fine with just removing the storage class declaration from the `app.yaml`
+definition of the `mehdb` application.
+
+== Running the Kubernetes StatefulSet In Action
+
+Steps are nicely described https://blog.openshift.com/kubernetes-statefulset-in-action[in the blogpost]
+the only change is not using the `kubectl` command but `oc` command.
+
+Instead of running
+
+```bash
+kubectl create ns mehdb
+kubectl -n=mehdb apply -f app.yaml
+```
+
+instead you run with `oc`
+
+```bash
+# kubernetes namespace matches the project in openshift
+oc new-project mehdb
+# that will switch you to the mehdb project but you can check
+oc project
+# applying the yaml declaration of statefulset
+git clone git@github.com:mhausenblas/mehdb.git
+cd mehdb
+# as you were switched to the the project mehdb
+#  you don't need to use '-n mehdb' parameter
+# ! expected you run over the previous section
+oc apply -f app.yaml
+```
+
+https://github.com/mhausenblas/mehdb/blob/master/app.yaml[The `app.yaml`] declares
+the StatefulSet controller with image to be loaded for it and the headless service
+as it's needed.
+
+NOTE: if you need to delete content from the project `mehdb` you can run
+  ```bash
+  oc delete all --all
+  # or only to point to the StatefulSet itself
+  #  oc delete sts mehdb
+  oc delete $(oc get pvc -o name)
+  ```
+
+Now you can go through
+https://blog.openshift.com/kubernetes-statefulset-in-action/[he steps in the blogpost].
+I would mention the `jump` application which let you process a shell command like
+
+```
+# showing the headless service returns both endpoints
+#  (both pods) on DNS lookup
+oc run -i -t --rm dnscheck --restart=Never\
+  --image=quay.io/mhausenblas/jump:0.2 -- nslookup mehdb
+```
+
+Scaling up and down is done through the StatefulSet controller with command
+
+```bash
+oc scale sts mehdb --replicas=3
+```
+
+== Running the StatefulSet drain controller
+
+The article
+https://medium.com/@marko.luksa/graceful-scaledown-of-stateful-apps-in-kubernetes-2205fc556ba9[Graceful scaledown of stateful apps in Kubernetes]
+clearly defines the purpose for the drain controller. When said in short the stateful application
+sometimes need a way how to clear its data from the persistent volumes when they are scaled down.
+Let's say you have 3 pods and you want you application is scaled down to two pods.
+If you do so there is left data on the peristent volume which belonged to the third pod
+you scaled down. The data will be left here until you scale up to 3 again.
+What if you need to do some clearance when you do not plan to scale to 3 in short time?
+That's where existence of the drain controller helps you.
+
+The code of the drain controller in stage of proof-of-concept is available at
+https://github.com/luksa/statefulset-drain-controller (July 2018, hopefully it will be added to the Kubernetes).
+
+If I take the `mehdb` example as I worked with that above I need to make a change
+in the `app.yaml` file for the StatefulSet definition to contain binding to the drain controller.
+You can check my changes https://github.com/ochaloup/mehdb/tree/drain-controller[here]:
+https://github.com/ochaloup/mehdb/commit/06227df795745b23f8d1cf7cde227f0404ee66c2
+
+For the drain controller to take an action it has to be defined and running.
+It's either per cluster or per namespace. You can see the commands to define the drain controller
+https://github.com/luksa/statefulset-drain-controller/#running-one-controller-for-the-whole-cluster[at the README.md].
+For both cases you need the privileges at least to define
+https://github.com/luksa/statefulset-drain-controller/blob/master/artifacts/per-namespace.yaml#L63[a `Role` with pod creating permission].
+
+To get running the example
+
+```bash
+# switch to admin account with permissions to create the Roles
+oc login -u system:admin
+# creation of the drain controller per namespace
+oc apply -f\
+ https://raw.githubusercontent.com/luksa/statefulset-drain-controller/master/artifacts/per-namespace.yaml
+
+# upload the mehdb app.yaml definition containing the template for the drain controller
+oc apply -f\
+  https://raw.githubusercontent.com/ochaloup/mehdb/drain-controller/app.yaml
+
+# check the running pods where drain controller should be listed
+oc get po
+> NAME                              READY  STATUS   RESTARTS  AGE
+> mehdb-0                           1/1    Running  0         1h
+> mehdb-1                           1/1    Running  0         1h
+> statefulset-drain-controller-...  1/1    Running  0         1h
+
+# scale the mehdb to 3 pods
+oc scale sts mehdb --replicas=3
+
+# in different shell run a simple log checking script
+while true; do oc logs mehdb-2 -f; if [ $? -ne 0 ]; then
+  sleep 1; echo "  ...sleeping 1"; fi; done
+
+# now we can save a value to the mehdb with curl command
+oc run -i -t --rm jumpod --restart=Never --image=quay.io/mhausenblas/jump:0.2\
+  -- curl --data "hello mehdb" -sL -XPUT  mehdb:9876/set/test
+oc run -i -t --rm jumpod --restart=Never --image=quay.io/mhausenblas/jump:0.2\
+  -- curl -sL -XGET  mehdb:9876/get/test
+
+# and now scale to two while take a look on the while checking script
+oc scale sts mehdb --replicas=3
+
+# you should see there was run the shell command saying
+# > Datadir '/mehdbdata' content now:
+# > /mehdbdata
+# > /mehdbdata/test
+# > /mehdbdata/test/content
+# > Draining data... this takes 10 seconds!
+# > /mehdbdata
+```
+
+== Summary
+
+This was a quick testing of the StatefulSet running on the Minishift
+and using the drain controller proof-of-concept. +
+In case of some text inaccuracy I will be happy when you let me know it in the comments.
