@@ -1,4 +1,4 @@
-= Set up HAProxy for HTTP header balancing
+= Set up HAProxy to balance by HTTP header balancing
 :hp-tags: load.balance, haproxy, admin
 :toc: macro
 :release: 1.0
@@ -83,7 +83,9 @@ curl -i -X GET localhost:8000/servlet-test/host?foo=one
 curl -i -X GET localhost:8000/servlet-test/host?foo=thousands
 ```
 
-The algorithm for hashing the `foo` value could be changed to spread the load as expected http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance .
+The algorithm for hashing the `foo` value could be changed to spread the load as expected
+http://cbonte.github.io/haproxy-dconv/1.8/snapshot/configuration.html#4.2-balance
+http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance[.]
 
 As the last resort let's balance by HTTP header. Create a new cfg file (I just copied it from the `test-url-hash.cfg`, it's not tuned in any way)
 
