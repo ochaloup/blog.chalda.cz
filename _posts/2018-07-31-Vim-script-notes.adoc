@@ -2,21 +2,21 @@
 :hp-tags: vim, plugin, scripting
 :toc: macro
 :release: 1.0
-:published_at: 2018-07-20
+:published_at: 2018-07-31
 :icons: font
 
 image::articles/vim-script.png[]
 
-I longed for a tool which helps me while manually investigating server logs
-and as I can't find any I decided to create a small Vim plugin
-https://github.com/ochaloup/vim-syntax-match[which highlights text].
+I've longed for a tool which would help me in manual investigation of server logs.
+I couldn't find any thus I created a small Vim plugin
+https://github.com/ochaloup/vim-syntax-match[which highlights text in the log].
 Getting to the state of having the plugin forced me to learn basics of
 the Vim scripting language. +
 Here I'm going to summarize few findings.
 
 == Starting with the Vim script
 
-There are many articles on the internet teaching about Vim script.
+There are many articles about Vim script.
 I found nice in particular these two series:
 
 icon:bookmark[] http://www.ibm.com/developerworks/library/l-vim-script-1 +
@@ -26,13 +26,13 @@ icon:bookmark[] http://learnvimscriptthehardway.stevelosh.com
 
 Ok, I want to write my script, how to get it running?
 
-My steps are creating a new vim script source code file
-where I put the code - normally I would create a function.
-At the next step I use command to load the code from the script in the openedVim window.
+When testing my steps are creating a new source code file
+where I put the script - normally I would create a function.
+At the next step I use command to load the code from the file from Vim.
 I use command `:source <file path>` for loading the code and
 `:call <function name>` to execute the function.
 
-Let's say you have the function as defined below saved in the file at `/tmp/test.function.vim`.
+Let's take an example. I have the function which I save into the file `/tmp/test.function.vim`.
 
 ```vim
 function! ListBuffers()
@@ -49,26 +49,28 @@ endfunction
 ```
 
 NOTE: notice use of the `!` at the end of the  `function` declaration. This says
-  that function redefinition will override the existing function with the same name.
+  loading the function for the second time will override the existing function with the same name.
   If you do not add the `!` then the Vim will not load the function and only
-  shouts at you that error happened.
+  shouts at you that the error happened.
 
-The function goes over all opened buffers
-and print their name with echo command. It will skip to print name of the buffer of type `'help'`.
+The function iterates over all opened buffers
+and prints their name. It will skip to print the name of the buffer of type `'help'`.
 
-When you have the function saved in the file can load and execute it.
+When I have the function I can load and execute it.
 
 ```vim
+" loading the source code file aka. loading the function
 " shortened version of :source command is :so
 :source /tmp/test.function.vim
+" invoking the function ListBuffers
 " shortened version of :call command is :cal
 :call ListBuffers()
 ```
 
 [NOTE]
 ====
-If you want to get printed function return value you can use `:echo` command
-in our case the return value is 0
+If you want to get printed the return value of the function you can use `:echo` command.
+In my case the return value is 0.
 
 ```vim
 " shortedned version of :echo command is :ec
@@ -79,26 +81,30 @@ There is more echo commands than only the `:echo`. Let's mention `:echoerr` whic
 prints to error output. Or `:echomsg` which interpret expressions.
 ====
 
-NOTE: if you have opened a empty Vim window there will be printed only number `1`.
-  To open another buffer (to get at least printed numbers `1` and `2`) run open command
-  with path to a file `:o /tmp/something`.
+NOTE: if you have opened n empty Vim window the function `ListBuffers` prints only number `1`.
+  To open another buffer (to get at least printed two numbers `1` and `2`), use `"badd` command.
+  `:badd` open buffer with a file but it does not load it.
+  For example `:badd something`.
 
-This is fine. Now I can start to tune my function. But it's a bit cumbersome
+Now I can start to tune my function. But it's a bit cumbersome
 to write `:so` and `:cal` for any change in the script.
 What about map these commands to a keyboard shortcuts? In the following example
 if I press `;s` the source is loaded from the file and after pressing `;b`
 the function listing buffers is invoked.
 
 ```vim
+" mapping loading the file with :source command to the keyboard shortcut ';s'
 :nmap ;s :source /tmp/test.function.vim<CR>
+" mapping calling the function ListBuffers to the keyboard shortcut ';b'
 :nmap ;b :call ListBuffers()<CR>
 :nmap <silent> ;= :call ListBuffers()<CR>
 ```
 
 * `<CR>` means `literal carriage return` which is needed when function should be executed
   (it replaces hitting ``<enter>` when you write it at the Vim command line)
-* `<silent>` causes that _nmap_ mapping not to echo any command it's executing,
-  in our case where the function just prints to the command line using `silent` won't make any difference
+* `<silent>` causes that _nmap_ mapping does not echo the command which is executing.
+  In our case where the function just prints to the command line the usage of the `silent`
+  won't make any difference in the behaviour.
 
 NOTE: Let me know of any better way in this to comments.
 
