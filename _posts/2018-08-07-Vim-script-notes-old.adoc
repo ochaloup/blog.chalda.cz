@@ -1,4 +1,4 @@
-= Vim script notes
+= Vim script notes - old
 :hp-tags: vim, plugin, scripting
 :toc: macro
 :release: 1.0
