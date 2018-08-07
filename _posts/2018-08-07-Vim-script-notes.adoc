@@ -1,5 +1,5 @@
 = Vim script notes
-:hp-image: /articles/vim-script.png
+:hp-image: /images/articles/vim-script.png
 :hp-tags: vim, plugin, scripting
 :toc: macro
 :release: 1.0
