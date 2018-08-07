@@ -351,7 +351,7 @@ There are commands to remove the docker images and containers (when not in use)
   removing a docker container
 
 On fedora docker saves images and containers under `/var/lib/docker` directory.
-You can search for the space used by the docker with `df -hs /var/lib/docker/*`.
+You can check the amount of the space the docker images occupy with command `du -sh /var/lib/docker/*`.
 If you want to clean your system from the docker images (it can't be restored afterwards)
 
 ```bash
