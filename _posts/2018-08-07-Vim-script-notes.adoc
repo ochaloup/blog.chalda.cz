@@ -2,7 +2,7 @@
 :hp-tags: vim, plugin, scripting
 :toc: macro
 :release: 1.0
-:published_at: 2018-07-31
+:published_at: 2018-08-07
 :icons: font
 
 image::articles/vim-script.png[]
@@ -106,15 +106,17 @@ the function listing buffers is invoked.
   In our case where the function just prints to the command line the usage of the `silent`
   won't make any difference in the behaviour.
 
-NOTE: Let me know of any better way in this to comments.
+NOTE: Let me know better ways in this.
 
-=== A little bit more about key mapping in vim
+=== A little bit more about key mapping in Vim
 
-When mapping keys in the insert mode the command has to be put between `<C-R>=` and `<CR>`.
-`<C-R>=` tells Vim to insert the result of evaluating what follows the function parenthesis `()``,
-`<CR>` tells Vim to actually evaluate the preceding expression.
-For example you can map to insert current date at place the cursor stands
-when you double press the `Ctrl+D` in the insert mode like
+Why mapping keys have to be put between `<C-R>=` and `<CR>` in the insert mode?
+
+* `<C-R>=` tells Vim to insert the result of the command (a function name which ends with `()`) to the text.
+* `<CR>` tells Vim to actually evaluate the preceding expression.
+
+For example you can create mapping to insert current date at place the cursor stands
+when you double press the `Ctrl+D` in the insert mode this way
 
 ```vim
 " double CTRL+D prints date into the place of cursor
@@ -131,15 +133,13 @@ abbreviation for `Ctrl+R` is not the same as `<CR>` (`literal carriage return`)
 it inserts the result of the subsequent expression as if it had been directly typed,
 which means that any special characters within the result retain their special meanings and behavior
 
-Few more notes
-
-* For being able to run some functions that needs to escape from the insert mode you need to use `C-O` (`:help i_CTRL-O`)
+* To run a function that needs to escape from the insert mode use `C-O` (`:help i_CTRL-O`)
   ```
   let cursor_back = "\<C-O>:call setpos('.'," . string(cursorpos) . ")\<CR>"
   ```
 * For mapping `TAB` use `inoremap` (see `:help i_CTRL-R`).
-  The `inoremap` is a form of the `imap`. It's used as the returned characters could also contain a TAB character.
-  That means if `TAB` is returned it won't invoked the mapped function again.
+**  The `inoremap` is a form of the `imap`. It's used when the returned characters could contain the `TAB` character.
+    That means if `TAB` is returned it won't invoked by the mapped function again.
 
 See more about mapping at
 link:http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)[Vim mapping keys wiki page].
@@ -149,11 +149,11 @@ link:http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)[Vim mappi
 * To show messages printed during the execution try `:messages` (shortened to `:mes`).
 * For writing functions check quick tutorial at http://learnvimscriptthehardway.stevelosh.com/chapters/23.html
 * The Vim uses symbol `.` for the strings concatenation.
-* Comments are used with `"` (double-quote)
+* Comments to be placed with `"` (`double-quote`)
 * String in Vim script can be declared within `"` too. If you want to use comment but vim script expects
-  `"` for the string declaration then use `|"` (`vertical bar` + `double-qoute`) as separator.
+  `"` for the string declaration then use `|"` (`vertical bar` + `double-quote`) as the separator.
 
-Each statement ends with end of line. if needed a statement over more lines use `backslash` at the start of the line, e.g.
+Each statement ends with end of line. For the statement over more lines use `\`(`backslash`) at the start of the line, e.g.
 
 [source, vim]
 ----
@@ -163,14 +163,14 @@ call SetName(
 \)
 ----
 
-or more statements could be put one by one with separating them with `vertical bar` (`|`)
+On the other hand more statements could be put onto one line when separated with the `vertical bar` (`|`)
 
 [source, vim]
 ----
 echo "Starting..." | call ListBuffers() | echo "Done"
 ----
 
-A strange thing (at least for me) is existence of the prefixed variables in the Vim.
+A strange thing (at least for me) is existence of the _prefixed variables_.
 If you won't use the prefix they do not work for you as you would expect.
 See below or check list of prefixes at https://codeyarns.com/2010/11/26/how-to-view-variables-in-vim.
 
@@ -178,13 +178,13 @@ See below or check list of prefixes at https://codeyarns.com/2010/11/26/how-to-v
 === Notes on functions writing a text to the opened document
 
 * For adding a text to the current line you can use function `setline`.
-  `:call setline(line('.'), getline('.') . ' hello')` which adds text ' hello' to the end of the current line
+  `:call setline(line('.'), getline('.') . ' hello')` which adds text `' hello'` at the end of the current line
 
 * For pasting a new line to the position of the particular row you can use function `append`.
 `:call append(line('.'), "new line to be added at the bottom of the current line")`
 
 
-== Cheatsheet on Vim scripting language
+== Vim scripting language cheatsheet
 
 === Variables
 
@@ -206,7 +206,7 @@ E.g. `let interests = 'unknown' " Error: variable type mismatch`
 .Scopes and prefix meanings
 [options="header"]
 |================================================================
-|Prefix    |Meaning
+|Prefix      |Meaning
 |`g:varname` |The variable is global
 |`s:varname` |The variable is local to the current script file
 |`w:varname` |The variable is local to the current editor window
@@ -220,11 +220,11 @@ E.g. `let interests = 'unknown' " Error: variable type mismatch`
 .Pseudovariables
 [options="header"]
 |================================================================
-|Prefix      |Meaning
-|`&varname `   |A Vim option (local option if defined, otherwise global)
+|Prefix        |Meaning
+|`&varname`    |A Vim option (local option if defined, otherwise global)
 |`&l:varname`  |A local Vim option
 |`&g:varname`  |A global Vim option
-|`@varname `   |A Vim register
+|`@varname`    |A Vim register
 |`$varname`    |An environment variable
 |================================================================
 
@@ -263,20 +263,22 @@ E.g. `let interests = 'unknown' " Error: variable type mismatch`
 |================================================================
 
 
-* numeric only(!) numeric value zero is false in a boolean context; otherwise in ay case (any non-zero numeric value is considered true
-* when a string is used as a boolean, it is first converted to an integer, and then evaluated for truth
-** for emptiness is needed to be used a function: `empty(a_string)`
-* comparators always perform *numeric comparison* (unless both operands are strings). In particular, if one operand is a string and the other a number, the string will be converted to a number.
+* numeric value zero is false in the boolean context; any non-zero numeric value is considered true
+* when a string is used as a boolean, it is first converted to an integer, and then evaluated for true
+** for checking emptiness is needed to be used a function: `empty(a_string)`
+* comparators always perform *numeric comparison* (unless both operands are strings).
+  In particular, if one operand is a string and the other a number, the string will be converted to a number.
 * `let ident='Vim'`
-** `ident == 0`     always numeric equality - always true (string 'Vim' converted to number 0)
-** `ident == '0'`   uses string equality if ident contains string but numeric equality if ident contains number
-* case sentistive/insensitive could  be used with any comparators (`<#` less-than case sensitive)
-** string comparision honor the settings of vim's `ignorecase` option normally - the `#` and `?` will force behavior of comparision that we want
+** `ident == 0`     always numeric equality - always true (string `'Vim'` converted to number `0`)
+** `ident == '0'`   uses string equality if `ident` contains string but numeric equality if `ident` contains number
+* case sentistive/insensitive could  be used with any comparators (`<#` operator means `less-than case sensitive`)
+** string comparision honor the settings of vim's `ignorecase` option, using the `#` and `?` will force
+   either case sensitive or case insensitive comparision
 
 
 ==== Floating point operations
 
-Floating point has to be explicitly marked. Floating point arithmetic comes to Vim from Vim 7.2 and later.
+Floating point has to be explicitly marked. Floating point arithmetic comes at Vim 7.2 and later.
 
 [source,vim]
 ----
@@ -326,7 +328,7 @@ endfor
 return completion . (restore ? cursor_back : "")
 ```
 
-==== If with regexp (if statement, conditionals)
+==== If with regexp (if statement, conditional)
 
 ```vim
 if curr_line =~ '\k' . curr_pos_pat
@@ -370,8 +372,8 @@ And various manipulation on it - e.g. indices less than zero, which then count b
 
 ===== List comparision
 
-* operator `=` compares values (all values are the same but could be in different containers)
-* operator `is` compares identity (aliases the same container)
+* operator `=` compares values (all values are the same, containers can be different)
+* operator `is` compares identity (containers have to be the same)
 
 ===== Nested list
 
@@ -397,13 +399,12 @@ let activities += ['code']
 let weekdays = week[1:5]
 ```
 
-* list assigment to a variable is assigment of pointer/reference. For having copy use function `copy()` or `deepcopy()`.
-
-NOTE: For info on existing list functions see chapter on helpful functions
+* list assignment to a variable is assignment of pointer/reference. For having copy use function `copy()` or `deepcopy()`.
 
 ====== Filter and map functionality
 
-That's specific functionality of work on list. `Filter` filters values and `map` applies some function on each value of the list.
+That's specific functionality working on lists. `Filter` filters values
+and `map` applies some function on each value of the list.
 
 * `let positive_only = filter(copy(list_of_numbers), 'v:val >= 0')`
 * `let increased_numbers = map(copy(list_of_numbers), 'v:val + 10')`
@@ -434,30 +435,20 @@ remove(dictionary, 'key')
 unlet dictionary['key']  "command unlet used
 ```
 
-====== Filter and map on dictionaries
-
-```vim
-" remove any entry whose value is the same as its key...
-call fil://jenkins.mw.lab.eng.bos.redhat.com/hudson/job/eap-70-jbossts-crashrec-txpropag-backcompatible-tests-jpa-db-matrix/23/s0.user=crashrec
-ds0.pass=crashrec
-ds0.db.name=crashrec
-ter(diagnosis, 'v:key != v:val')
-" map walks through each value, aliases it to v:val, evaluates the expression in the string, and replaces the value with the result of that expression
-call map( names, 'toupper(v:val[0]) . tolower(v:val[1:])' )
-```
-
 === Functions declaration
 
-* `function <name>()` declares fuction, name has to be unique, parentheses can contain arguments of function
-* `function! <name>()` declares function when name of it exists is overridden (reloaded)
-* function ends with expression `endfunction`
+* `function <name>()` declares function, name has to be unique, parentheses can contain arguments of the function
+* `function! <name>()` declares function, if function of the name exists it's overridden
+* function ends with definition `endfunction`
 * function name has to start with capital letter or with `s:` which declares it as local for the current script file
 
-Function could be scoped as properties can. E.g. `function s:<name>()` says that function is visible only in scope of current script file (see `s:`).
+Function could be scoped in the same way as variables can be - e.g. `function s:<name>()`
+says that function is visible only in scope of current script file (see `s:`).
 
 [IMPORTANT]
 ====
-In difference from other scripting languages you can't ignore return value of function. If function returns anything you need to use it - ie. `let a = s:fuctionname()`. Or you can use
+In difference from other scripting languages you can't ignore return value of function.
+If function returns anything you need to use it - ie. `let a = s:fuctionname()`. Or you can use
 `echo` command like `echo s:functionname()`.
 ====
 
@@ -476,15 +467,21 @@ function printme(text)
 endfunction
 ```
 
-NOTE: if position argument used then `a:0` contains number of arguments passed to the method.
+NOTE: if position argument is used then `a:0` contains number of arguments.
 
-For undefined number of arguments you will use `...` like `function CommentBlock(comment, ...)`. Now you can access to comment as `a:comment` and any other argument is accesible
-via position parameter declaration. You can check number of argument `let introducer =  a:0 >= 1  ?  a:1  :  "//"`.
+For undefined number of arguments use `...`. For examplee `function CommentBlock(comment, ...)`.
+Now you can access to comment as `a:comment` and any other arguments are accesible
+via position parameter declaration. You can check number of argument by `let introducer =  a:0 >= 1  ?  a:1  :  "//"`.
 
-Normally is function called in scope of current line. You can define scope that function work at - ie. `5,$call CommentBlock` will call _CommentBlock_ function for each line.
+Normally the function is called in scope of current line. You can define scope that function work at,
+by scope definition `<from,to>call <function_name>`. For example `5,$call CommentBlock` will call _CommentBlock_ function
+for each line starting line number 5 and ending at the end of the file.
 
-If we want to have special tools for handling range we can say that range attributes won't be considered and function will called just once `function DeAmperfyAll() range`.
-The word `range` says to call function only once. Then there is added special parameters `a:firstline` and `a:lastline` that says the range that user called with.
+If we want to have special handling of the ranges we can say that range attributes
+won't be considered and function will called just once `function DeAmperfyAll() range`.
+The word `range` says to call function only once (not once for each line in the range).
+Then there could be added special parameters `a:firstline` and `a:lastline`
+which returns the range that user called the function within.
 We can use it for example `for linenum in range(a:firstline, a:lastline)`
 
 If visual mode is used then function for the range of the visual block could be used as `Vip:call DeAmperfyAll()`.
@@ -526,7 +523,7 @@ To help and to see what functions we can use
 |===
 
 
-==== List functions
+==== Functions for list
 |===
 |`copy()`        |providing shallow copy of a list (as normally assigning a list to different property means only referencing the same pointer)
 |`deepcopy()`    |providing deep copy of a list
@@ -546,7 +543,7 @@ To help and to see what functions we can use
 |`reverse()`     |
 |===
 
-==== Dictionary functions
+==== Function for dictionaries
 |===
 |`keys()`        |list of keys from dictionary
 |`values()`      |list of values from dictionary
@@ -567,7 +564,8 @@ To help and to see what functions we can use
 
 ==== Vim events
 
-To get info about what are accesible events that could be used for hooks run `:help autocmd-events` or for detailed `:help autocmd-events-abc`.
+To get info about what are available events for the hooks run
+`:help autocmd-events` or for detailed info `:help autocmd-events-abc`.
 
 Mechanism of interception of events is known as `autocommand`.
 
@@ -577,10 +575,10 @@ autocmd  EventName,EventName2,...  filename_pattern   :command
 autocmd  EventName  filename_pattern   :silent command
 ```
 
-* EventName is one of help page `:help autocmd-events`, if more events are specified the autocmd will be invoked for any of them
-* filename_pattern is similar to bash pattern see `:help autocmd-patterns`
+* `EventName` is one of help page `:help autocmd-events`, if more events are specified the `autocmd` will be invoked for any of them
+* `filename_pattern` is similar to bash pattern see `:help autocmd-patterns`
 * command is any valid vim command (colon at the start of command is optional but recommended)
-** Vim normally displays a notification after command completes. To disable that annoyance `silent` could be used
+** Vim normally displays a notification after command completes. To disable that the option `silent` could be used
 
 Autocommands could be grouped and then worked together
 
@@ -602,8 +600,10 @@ autocmd!  Unfocussed      *      *.txt
 autocmd!  Unfocussed
 ```
 
-`autocmd!` itself deactivates from current group and is useful for doing cleanup before settings group autocommands.
-Adding an autocmd! to the start of every group is important because autocommands do not statically declare event handlers; they dynamically create them.
+`autocmd!` itself deactivates from current group and is useful for doing cleanup
+before settings group autocommands.
+Adding an `autocmd!` to the start of every group is important because autocommands
+do not statically declare event handlers; they dynamically create them.
 
 ```vim
 augroup Unfocussed
@@ -614,8 +614,11 @@ augroup Unfocussed
 augroup END
 ```
 
-Another useful set of events are BufWritePre, FileWritePre, and FileAppendPre. These `Pre` events are queued just before your Vim session writes a buffer back to disk (as a result of a command such as :write, :update, or :saveas).
-For all three types of events, Vim sets the special line-number aliases `'[` and `']` to the range of lines being written. For example usage for `s`
+Another useful set of events are `BufWritePre`, `FileWritePre`, and `FileAppendPre`.
+These `Pre` events are queued just before your Vim session writes a buffer back to disk
+(as a result of a command such as `:write`, `:update`, or `:saveas`).
+For all three types of events, Vim sets the special line-number aliases `'[` and `']`
+to the range of lines being written. For example usage for `s` is:
 
 ```vim
 '[,']s/^This file last updated: \zs.*/\= strftime("%c") /
@@ -625,7 +628,9 @@ For all three types of events, Vim sets the special line-number aliases `'[` and
 
 `:help user-commands`
 
-Simple example how user can create his own command is (user command has to start with capital letter) `command Showme echo 'hello'`
+Simple example how user can create his own command: `command Showme echo 'hello'`
+
+NOTE: user command has to start with the capital letter
 
 For command that will call a function and pass arguments do
 
@@ -639,3 +644,8 @@ For quoting arguments use (as seen above for echo we can do it easier without `e
 ```
 :command! -nargs=1 FW execute "echo" string(<q-args>)
 ```
+
+== Summary
+
+These were my notes on Vim scripting. Hopefully somebody finds them useful.
+I will be happy if you let me know how to enhance this guide.
