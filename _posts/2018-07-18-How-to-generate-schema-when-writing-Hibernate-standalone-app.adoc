@@ -1,5 +1,6 @@
 = How to generate schema when writing Hibernate standalone app
 :hp-tags: jpa, database, hibernate
+:hp-image: /images/articles/hibernate-standalone.png
 :toc: macro
 :release: 1.0
 :published_at: 2018-07-18

@@ -1,5 +1,6 @@
 = Vim plugin to work with text highlighting
 :hp-tags: plugin, vim
+:hp-image: /images/articles/vim-syntax-match-plugin.png
 :toc: macro
 :release: 1.0
 :published_at: 2018-05-04

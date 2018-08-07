@@ -1,4 +1,5 @@
 = Maven plugin and fight with classloading
+:hp-image: /images/articles/maven_plugin.png
 :hp-tags: java, maven
 :toc: macro
 :release: 1.0
