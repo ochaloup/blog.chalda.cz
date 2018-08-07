@@ -1,5 +1,4 @@
-= Vim script notes
-:hp-image: /images/articles/vim-script.png
+= Vim script notes - old
 :hp-tags: vim, plugin, scripting
 :toc: macro
 :release: 1.0
@@ -200,8 +199,11 @@ See below or check list of prefixes at https://codeyarns.com/2010/11/26/how-to-v
 
 [WARNING]
 ====
-Variable types, once assigned, are permanent and strictly enforced at runtime:
-E.g. `let interests = 'unknown' " Error: variable type mismatch`
+Variable types, once assigned, are permanent and strictly enforced at runtime.
+As we set the interests as a list there will be error now
+(see at https://www.ibm.com/developerworks/library/l-vim-script-1/index.html[ibm.com, vim script part 1])
+
+`let interests = 'unknown' " Error: variable type mismatch`
 ====
 
 .Scopes and prefix meanings
