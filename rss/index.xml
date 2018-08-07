@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten ]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Wed, 18 Jul 2018 18:14:16 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[How to generate schema when writing Hibernate standalone app]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 07 Aug 2018 13:46:57 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[How to generate schema when writing Hibernate standalone app]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -70,7 +70,7 @@ cases. In one the strategy to be used as defined in the <code>persistence.xml</c
 to the <code>MetadataBuilder</code>.</p>
 </div>
 <div class="sect2">
-<h3 id="_running_code_example">Running code example</h3>
+<h3 id="_running_the_code_example">Running the code example</h3>
 <div class="paragraph">
 <p>I played with the both approaches
 under the project <a href="https://github.com/ochaloup/hibernate-standalone" class="bare">https://github.com/ochaloup/hibernate-standalone</a>.</p>
@@ -3092,155 +3092,7 @@ systemctl start dnsmasq</code></pre>
 </li>
 </ul>
 </div>
-</div>]]></description><link>http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html</guid><category><![CDATA[openshift]]></category><category><![CDATA[minishift]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Thu, 23 Nov 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Set up HAProxy to balance by HTTP header balancing]]></title><description><![CDATA[<div class="imageblock">
-<div class="content">
-<img src="http://blog.chalda.cz/images/articles/haproxy_logo.png" alt="haproxy logo.png">
-</div>
-</div>
-<div class="paragraph">
-<p>I started to experiment with <a href="https://www.haproxy.org/">HAProxy</a> where these are few notes on how to start with.</p>
-</div>
-<div class="paragraph">
-<p>I wanted to have HAProxy as a standalone program and not installed into my Linux machine with package system. Thus</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>download HAProxy from <a href="https://www.haproxy.org" class="bare">https://www.haproxy.org</a>, I used downloading <em>bz2</em> archive from column <em>Latest version</em>.</p>
-</li>
-<li>
-<p><code>tar xfz haproxy-*.tar.gz</code></p>
-</li>
-<li>
-<p><code>cd haproxy-*/</code></p>
-</li>
-<li>
-<p><code>make TARGET=generic</code></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>At this time the HAProxy is built and could be run. For the start it&#8217;s <code>./haproxy&#8201;&#8212;&#8201;config-file.cfg</code>. (start with ones situated at folder <code>tests</code>).</p>
-</div>
-<div class="paragraph">
-<p>For experimenting I downloaded WildFly 11 (<a href="http://wildfly.org/downloads" class="bare">http://wildfly.org/downloads</a>), started in two instances and deployed a simple servlet showing simple message of what instance handled the request.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">curl http://download.jboss.org/wildfly/11.0.0.Final/wildfly-11.0.0.Final.zip -o wfly.zip
-unzip wfly.zip &amp;&amp; mv wildfly-11.0.0.Final w1
-unzip wfly.zip &amp;&amp; mv wildfly-11.0.0.Final w2
-
-# running in two different consoles
-cd w1 &amp;&amp; ./bin/standalone.sh -Did=w1
-cd w2 &amp;&amp; ./bin/standalone.sh -Did=w2 -Djboss.socket.binding.port-offset=100
-
-# in the third console
-git clone https://github.com/ochaloup/servlet-test.git
-cd servlet-test &amp;&amp; mvn package
-cp target/servlet-test.war ${HOME}/w1/standalone/deployments/
-cp target/servlet-test.war ${HOME}/w2/standalone/deployments/</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Now we have two instances of WildFly application servers running at <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> and <code><a href="http://localhost:8180" class="bare">http://localhost:8180</a></code>. You can check if the servlet deployed sucessfully</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">curl -i -X GET http://localhost:8080/servlet-test/host</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You should get response containing header and text</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>X-processed-by: w1
-...
-url: http://localhost:8080/servlet-test/host at localhost:8080, 10.0.0.7, &lt;hostname&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s run the haproxy and check roundrobin loadbalancing. Go to the HAProxy installation directory and open <code>tests/test-connection.cfg</code>. Add to the <code>server</code> directive one more with port <code>8181</code>. You will have something similar to.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>listen httpclose
-	option	httpclose
-	bind	:8001
-	server	srv 127.0.0.1:8080
-	server	srv2 127.0.0.1:8180
-	reqadd	X-request:\ mode=httpclose
-	rspadd	X-response:\ mode=httpclose</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s start the HAProxy and check with <code>curl</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>./haproxy -- tests/test-connection.cfg</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>and check with <code>curl</code>. Run several times and check how the header <code>X-processed-by</code> is changing plus you can see WildFly console log in the particular console window.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>curl -i -X GET  http://localhost:8001/servlet-test/host</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Now let&#8217;s balance by url parameter. You need to redefine file <code>tests/test-url-hash.cfg</code> to contain the localhost and both ports where WildFly is running. Then you can run <code>curl</code> and alter the foo parameter and see what is the WildFly instance handling the requests.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">./haproxy -- tests/test-url-hash.cfg
-
-curl -i -X GET localhost:8000/servlet-test/host?foo=one
-curl -i -X GET localhost:8000/servlet-test/host?foo=thousands</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The algorithm for hashing the <code>foo</code> value could be changed to spread the load as expected <a href="http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance" class="bare">http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance</a> .</p>
-</div>
-<div class="paragraph">
-<p>As the last resort let&#8217;s balance by HTTP header. Create a new cfg file (I just copied it from the <code>test-url-hash.cfg</code>, it&#8217;s not tuned in any way)</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>global
-	maxconn 100
-	log		127.0.0.1 local0
-
-listen  vip1
-	log		global
-	option		httplog
-    bind		:8000
-    mode		http
-    maxconn		100
-    timeout	client  5000
-	timeout	connect 5000
-	timeout	server  5000
-	balance		hdr(long-running-action)
-	server		srv1 127.0.0.1:8080
-	server		srv2 127.0.0.1:8180
-
-	# control activity this way
-	stats		uri /stat</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And now run the <code>curl</code> and check what instance serves the requests.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">./haproxy -- tests/test-httpheader-hash.cfg
-
-curl -i -X GET -H 'long-running-action: 1' localhost:8000/servlet-test/host
-curl -i -X GET -H 'long-running-action: 2' localhost:8000/servlet-test/host</code></pre>
-</div>
-</div>]]></description><link>http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html</guid><category><![CDATA[load.balance]]></category><category><![CDATA[haproxy]]></category><category><![CDATA[admin]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Thu, 16 Nov 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Groovy and XML]]></title><description><![CDATA[<div id="preamble">
+</div>]]></description><link>http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html</link><guid isPermaLink="true">http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html</guid><category><![CDATA[openshift]]></category><category><![CDATA[minishift]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Thu, 23 Nov 2017 00:00:00 GMT</pubDate></item><item><title><![CDATA[Groovy and XML]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -4957,7 +4809,7 @@ There is another article talking about this topic
 <p>[2017-11-23] <a href="http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html" class="bare">http://blog.chalda.cz/2017/11/23/Starting-Minishift-without-internet-connection.html</a></p>
 </li>
 <li>
-<p>[2017-11-16] <a href="http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-for-HTTP-header-balancing.html" class="bare">http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-for-HTTP-header-balancing.html</a></p>
+<p>[2017-11-16] <a href="http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html" class="bare">http://blog.chalda.cz/2017/11/16/Set-up-HA-Poxy-to-balance-by-HTTP-header-balancing.html</a></p>
 </li>
 <li>
 <p>[2017-10-01] <a href="https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift" class="bare">https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift</a></p>
