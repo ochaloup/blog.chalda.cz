@@ -1,4 +1,1318 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 07 Aug 2018 14:03:30 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Your Blog title]]></title><link>http://blog.chalda.cz/2018/08/07/Your-Blog-title.html</link><guid isPermaLink="true">http://blog.chalda.cz/2018/08/07/Your-Blog-title.html</guid><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Tue, 07 Aug 2018 00:00:00 GMT</pubDate></item><item><title><![CDATA[How to generate schema when writing Hibernate standalone app]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 07 Aug 2018 14:07:15 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Vim script notes]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/vim-script.png" alt="vim script.png">
+</div>
+</div>
+<div class="paragraph">
+<p>I&#8217;ve longed for a tool which would help me in manual investigation of server logs.
+I couldn&#8217;t find any thus I created a small Vim plugin
+<a href="https://github.com/ochaloup/vim-syntax-match">which highlights text in the log</a>.
+Getting to the state of having the plugin forced me to learn basics of
+the Vim scripting language.<br>
+Here I&#8217;m going to summarize few findings.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_starting_with_the_vim_script">Starting with the Vim script</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are many articles about Vim script.
+I found nice in particular these two series:</p>
+</div>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-bookmark"></i></span> <a href="http://www.ibm.com/developerworks/library/l-vim-script-1" class="bare">http://www.ibm.com/developerworks/library/l-vim-script-1</a><br>
+<span class="icon"><i class="fa fa-bookmark"></i></span> <a href="http://learnvimscriptthehardway.stevelosh.com" class="bare">http://learnvimscriptthehardway.stevelosh.com</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_load_and_run_a_function">How to load and run a function</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Ok, I want to write my script, how to get it running?</p>
+</div>
+<div class="paragraph">
+<p>When testing my steps are creating a new source code file
+where I put the script - normally I would create a function.
+At the next step I use command to load the code from the file from Vim.
+I use command <code>:source &lt;file path&gt;</code> for loading the code and
+<code>:call &lt;function name&gt;</code> to execute the function.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s take an example. I have the function which I save into the file <code>/tmp/test.function.vim</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">function! ListBuffers()
+  let buffers = filter(range(1, bufnr('$')), 'bufexists(v:val)')
+  for buffer in buffers
+    if getbufvar(buffer, "&amp;filetype") == 'help'
+      " this is a 'help' buffer, skipping
+      continue
+    endif
+    " ec is short version for command echo
+    ec 'Having an opened buffer: ' . buffer
+  endfor
+endfunction</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+notice use of the <code>!</code> at the end of the  <code>function</code> declaration. This says
+  loading the function for the second time will override the existing function with the same name.
+  If you do not add the <code>!</code> then the Vim will not load the function and only
+  shouts at you that the error happened.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The function iterates over all opened buffers
+and prints their name. It will skip to print the name of the buffer of type <code>'help'</code>.</p>
+</div>
+<div class="paragraph">
+<p>When I have the function I can load and execute it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">" loading the source code file aka. loading the function
+" shortened version of :source command is :so
+:source /tmp/test.function.vim
+" invoking the function ListBuffers
+" shortened version of :call command is :cal
+:call ListBuffers()</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you want to get printed the return value of the function you can use <code>:echo</code> command.
+In my case the return value is 0.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">" shortedned version of :echo command is :ec
+:echo ListBuffers()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There is more echo commands than only the <code>:echo</code>. Let&#8217;s mention <code>:echoerr</code> which
+prints to error output. Or <code>:echomsg</code> which interpret expressions.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+if you have opened n empty Vim window the function <code>ListBuffers</code> prints only number <code>1</code>.
+  To open another buffer (to get at least printed two numbers <code>1</code> and <code>2</code>), use <code>"badd</code> command.
+  <code>:badd</code> open buffer with a file but it does not load it.
+  For example <code>:badd something</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now I can start to tune my function. But it&#8217;s a bit cumbersome
+to write <code>:so</code> and <code>:cal</code> for any change in the script.
+What about map these commands to a keyboard shortcuts? In the following example
+if I press <code>;s</code> the source is loaded from the file and after pressing <code>;b</code>
+the function listing buffers is invoked.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">" mapping loading the file with :source command to the keyboard shortcut ';s'
+:nmap ;s :source /tmp/test.function.vim&lt;CR&gt;
+" mapping calling the function ListBuffers to the keyboard shortcut ';b'
+:nmap ;b :call ListBuffers()&lt;CR&gt;
+:nmap &lt;silent&gt; ;= :call ListBuffers()&lt;CR&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>&lt;CR&gt;</code> means <code>literal carriage return</code> which is needed when function should be executed
+(it replaces hitting <code>`&lt;enter&gt;</code> when you write it at the Vim command line)</p>
+</li>
+<li>
+<p><code>&lt;silent&gt;</code> causes that <em>nmap</em> mapping does not echo the command which is executing.
+In our case where the function just prints to the command line the usage of the <code>silent</code>
+won&#8217;t make any difference in the behaviour.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Let me know better ways in this.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_a_little_bit_more_about_key_mapping_in_vim">A little bit more about key mapping in Vim</h3>
+<div class="paragraph">
+<p>Why mapping keys have to be put between <code>&lt;C-R&gt;=</code> and <code>&lt;CR&gt;</code> in the insert mode?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>&lt;C-R&gt;=</code> tells Vim to insert the result of the command (a function name which ends with <code>()</code>) to the text.</p>
+</li>
+<li>
+<p><code>&lt;CR&gt;</code> tells Vim to actually evaluate the preceding expression.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For example you can create mapping to insert current date at place the cursor stands
+when you double press the <code>Ctrl+D</code> in the insert mode this way</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">" double CTRL+D prints date into the place of cursor
+:imap &lt;silent&gt; &lt;C-D&gt;&lt;C-D&gt; &lt;C-R&gt;=strftime("%e %b %Y")&lt;CR&gt;
+" double CTRL+T prints time into the place of cursor
+:imap &lt;silent&gt; &lt;C-T&gt;&lt;C-T&gt; &lt;C-R&gt;=strftime("%l:%M %p")&lt;CR&gt;
+" CTRL+Y prints output of the function 'ListBuffers' at the place of the cursor
+:imap &lt;silent&gt; &lt;C-Y&gt; &lt;C-R&gt;&lt;C-R&gt;=ListBuffers()&lt;CR&gt;</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>&lt;C-R&gt;</code></dt>
+<dd>
+<p>abbreviation for <code>Ctrl+R</code> is not the same as <code>&lt;CR&gt;</code> (<code>literal carriage return</code>)</p>
+</dd>
+<dt class="hdlist1"><code>&lt;C-R&gt;&lt;C-R&gt;</code></dt>
+<dd>
+<p>it inserts the result of the subsequent expression as if it had been directly typed,
+which means that any special characters within the result retain their special meanings and behavior</p>
+<div class="ulist">
+<ul>
+<li>
+<p>To run a function that needs to escape from the insert mode use <code>C-O</code> (<code>:help i_CTRL-O</code>)
+<code>`
+let cursor_back = "\&lt;C-O&gt;:call setpos('.'," . string(cursorpos) . ")\&lt;CR&gt;"
+</code>`</p>
+</li>
+<li>
+<p>For mapping <code>TAB</code> use <code>inoremap</code> (see <code>:help i_CTRL-R</code>).</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>inoremap</code> is a form of the <code>imap</code>. It&#8217;s used when the returned characters could contain the <code>TAB</code> character.
+That means if <code>TAB</code> is returned it won&#8217;t invoked by the mapped function again.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>See more about mapping at
+<a href="http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-<em>Tutorial</em>(Part_1)">Vim mapping keys wiki page</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_general_notes_on_vim_scripting">General notes on Vim scripting</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>To show messages printed during the execution try <code>:messages</code> (shortened to <code>:mes</code>).</p>
+</li>
+<li>
+<p>For writing functions check quick tutorial at <a href="http://learnvimscriptthehardway.stevelosh.com/chapters/23.html" class="bare">http://learnvimscriptthehardway.stevelosh.com/chapters/23.html</a></p>
+</li>
+<li>
+<p>The Vim uses symbol <code>.</code> for the strings concatenation.</p>
+</li>
+<li>
+<p>Comments to be placed with <code>"</code> (<code>double-quote</code>)</p>
+</li>
+<li>
+<p>String in Vim script can be declared within <code>"</code> too. If you want to use comment but vim script expects
+<code>"</code> for the string declaration then use <code>|"</code> (<code>vertical bar</code> + <code>double-quote</code>) as the separator.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each statement ends with end of line. For the statement over more lines use <code>\</code>(<code>backslash</code>) at the start of the line, e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">call SetName(
+\  first_name,
+\  second_name
+\)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On the other hand more statements could be put onto one line when separated with the <code>vertical bar</code> (<code>|</code>)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">echo "Starting..." | call ListBuffers() | echo "Done"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A strange thing (at least for me) is existence of the <em>prefixed variables</em>.
+If you won&#8217;t use the prefix they do not work for you as you would expect.
+See below or check list of prefixes at <a href="https://codeyarns.com/2010/11/26/how-to-view-variables-in-vim" class="bare">https://codeyarns.com/2010/11/26/how-to-view-variables-in-vim</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_notes_on_functions_writing_a_text_to_the_opened_document">Notes on functions writing a text to the opened document</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>For adding a text to the current line you can use function <code>setline</code>.
+<code>:call setline(line('.'), getline('.') . ' hello')</code> which adds text <code>' hello'</code> at the end of the current line</p>
+</li>
+<li>
+<p>For pasting a new line to the position of the particular row you can use function <code>append</code>.
+<code>:call append(line('.'), "new line to be added at the bottom of the current line")</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_vim_scripting_language_cheatsheet">Vim scripting language cheatsheet</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_variables">Variables</h3>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Variables types</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">type</th>
+<th class="tableblock halign-left valign-top">example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">scalar</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>let height = 165</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>let interests = [ 'Cinema', 'Literature', 101 ]</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">dictionary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>let phone     = { 'cell':5551017346, 'work':'?' }</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Variable types, once assigned, are permanent and strictly enforced at runtime:
+E.g. <code>let interests = 'unknown' " Error: variable type mismatch</code></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 2. Scopes and prefix meanings</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Prefix</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>g:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is global</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is local to the current script file</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>w:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is local to the current editor window</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is local to the current editor tab</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>b:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is local to the current editor buffer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>l:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is local to the current function</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is a parameter of the current function</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>v:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The variable is one that Vim predefines</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 3. Pseudovariables</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Prefix</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&amp;varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A Vim option (local option if defined, otherwise global)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&amp;l:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A local Vim option</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&amp;g:varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A global Vim option</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A Vim register</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$varname</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An environment variable</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_operators">Operators</h3>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 4. Pseudovariables</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Operation</th>
+<th class="tableblock halign-left valign-top">Operator syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Assignment</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>let var=expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric-add-and-assign</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>let var+=expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric-subtract-and-assign</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>let var-=expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String-concatenate-and-assign</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>let var.=expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ternary operator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool?expr-if-true:expr-if-false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logical OR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">`bool</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool`</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logical AND</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bool&amp;&amp;bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric or string equality</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr==expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String case insensitive eq</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr==?expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String case sensitive eq</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr==#expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric or string inequality</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr!=expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric or string greater-then</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr&gt;expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric or string gr-or-eq</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr&gt;=expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric or string less than</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr&lt;expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric or string l-or-eq</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expr&#8656;expr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric addition</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>num+num</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric subtraction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>num-num</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String concatenation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>str.str</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric multiplication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>num*num</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric division</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>num/num</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric modulus</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>num%num</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convert to number</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>+num</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric negation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-num</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logical NOT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>!bool</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parenthetical precedence</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(expr)</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist">
+<ul>
+<li>
+<p>numeric value zero is false in the boolean context; any non-zero numeric value is considered true</p>
+</li>
+<li>
+<p>when a string is used as a boolean, it is first converted to an integer, and then evaluated for true</p>
+<div class="ulist">
+<ul>
+<li>
+<p>for checking emptiness is needed to be used a function: <code>empty(a_string)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>comparators always perform <strong>numeric comparison</strong> (unless both operands are strings).
+In particular, if one operand is a string and the other a number, the string will be converted to a number.</p>
+</li>
+<li>
+<p><code>let ident='Vim'</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ident == 0</code>     always numeric equality - always true (string <code>'Vim'</code> converted to number <code>0</code>)</p>
+</li>
+<li>
+<p><code>ident == '0'</code>   uses string equality if <code>ident</code> contains string but numeric equality if <code>ident</code> contains number</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>case sentistive/insensitive could  be used with any comparators (<code>&lt;#</code> operator means <code>less-than case sensitive</code>)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>string comparision honor the settings of vim&#8217;s <code>ignorecase</code> option, using the <code>#</code> and <code>?</code> will force
+either case sensitive or case insensitive comparision</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_floating_point_operations">Floating point operations</h4>
+<div class="paragraph">
+<p>Floating point has to be explicitly marked. Floating point arithmetic comes at Vim 7.2 and later.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">let filecount = 234
+
+echo filecount/100   |" echoes 2
+echo filecount/100.0 |" echoes 2.34</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_code_structure_syntax">Code structure/Syntax</h3>
+<div class="sect3">
+<h4 id="_if_syntax">IF syntax</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">if left_width &gt;= 0
+    let max_align_col = max([max_align_col, left_width])
+    ...
+endif</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_for_syntax">FOR syntax</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">for linetext in getline(firstline, lastline)
+    " working with text on the line
+    ...
+endfor</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">for linenum in range(firstline, lastline)
+    " working with line numbers
+    ...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_iterating_over_nested_list">Iterating over nested list</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">for [name, rank, serial] in list_of_lists
+    echo rank . ' ' . name . '(' . serial . ')'
+endfor</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ternary_operator">Ternary operator</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">return completion . (restore ? cursor_back : "")</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_if_with_regexp_if_statement_conditional">If with regexp (if statement, conditional)</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">if curr_line =~ '\k' . curr_pos_pat
+  return "\&lt;C-N&gt;"
+endif</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_elif_statement_elseif_statement">Elif statement (elseif statement)</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">if 0
+ echom "if"
+elseif "nope!"
+ echom "elseif"
+else
+ echom "finally!"
+endif``</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_try_catch">Try/catch</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">" mkdir can throw E739 error when is unable to create the requested directory
+try
+    call mkdir( required_dir, 'p' )
+catch
+    echo "Can't create directory " . required_dir
+endtry</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_lists">Lists</h4>
+<div class="sect4">
+<h5 id="_list_creation_could_be">List creation could be</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">let data = [1,2,3,4,5,6,"seven"]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And various manipulation on it - e.g. indices less than zero, which then count backward from the end of the list:
+<code>let data[-1] .=  ' samurai'</code></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_list_comparision">List comparision</h5>
+<div class="ulist">
+<ul>
+<li>
+<p>operator <code>=</code> compares values (all values are the same, containers can be different)</p>
+</li>
+<li>
+<p>operator <code>is</code> compares identity (containers have to be the same)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_nested_list">Nested list</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">let pow = [
+\   [ 1, 0, 0, 0  ],
+\   [ 1, 1, 1, 1  ],
+\]
+" and later...
+echo pow[x][y]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_list_concatenation">List concatenation</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">let activities = ['sleep', 'eat'] + ['game', 'drink']
+let activities += ['code']</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_sublist">Sublist</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">let weekdays = week[1:5]</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>list assignment to a variable is assignment of pointer/reference. For having copy use function <code>copy()</code> or <code>deepcopy()</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_filter_and_map_functionality">Filter and map functionality</h6>
+<div class="paragraph">
+<p>That&#8217;s specific functionality working on lists. <code>Filter</code> filters values
+and <code>map</code> applies some function on each value of the list.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>let positive_only = filter(copy(list_of_numbers), 'v:val &gt;= 0')</code></p>
+</li>
+<li>
+<p><code>let increased_numbers = map(copy(list_of_numbers), 'v:val + 10')</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_dictionaries">Dictionaries</h4>
+<div class="sect5">
+<h6 id="_basics">Basics</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">let seen = {}   " Haven't seen anything yet
+let daytonum = { 'Sun':0, 'Mon':1, 'Tue':2, 'Wed':3, 'Thu':4, 'Fri':5, 'Sat':6 }
+let day = daytonum['Sun']</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_for_loop">For loop</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">for [next_key, next_val] in items(dict)
+    let result = process(next_val)
+    echo "Result for " next_key " is " result
+endfor</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_remove">Remove</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">remove(dictionary, 'key')
+unlet dictionary['key']  "command unlet used</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_functions_declaration">Functions declaration</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>function &lt;name&gt;()</code> declares function, name has to be unique, parentheses can contain arguments of the function</p>
+</li>
+<li>
+<p><code>function! &lt;name&gt;()</code> declares function, if function of the name exists it&#8217;s overridden</p>
+</li>
+<li>
+<p>function ends with definition <code>endfunction</code></p>
+</li>
+<li>
+<p>function name has to start with capital letter or with <code>s:</code> which declares it as local for the current script file</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Function could be scoped in the same way as variables can be - e.g. <code>function s:&lt;name&gt;()</code>
+says that function is visible only in scope of current script file (see <code>s:</code>).</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In difference from other scripting languages you can&#8217;t ignore return value of function.
+If function returns anything you need to use it - ie. <code>let a = s:fuctionname()</code>. Or you can use
+<code>echo</code> command like <code>echo s:functionname()</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If function does not return anything then you can invoke it by calling through <code>call</code> like <code>call s:functionname()</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="_function_arguments">Function arguments</h4>
+<div class="paragraph">
+<p><code>function name(param, param2)</code></p>
+</div>
+<div class="paragraph">
+<p>You can access to parameters by name or by position. In both cases you need to use prefix <code>a:</code> for get value.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">function printme(text)
+  echo a:text
+  echo a:1
+endfunction</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+if position argument is used then <code>a:0</code> contains number of arguments.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For undefined number of arguments use <code>&#8230;&#8203;</code>. For examplee <code>function CommentBlock(comment, &#8230;&#8203;)</code>.
+Now you can access to comment as <code>a:comment</code> and any other arguments are accesible
+via position parameter declaration. You can check number of argument by <code>let introducer =  a:0 &gt;= 1  ?  a:1  :  "//"</code>.</p>
+</div>
+<div class="paragraph">
+<p>Normally the function is called in scope of current line. You can define scope that function work at,
+by scope definition <code>&lt;from,to&gt;call &lt;function_name&gt;</code>. For example <code>5,$call CommentBlock</code> will call <em>CommentBlock</em> function
+for each line starting line number 5 and ending at the end of the file.</p>
+</div>
+<div class="paragraph">
+<p>If we want to have special handling of the ranges we can say that range attributes
+won&#8217;t be considered and function will called just once <code>function DeAmperfyAll() range</code>.
+The word <code>range</code> says to call function only once (not once for each line in the range).
+Then there could be added special parameters <code>a:firstline</code> and <code>a:lastline</code>
+which returns the range that user called the function within.
+We can use it for example <code>for linenum in range(a:firstline, a:lastline)</code></p>
+</div>
+<div class="paragraph">
+<p>If visual mode is used then function for the range of the visual block could be used as <code>Vip:call DeAmperfyAll()</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_interesting_out_of_the_box_functions">Interesting out-of-the-box functions</h3>
+<div class="paragraph">
+<p>To help and to see what functions we can use
+<code>:help functions</code> and listing <code>:help function-list</code></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>echo</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">internal statement showing a string (result of function) on line at bottom of window</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exists()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">says if particular property is declared/exists - e.g. <code>exists('b:backup_count')</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>input()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ask user to write a text and that is returned from the function</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>virtcol()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns on-screen column (or "virtual column"), '.' argument specifies that you want the column number of the current cursor position</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>getpos()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns position of cursor - for current line it&#8217;s <code>getpos('.')</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setpos()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">setting position of cursor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>search()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">function to look backwards through the file from the cursor position, search(regexp pattern to find, configuration string - e.g. <code>bnW</code> means <em>search backwards but not to move the cursor nor to wrap the search</em>,
+                  if search fails returns 0; or flags <code>nW</code> search downwards and returns -1 if search hit the end of file</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>getfontname()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">shows guifont name, works only for gvim, font name could be set with <code>:set guifont=Monospace\ 20</code> or on win <code>:set guifont=Monospace:h20</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>getline()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns line defined with number - getline(line_number)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>setline()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">brother of <code>getline()</code> but it repaces text at passed line and changes to particular text <code>setline('.', 'hello')</code> - this changes text on current line for phrase 'hello'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>line()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns line number e.g. <code>line('.')</code> returns number of the current line or <code>line('$')</code> returns number of last line of the text</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>matchstr()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns part of the string that matches pattern - ie. matchstr(string_to_check, target_pattern) - returns that part of the string where target pattern matches, ie. matchstr('abc', 'b.') returns 'bc'</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>match()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tries to match a character from text defined by regexp - ie. <code>match(linetext, '\s*', ASSIGN_OP)</code> returns -1 if does not match assigment operation character in the text</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>matchlist()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns a list of all the fields captured by the regex - ie. <code>matchlist(linetext, regexp)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>substitute()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">substitutes text - <code>substitute(text_of_line, regexp_to_find_on_the_line, replacement_string, flags/tags)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>max([..,..])</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns bigger number from a list (see below)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>strlen()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns length of a string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>printf()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">printing text in reformated way specified by formatter</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>execute</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">used to evaluate a string as if it were a Vimscript command</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>silent! execute</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">executing regexp stuff - e.g. <code>silent ! execute "'[,']s/" . signature . '/\= ' . replacement . '/'</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expand()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">expanding expression, expansion could be modified (see <code>:h expand</code>), for example "head" of file path of currently opened file filepath:  <code>expand("%:h")</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isdirectory()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">is requested path directory which exists</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mkdir()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">creating directory, flags could be used <code>mkdir(dir_path, 'p')</code> where flag <code>p</code> means create parent dir if not exists</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>confirm()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">asking user for confirmation, it will gives options for user in way of <code>confirm("is that ok?", "yes\nno")</code> and returns 1 or 2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">inner command that exits function or so</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>system('date')</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">returns current date</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">``</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="_functions_for_list">Functions for list</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>copy()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">providing shallow copy of a list (as normally assigning a list to different property means only referencing the same pointer)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>deepcopy()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">providing deep copy of a list</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>len()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">length of list</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>empty()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">is list empty?, the same as <code>len(a_list) == 0</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>max()/min()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maximum or minimum from list of numbers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>index()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">index of first occurrence of value or pattern in list, is <code>index(list, value)</code>, uses <code>==</code> comparision</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>match()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">index of first occurrence of value or pattern in list, is <code>match(list, pattern)</code>, uses <code>=~</code> comparision</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>range()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">generating list of numbers in some range e.g. <code>range(min,max,step)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>split()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">split to sequence of word ie. <code>split(text, delimiter_pattern)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>join()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">joining list values</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>insert()</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>add()</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>extend()</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>remove()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">remove({list},{index}) removes item from the list and returns it</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sort()</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>reverse()</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_function_for_dictionaries">Function for dictionaries</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>keys()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list of keys from dictionary</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>values()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list of values from dictionary</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>has_key()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">say if particular dictionary has a key</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>items()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list of lists where each sublist contains 'key' and 'value' of the dictionary item</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>extend()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">adding other dictionary to a dictionary</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>remove()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">remove key from dictionary</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>unlet</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">remove from dictionary (<em>inner command, not a function</em>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>empty()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true if no entries at all</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>len()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">how many entries?</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>count()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">how many values are equal to str?</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>max()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">find largest value of any entry</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>min()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">find smallest value of any entry</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>call map()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">transform values by eval&#8217;ing string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>echo string()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">print dictionary as key/value pairs</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vim_events">Vim events</h4>
+<div class="paragraph">
+<p>To get info about what are available events for the hooks run
+<code>:help autocmd-events</code> or for detailed info <code>:help autocmd-events-abc</code>.</p>
+</div>
+<div class="paragraph">
+<p>Mechanism of interception of events is known as <code>autocommand</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">autocmd  EventName  filename_pattern   :command
+autocmd  EventName,EventName2,...  filename_pattern   :command
+autocmd  EventName  filename_pattern   :silent command</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>EventName</code> is one of help page <code>:help autocmd-events</code>, if more events are specified the <code>autocmd</code> will be invoked for any of them</p>
+</li>
+<li>
+<p><code>filename_pattern</code> is similar to bash pattern see <code>:help autocmd-patterns</code></p>
+</li>
+<li>
+<p>command is any valid vim command (colon at the start of command is optional but recommended)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Vim normally displays a notification after command completes. To disable that the option <code>silent</code> could be used</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Autocommands could be grouped and then worked together</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">augroup GROUPNAME
+    " autocommand specifications here ...
+augroup END</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Deactivation with <code>autocmd!</code> command</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">" generic syntax
+autocmd!  [group]  [EventName [filename_pattern]]
+
+" deactivate whole group not depending on event name
+autocmd!  Unfocussed      *      *.txt
+" deactivate whole group not concerning file type
+autocmd!  Unfocussed</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>autocmd!</code> itself deactivates from current group and is useful for doing cleanup
+before settings group autocommands.
+Adding an <code>autocmd!</code> to the start of every group is important because autocommands
+do not statically declare event handlers; they dynamically create them.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">augroup Unfocussed
+    autocmd!
+
+    autocmd  FocusLost  *.txt   :call Autosave()
+    ...
+augroup END</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another useful set of events are <code>BufWritePre</code>, <code>FileWritePre</code>, and <code>FileAppendPre</code>.
+These <code>Pre</code> events are queued just before your Vim session writes a buffer back to disk
+(as a result of a command such as <code>:write</code>, <code>:update</code>, or <code>:saveas</code>).
+For all three types of events, Vim sets the special line-number aliases <code>'[</code> and <code>']</code>
+to the range of lines being written. For example usage for <code>s</code> is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-vim" data-lang="vim">'[,']s/^This file last updated: \zs.*/\= strftime("%c") /</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_user_commands">User commands</h3>
+<div class="paragraph">
+<p><code>:help user-commands</code></p>
+</div>
+<div class="paragraph">
+<p>Simple example how user can create his own command: <code>command Showme echo 'hello'</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+user command has to start with the capital letter
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For command that will call a function and pass arguments do</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>command! -nargs=1 MyCommand call s:MyFunc(&lt;f-args&gt;)
+command! -nargs=1 Showme echo &lt;f-args&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For quoting arguments use (as seen above for echo we can do it easier without <code>execute</code> command being used but this is for showing how that could be)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>:command! -nargs=1 FW execute "echo" string(&lt;q-args&gt;)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary">Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>These were my notes on Vim scripting. Hopefully somebody finds them useful.
+I will be happy if you let me know how to enhance this guide.</p>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2018/08/07/Vim-script-notes.html</link><guid isPermaLink="true">http://blog.chalda.cz/2018/08/07/Vim-script-notes.html</guid><category><![CDATA[vim]]></category><category><![CDATA[plugin]]></category><category><![CDATA[scripting]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Tue, 07 Aug 2018 00:00:00 GMT</pubDate></item><item><title><![CDATA[How to generate schema when writing Hibernate standalone app]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
