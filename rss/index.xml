@@ -1,4 +1,347 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Tue, 07 Aug 2018 14:21:17 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Vim script notes]]></title><description><![CDATA[<div id="preamble">
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Chalda's blog]]></title><description><![CDATA[Notes for not   being forgotten]]></description><link>http://blog.chalda.cz</link><image><url>/images/cover.jpg</url><title>Chalda&apos;s blog</title><link>http://blog.chalda.cz</link></image><generator>RSS for Node</generator><lastBuildDate>Wed, 08 Aug 2018 12:07:21 GMT</lastBuildDate><atom:link href="http://blog.chalda.cz/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Playing with StatefulSets in Minishift]]></title><description><![CDATA[<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://blog.chalda.cz/images/articles/minishift-stateful.png" alt="minishift stateful.png">
+</div>
+</div>
+<div class="paragraph">
+<p>The point of this article is to put down few notes about StatefulSets in Kubernetes
+aka in OpenShift.</p>
+</div>
+<div class="paragraph">
+<p>The content is about deploying the demo application
+<a href="https://blog.openshift.com/kubernetes-statefulset-in-action" class="bare">https://blog.openshift.com/kubernetes-statefulset-in-action</a>.
+to the locally installed <a href="https://github.com/minishift/minishift">Minishift</a>.
+The next step is to look at the OpenShift Statefulset drain controller as presented
+<a href="https://medium.com/@marko.luksa/graceful-scaledown-of-stateful-apps-in-kubernetes-2205fc556ba9">in the article of Marko Lukša</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_statefulsets_and_requirements">StatefulSets and requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations">As the documentation says</a>
+the StatefulSet is <code>a workload API object used to manage stateful applications</code>.
+It&#8217;s capable to manage pods useful for application which needs to pertain state.
+<a href="https://blog.yugabyte.com/orchestrating-stateful-apps-with-kubernetes-statefulsets-ce3a4a9dfd7e">The StatefulSet operates under the same pattern as any other <code>Controller</code></a>
+which are (at this time)
+<a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment">Deployment</a>
+and (the default controller) <a href="https://kubernetes.io/docs/concepts/workloads/controllers/replicaset">ReplicationSet</a>.</p>
+</div>
+<div class="paragraph">
+<p>StatefulSet provides several
+<a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#using-statefulsets">guarantees</a> -
+strict naming and ordering, stable persistent storage, unique network identifier. With merits it brings several
+<a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#limitations">limitations</a>.
+From the perspective of the demo application, to be used in this text, I would mention
+ * the need the storage to be provisioned with
+   <a href="https://kubernetes.io/docs/concepts/storage/storage-classes">storage class</a>
+ * the need to define <a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services">the headless service</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_demo_application_from_kubernetes_to_minishift">Demo application from Kubernetes to Minishift</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The blog post <a href="https://blog.openshift.com/kubernetes-statefulset-in-action">Kubernetes StatefulSet In Action</a> perfectly
+describes all steps needed for running the demo app <code>mehdb</code> at Kubernetes but I have
+few doubts about OpenShift. Let&#8217;s summarize them.</p>
+</div>
+<div class="paragraph">
+<p>First there is said that for the StatefulSets I need a <code>StorageClass</code> to provide the <code>PersistentVolume</code>.
+If you clone the <a href="https://github.com/mhausenblas/mehdb">mehdb repository</a>
+you can find requirements of having defined <code>ebs storage class</code>
+<a href="https://github.com/mhausenblas/mehdb/blob/master/app.yaml#L45">in the application yaml declaration</a>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+the storage class definition is not needed. The Minishift provides
+  the <code>PersistentVolume</code>(PV) claimed by PersistentVolumeClaim(<code>PVC</code>) automatically
+  In fact the necessary step is only to remove the line declaring the <code>ebs</code> storage class
+  from the <code>app.yaml</code> file. But I thought it&#8217;s necessary to declare it&#8230;&#8203;
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_storage_class_declaration">Storage class declaration</h3>
+<div class="paragraph">
+<p>I defined the <code>StorageClass</code> from the existing
+<code>PersistentVolumes</code>, already pre-defined by the Minishift, as it&#8217;s described in the article
+<a href="https://docs.openshift.org/latest/install_config/storage_examples/storage_classes_legacy.html">Using Storage Classes for Existing Legacy Storage</a>.</p>
+</div>
+<div class="paragraph">
+<p>Minishift from the version 1.5 declares and dynamically provides <code>PersistentVolumes</code>
+named <code>pv0001</code> to <code>pv0100</code>. You need to be with admin privileges to be permitted to look at them
+(while expecting your Minishift
+<a href="https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift">is already running</a>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># log in as the administrator
+oc login -u system:admin
+# listing available persistent volumes
+oc get pv</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For being able to connect the <code>StorageClass</code> with the existing <code>PersistentVolume</code>
+we delclare the <code>StorageClass</code> with <a href="https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner">no provisioner</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">cat &lt;&lt;EOF | oc create -f -
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: ebs
+provisioner: no-provisioning
+parameters:
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can now bound the existing <code>PeristentVolume</code> with the <code>StorageClass</code>.
+<a href="https://blog.openshift.com/working-openshift-configurations">There is nice blogpost</a>
+about changing existing OpenShift objects.</p>
+</div>
+<div class="paragraph">
+<p>You can either use <code>oc edit</code> command.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># priting the PV object named 'pv0001'
+oc get pv/pv0001 -o yaml
+# edit the object
+oc edit pv/pv0001
+# edit the yaml file to contain content like
+# ...
+#  persistentVolumeReclaimPolicy: Recycle
+#  storageClassName: ebs
+# status:
+#  phase: Available
+# ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or you can update the the object specification by calling <code>oc patch</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">oc patch pv/pv0001 --patch '{"spec":{"storageClassName": "ebs"}}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_without_storage_class_declaration">Without storage class declaration</h3>
+<div class="paragraph">
+<p>As mentioned in note above I found out the storage class is not needed.
+I was fine just with removing the storage class declaration from the <code>app.yaml</code>
+of the <code>mehdb</code> application.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_the_kubernetes_statefulset_in_action">Running the Kubernetes StatefulSet In Action</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Steps are nicely described <a href="https://blog.openshift.com/kubernetes-statefulset-in-action">in the blogpost</a>.
+In direction to Kubernetes there is the only change
+of not using the <code>kubectl</code> command but <code>oc</code> command.</p>
+</div>
+<div class="paragraph">
+<p>Instead of running</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">#  creating namespace
+kubectl create ns mehdb
+# applying the yaml declaration of the statefulset
+git clone git@github.com:mhausenblas/mehdb.git
+cd mehdb
+kubectl -n=mehdb apply -f app.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>you run</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># kubernetes namespace matches the project in openshift
+oc new-project mehdb
+# that will switch you to the mehdb project but you can
+# rather check your active project with command
+oc project
+# applying the yaml declaration of the statefulset
+git clone git@github.com:mhausenblas/mehdb.git
+cd mehdb
+# as you were switched to the the project mehdb
+#  you don't need to use '-n mehdb' parameter
+oc apply -f app.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/mhausenblas/mehdb/blob/master/app.yaml">The <code>app.yaml</code></a> declares
+the <code>StatefulSet</code> controller with image to be loaded and the headless service
+as needed for the <code>StatefulSet</code> to work.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+if you need to delete content from the project <code>mehdb</code> you can run
+  <code><code>bash
+  oc delete all --all
+  # or only to point to the StatefulSet itself
+  #  oc delete sts mehdb
+  oc delete $(oc get pvc -o name)
+  </code></code>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now you can go through
+<a href="https://blog.openshift.com/kubernetes-statefulset-in-action/">the steps in the blogpost</a>.
+I would special highlight the existence of the <code>jump</code> dockerized application
+which let you process a shell command at your wish</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code># showing the headless service returns both endpoints
+#  (both pods) on DNS lookup
+oc run -i -t --rm dnscheck --restart=Never\
+  --image=quay.io/mhausenblas/jump:0.2 -- nslookup mehdb</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Scaling up and down is done through the <code>StatefulSet</code> controller with command</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">oc scale sts mehdb --replicas=3</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_the_statefulset_drain_controller">Running the StatefulSet drain controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The article
+<a href="https://medium.com/@marko.luksa/graceful-scaledown-of-stateful-apps-in-kubernetes-2205fc556ba9">Graceful scaledown of stateful apps in Kubernetes</a>
+clearly defines the purpose for the drain controller. When said in short the stateful application
+sometimes need a way how to clear its data from the persistent volumes when it&#8217;s scaled down.
+Let&#8217;s say you have 3 pods and you want the application to scale down to two pods.
+If you do so there is left data on the persistent volume which belonged to the third pod
+already stopped. The data will be left there until you scale up to 3 again.
+What if you need to do some clearance, what if you do not plan to scale to 3 in short time?
+That&#8217;s where existence of the drain controller helps you.</p>
+</div>
+<div class="paragraph">
+<p>The code of the drain controller in stage of proof-of-concept is available at
+<a href="https://github.com/luksa/statefulset-drain-controller" class="bare">https://github.com/luksa/statefulset-drain-controller</a> (July 2018, hopefully it will be added to the Kubernetes).</p>
+</div>
+<div class="paragraph">
+<p>If I take the <code>mehdb</code> example I need to make a change
+in the <code>app.yaml</code> file for the <code>StatefulSet</code> definition to contain binding to the drain controller.
+You can check my changes <a href="https://github.com/ochaloup/mehdb/tree/drain-controller">over here</a>:
+<a href="https://github.com/ochaloup/mehdb/commit/06227df795745b23f8d1cf7cde227f0404ee66c2" class="bare">https://github.com/ochaloup/mehdb/commit/06227df795745b23f8d1cf7cde227f0404ee66c2</a></p>
+</div>
+<div class="paragraph">
+<p>For the drain controller to drain data during application scale down it has to be defined and running.
+The drain controller can be defined either per cluster or per namespace. You can see the commands to define the drain controller
+<a href="https://github.com/luksa/statefulset-drain-controller/#running-one-controller-for-the-whole-cluster">either per cluster or per namespace at the README.md</a>.
+For both cases you need the privileges to define
+<a href="https://github.com/luksa/statefulset-drain-controller/blob/master/artifacts/per-namespace.yaml#L63">a <code>Role</code> with permission to create pods</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_mehdb_example_with_statefulset_drain_controller">Running mehdb example with StatefulSet drain controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s take a look on commands for get the drain controller running in <code>mehdb</code> demo application.
+The action which we define for the StatefulSet drain controller is pretty simple
+in our case as we want it
+<a href="https://github.com/ochaloup/mehdb/blob/drain-controller/app.yaml#L26">to delete the content of the <code>mehdb</code> data directory</a>
+with the command <code>rm -rf $MEHDB_DATADIR/*</code>. If we want to verify that the drain pod
+was really launched then we can save a data to the <code>mehdb</code> and then check
+if the directory of the scaled down pod was cleared  - data does not occupy space anymore.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># switch to admin account with permissions to create the Roles
+oc login -u system:admin
+# creation of the drain controller per namespace
+oc apply -f\
+ https://raw.githubusercontent.com/luksa/statefulset-drain-controller/master/artifacts/per-namespace.yaml
+
+# upload the mehdb app.yaml definition containing the template for the drain controller
+oc apply -f\
+  https://raw.githubusercontent.com/ochaloup/mehdb/drain-controller/app.yaml
+
+# check the running pods where drain controller should be listed
+oc get po
+&gt; NAME                              READY  STATUS   RESTARTS  AGE
+&gt; mehdb-0                           1/1    Running  0         1h
+&gt; mehdb-1                           1/1    Running  0         1h
+&gt; statefulset-drain-controller-...  1/1    Running  0         1h
+
+# scale the mehdb to 3 pods
+oc scale sts mehdb --replicas=3
+
+# in a different shell run a simple log checking script
+while true; do oc logs mehdb-2 -f; if [ $? -ne 0 ]; then
+  sleep 1; echo "  ...sleeping 1"; fi; done
+
+# now we can save a value to the mehdb with curl command
+oc run -i -t --rm jumpod --restart=Never --image=quay.io/mhausenblas/jump:0.2\
+  -- curl --data "hello mehdb" -sL -XPUT  mehdb:9876/set/test
+oc run -i -t --rm jumpod --restart=Never --image=quay.io/mhausenblas/jump:0.2\
+  -- curl -sL -XGET  mehdb:9876/get/test
+
+# let's scale to two pods while taking a look on the `while cycle`
+# which shows the logs of the mehdb-2 pods
+oc scale sts mehdb --replicas=3
+
+# you should see there the shell command saying
+# &gt; Datadir '/mehdbdata' content now:
+# &gt; /mehdbdata
+# &gt; /mehdbdata/test
+# &gt; /mehdbdata/test/content
+# &gt; Draining data... this takes 10 seconds!
+# &gt; /mehdbdata
+
+# from that it can be observed that the StatefulSet drain controller were run
+# and it has cleared the content of the /mehdbdata directory
+#  to save the space on the drive</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary">Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This was a quick testing of the <code>StatefulSet</code> running on the Minishift
+and using the <a href="https://github.com/luksa/statefulset-drain-controller">StatefulSet drain controller</a>
+proof-of-concept.</p>
+</div>
+</div>
+</div>]]></description><link>http://blog.chalda.cz/2018/08/08/Playing-with-Stateful-Sets-in-Minishift.html</link><guid isPermaLink="true">http://blog.chalda.cz/2018/08/08/Playing-with-Stateful-Sets-in-Minishift.html</guid><category><![CDATA[minishift]]></category><category><![CDATA[openshift]]></category><category><![CDATA[statefulset]]></category><dc:creator><![CDATA[chalda]]></dc:creator><pubDate>Wed, 08 Aug 2018 00:00:00 GMT</pubDate></item><item><title><![CDATA[Vim script notes]]></title><description><![CDATA[<div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
@@ -344,8 +687,12 @@ See below or check list of prefixes at <a href="https://codeyarns.com/2010/11/26
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Variable types, once assigned, are permanent and strictly enforced at runtime:
-E.g. <code>let interests = 'unknown' " Error: variable type mismatch</code></p>
+<p>Variable types, once assigned, are permanent and strictly enforced at runtime.
+As we set the interests as a list there will be error now
+(see at <a href="https://www.ibm.com/developerworks/library/l-vim-script-1/index.html">ibm.com, vim script part 1</a>)</p>
+</div>
+<div class="paragraph">
+<p><code>let interests = 'unknown' " Error: variable type mismatch</code></p>
 </div>
 </td>
 </tr>
@@ -3139,7 +3486,7 @@ but for exited ones too.</p>
 </div>
 <div class="paragraph">
 <p>On fedora docker saves images and containers under <code>/var/lib/docker</code> directory.
-You can search for the space used by the docker with <code>df -hs /var/lib/docker/*</code>.
+You can check the amount of the space the docker images occupy with command <code>du -sh /var/lib/docker/*</code>.
 If you want to clean your system from the docker images (it can&#8217;t be restored afterwards)</p>
 </div>
 <div class="listingblock">
