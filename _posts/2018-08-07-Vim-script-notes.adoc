@@ -1,4 +1,5 @@
-= Vim script notes - old
+= Vim script notes
+:hp-image: /images/articles/vim-script.png
 :hp-tags: vim, plugin, scripting
 :toc: macro
 :release: 1.0
