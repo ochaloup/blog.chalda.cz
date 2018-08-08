@@ -119,7 +119,7 @@ of the `mehdb` application.
 == Running the Kubernetes StatefulSet In Action
 
 Steps are nicely described https://blog.openshift.com/kubernetes-statefulset-in-action[in the blogpost].
-In direction to Kubernetes there is the only change
+In direction to OpenShift/Minishift there is the only change
 of not using the `kubectl` command but `oc` command.
 
 Instead of running
