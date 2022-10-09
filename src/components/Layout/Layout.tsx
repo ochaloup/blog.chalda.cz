@@ -8,7 +8,7 @@ import * as styles from "./Layout.module.scss";
 interface Props {
   title: string;
   description?: string;
-  socialImage?: string;
+  socialimage?: string;
   children: React.ReactNode;
 }
 
@@ -16,10 +16,10 @@ const Layout: React.FC<Props> = ({
   children,
   title,
   description,
-  socialImage = "",
+  socialimage = "",
 }: Props) => {
   const { author, url } = useSiteMetadata();
-  const metaImage = socialImage || author.photo;
+  const metaImage = socialimage || author.photo;
   const metaImageUrl = url + metaImage;
 
   return (

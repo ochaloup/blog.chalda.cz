@@ -1,6 +1,6 @@
 import Edge from "./edge";
 
-interface AllMarkdownRemark {
+interface AllAsciidoc {
   edges: Array<Edge>;
   group: Array<{
     fieldValue: string;
@@ -8,4 +8,4 @@ interface AllMarkdownRemark {
   }>;
 }
 
-export default AllMarkdownRemark;
+export default AllAsciidoc;

@@ -1,31 +1,34 @@
 import { CreatePagesArgs } from "gatsby";
 
+import * as types from "../types";
+import groupTag from "../utils/group-tags";
+
 interface TagsQueryResult {
-  allMarkdownRemark: {
-    group: Array<{
-      fieldValue: string;
-      totalCount: number;
-    }>;
-  };
+  allAsciidoc: {
+    edges?: Array<types.Edge>;
+  }
 }
 
 const tagsQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   const result = await graphql<TagsQueryResult>(`
     {
-      allMarkdownRemark(
+      allAsciidoc(
         filter: {
-          frontmatter: { template: { eq: "post" }, draft: { ne: true } }
+          pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } }
         }
       ) {
-        group(field: frontmatter___tags) {
-          fieldValue
-          totalCount
+        edges {
+          node {
+            pageAttributes {
+              tags
+            }
+          }
         }
       }
     }
   `);
 
-  return result?.data?.allMarkdownRemark?.group || [];
+  return groupTag(result?.data?.allAsciidoc?.edges || []);
 };
 
 export default tagsQuery;

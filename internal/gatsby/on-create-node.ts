@@ -12,9 +12,9 @@ const onCreateNode: GatsbyNode["onCreateNode"] = ({
 }) => {
   const { createNodeField } = actions;
 
-  if (node.internal.type === "MarkdownRemark") {
-    const { frontmatter, parent }: types.Edge["node"] = node;
-    const { tags, category, slug } = frontmatter || {};
+  if (node.internal.type === "Asciidoc") {
+    const { pageAttributes, parent }: types.Edge["node"] = node;
+    const { tags, category, slug } = pageAttributes || {};
 
     if (slug) {
       const dirname = parent && getNode(parent)?.relativeDirectory;
@@ -30,7 +30,8 @@ const onCreateNode: GatsbyNode["onCreateNode"] = ({
     }
 
     if (tags) {
-      const value = tags.map((tag) =>
+      const splitTags = tags.split(",").map(t => t.trim());
+      const value = splitTags.map((tag) =>
         utils.concat(
           constants.routes.tagRoute,
           "/",

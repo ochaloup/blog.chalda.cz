@@ -3,7 +3,7 @@ import { CreatePagesArgs } from "gatsby";
 import * as types from "../types";
 
 export interface PostsQueryResult {
-  allMarkdownRemark: {
+  allAsciidoc: {
     edges?: Array<types.Edge>;
   };
 }
@@ -11,7 +11,7 @@ export interface PostsQueryResult {
 const postsQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   const result = await graphql<PostsQueryResult>(`
     {
-      allMarkdownRemark(filter: { frontmatter: { draft: { ne: true } } }) {
+      allAsciidoc(filter: { pageAttributes: { draft: { ne: "true" } } }) {
         edges {
           node {
             fields {
@@ -23,7 +23,7 @@ const postsQuery = async (graphql: CreatePagesArgs["graphql"]) => {
     }
   `);
 
-  return result?.data?.allMarkdownRemark;
+  return result?.data?.allAsciidoc;
 };
 
 export default postsQuery;

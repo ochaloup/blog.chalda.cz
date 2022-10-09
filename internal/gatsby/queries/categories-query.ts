@@ -1,7 +1,7 @@
 import { CreatePagesArgs } from "gatsby";
 
 interface CategoriesQueryResult {
-  allMarkdownRemark: {
+  allAsciidoc: {
     group: Array<{
       fieldValue: string;
       totalCount: number;
@@ -12,13 +12,13 @@ interface CategoriesQueryResult {
 const categoriesQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   const result = await graphql<CategoriesQueryResult>(`
     {
-      allMarkdownRemark(
+      allAsciidoc(
         filter: {
-          frontmatter: { template: { eq: "post" }, draft: { ne: true } }
+          pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } }
         }
-        sort: { order: DESC, fields: [frontmatter___date] }
+        sort: { order: DESC, fields: [revision___date] }
       ) {
-        group(field: frontmatter___category) {
+        group(field: pageAttributes___category) {
           fieldValue
           totalCount
         }
@@ -26,7 +26,7 @@ const categoriesQuery = async (graphql: CreatePagesArgs["graphql"]) => {
     }
   `);
 
-  return result?.data?.allMarkdownRemark?.group ?? [];
+  return result?.data?.allAsciidoc?.group ?? [];
 };
 
 export default categoriesQuery;

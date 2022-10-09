@@ -1,7 +1,7 @@
 import { graphql, useStaticQuery } from "gatsby";
 
 interface CategoriesQueryResult {
-  allMarkdownRemark: {
+  allAsciidoc: {
     group: Array<{
       fieldValue: string;
       totalCount: number;
@@ -10,15 +10,15 @@ interface CategoriesQueryResult {
 }
 
 const useCategoriesList = () => {
-  const { allMarkdownRemark } = useStaticQuery<CategoriesQueryResult>(
+  const { allAsciidoc } = useStaticQuery<CategoriesQueryResult>(
     graphql`
       query CategoriesListQuery {
-        allMarkdownRemark(
+        allAsciidoc(
           filter: {
-            frontmatter: { template: { eq: "post" }, draft: { ne: true } }
+            pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } }
           }
         ) {
-          group(field: frontmatter___category) {
+          group(field: pageAttributes___category) {
             fieldValue
             totalCount
           }
@@ -27,7 +27,7 @@ const useCategoriesList = () => {
     `,
   );
 
-  return allMarkdownRemark.group ?? [];
+  return allAsciidoc.group ?? [];
 };
 
 export default useCategoriesList;

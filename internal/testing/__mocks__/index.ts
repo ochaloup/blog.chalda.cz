@@ -1,5 +1,5 @@
-export { default as allMarkdownRemark } from "./all-markdown-remark";
-export { default as markdownRemark } from "./markdown-remark";
+export { default as allAsciidoc } from "./all-asciidoc";
+export { default as asciidoc } from "./asciidoc";
 export { default as siteMetadata } from "./site-metadata";
 export { default as pageContext } from "./page-context";
 export { default as contacts } from "./contacts";

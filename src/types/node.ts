@@ -1,10 +1,14 @@
 import Fields from "./fields";
-import Frontmatter from "./frontmatter";
+import PageAttributes from "./page-attributes";
+import Revision from "./revision";
+import Document from "./document";
 
 interface Node {
   id: string;
   fields: Fields;
-  frontmatter: Frontmatter;
+  pageAttributes: PageAttributes;
+  document: Document;
+  revision: Revision;
   html: string;
 }
 

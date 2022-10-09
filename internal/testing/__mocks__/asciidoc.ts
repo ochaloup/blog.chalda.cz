@@ -5,14 +5,18 @@ export default {
     tagsSlugs: ["/handwriting", "/helvetica"],
     categorySlug: "/typography",
   },
-  frontmatter: {
+  revision: {
     date: "2016-09-01",
+  },
+  pageAttributes: {
     description:
       "An Essay on Typography by Eric Gill takes the reader back to the year 1930. The year when a conflict between two worlds came to its term. The machines of the industrial world finally took over the handicrafts.",
     category: "Typography",
-    tags: ["Handwriting", "Helvetica"],
-    title: "Perfecting the Art of Perfection",
+    tags: "Handwriting, Helvetica",
     template: "post",
+  },
+  document: {
+    title: "Perfecting the Art of Perfection",
   },
   html: "<p>An Essay on Typography by Eric Gill takes the reader back to the year 1930. The year when a conflict between two worlds came to its term. The machines of the industrial world finally took over the handicrafts.</p>",
 };

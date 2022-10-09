@@ -1,33 +1,37 @@
 import { graphql, useStaticQuery } from "gatsby";
+import { groupTag } from "@/utils";
+
+import * as types from "../types";
+
 
 interface TagsQueryResult {
-  allMarkdownRemark: {
-    group: Array<{
-      fieldValue: string;
-      totalCount: number;
-    }>;
-  };
+  allAsciidoc: {
+    edges?: Array<types.Edge>;
+  }
 }
 
 const useTagsList = () => {
-  const { allMarkdownRemark } = useStaticQuery<TagsQueryResult>(
+  const { allAsciidoc } = useStaticQuery<TagsQueryResult>(
     graphql`
       query TagsListQuery {
-        allMarkdownRemark(
+        allAsciidoc(
           filter: {
-            frontmatter: { template: { eq: "post" }, draft: { ne: true } }
+            pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } }
           }
         ) {
-          group(field: frontmatter___tags) {
-            fieldValue
-            totalCount
+          edges {
+            node {
+              pageAttributes {
+                tags
+              }
+            }
           }
         }
       }
     `,
   );
 
-  return allMarkdownRemark.group || [];
+  return groupTag(allAsciidoc?.edges || []);
 };
 
 export default useTagsList;

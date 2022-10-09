@@ -4,4 +4,4 @@ export type { default as Dictionary } from "./dictionary";
 export type { default as Nullable } from "./nullable";
 export type { default as PageContext } from "./page-context";
 export type { default as Pagination } from "./pagination";
-export type { default as AllMarkdownRemark } from "./all-markdown-remark";
+export type { default as AllAsciidoc } from "./all-asciidoc";

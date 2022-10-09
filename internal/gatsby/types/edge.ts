@@ -1,12 +1,20 @@
 import { Node as GatsbyNode } from "gatsby";
 
-interface Frontmatter {
+interface Revision {
   date?: string;
+  number?: string;
+}
+
+interface PageAttributes {
   slug?: string;
   template?: string;
   category?: string;
   description?: string;
-  tags?: Array<string>;
+  tags?: string;
+}
+
+interface Document {
+  title?: string;
 }
 
 interface Fields {
@@ -17,7 +25,9 @@ interface Fields {
 
 interface Node extends GatsbyNode {
   fields?: Fields;
-  frontmatter?: Frontmatter;
+  revision?: Revision;
+  pageAttributes?: PageAttributes;
+  document?: Document;
 }
 
 interface Edge {

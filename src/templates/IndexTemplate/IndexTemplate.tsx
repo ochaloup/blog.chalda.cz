@@ -8,11 +8,11 @@ import { Page } from "@/components/Page";
 import { Pagination } from "@/components/Pagination";
 import { Sidebar } from "@/components/Sidebar";
 import { useSiteMetadata } from "@/hooks";
-import { AllMarkdownRemark, PageContext } from "@/types";
+import { AllAsciidoc, PageContext } from "@/types";
 
 interface Props {
   data: {
-    allMarkdownRemark: AllMarkdownRemark;
+    allAsciidoc: AllAsciidoc;
   };
   pageContext: PageContext;
 }
@@ -24,7 +24,7 @@ const IndexTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
   const { currentPage, hasNextPage, hasPrevPage, prevPagePath, nextPagePath } =
     pagination;
 
-  const { edges } = data.allMarkdownRemark;
+  const { edges } = data.allAsciidoc;
   const pageTitle =
     currentPage > 0 ? `Posts - Page ${currentPage} - ${siteTitle}` : siteTitle;
 
@@ -46,11 +46,11 @@ const IndexTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
 
 export const query = graphql`
   query IndexTemplate($limit: Int!, $offset: Int!) {
-    allMarkdownRemark(
+    allAsciidoc(
       limit: $limit
       skip: $offset
-      sort: { order: DESC, fields: [frontmatter___date] }
-      filter: { frontmatter: { template: { eq: "post" }, draft: { ne: true } } }
+      sort: { order: DESC, fields: [revision___date] }
+      filter: { pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } } }
     ) {
       edges {
         node {
@@ -58,10 +58,14 @@ export const query = graphql`
             categorySlug
             slug
           }
-          frontmatter {
+          pageAttributes {
             description
             category
+          }
+          document {
             title
+          }
+          revision {
             date
           }
         }

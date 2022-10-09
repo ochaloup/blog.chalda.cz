@@ -38,7 +38,7 @@ export default {
         feeds: [
           {
             serialize: ({
-              query: { site, allMarkdownRemark },
+              query: { site, allAsciidoc },
             }: {
               query: {
                 site: {
@@ -46,25 +46,25 @@ export default {
                     url: string;
                   };
                 };
-                allMarkdownRemark: {
+                allAsciidoc: {
                   edges: Array<types.Edge>;
                 };
               };
             }) =>
-              allMarkdownRemark.edges.map(({ node }) => ({
-                ...node.frontmatter,
-                date: node?.frontmatter?.date,
-                description: node?.frontmatter?.description,
+            allAsciidoc.edges.map(({ node }) => ({
+                ...node.pageAttributes,
+                date: node?.revision?.date,
+                description: node?.pageAttributes?.description,
                 url: site.siteMetadata.url + node?.fields?.slug,
                 guid: site.siteMetadata.url + node?.fields?.slug,
                 custom_elements: [{ "content:encoded": node.html }],
               })),
             query: `
               {
-                allMarkdownRemark(
+                allAsciidoc(
                   limit: 1000,
-                  sort: { order: DESC, fields: [frontmatter___date] },
-                  filter: { frontmatter: { template: { eq: "post" }, draft: { ne: true } } }
+                  sort: { order: DESC, fields: [revision___date] },
+                  filter: { pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } } }
                 ) {
                   edges {
                     node {
@@ -72,10 +72,14 @@ export default {
                       fields {
                         slug
                       }
-                      frontmatter {
+                      revision {
                         date
-                        title
+                      }
+                      pageAttributes {
                         description
+                      }
+                      document {
+                        title
                       }
                     }
                   }
@@ -89,26 +93,13 @@ export default {
       },
     },
     {
-      resolve: "gatsby-transformer-remark",
+      resolve: `gatsby-transformer-asciidoc`,
       options: {
-        plugins: [
-          {
-            resolve: "gatsby-remark-images",
-            options: {
-              maxWidth: 960,
-              withWebp: true,
-            },
-          },
-          {
-            resolve: "gatsby-remark-responsive-iframe",
-            options: { wrapperStyle: "margin-bottom: 1.0725rem" },
-          },
-          "gatsby-remark-autolink-headers",
-          "gatsby-remark-prismjs",
-          "gatsby-remark-copy-linked-files",
-          "gatsby-remark-smartypants",
-          "gatsby-remark-external-links",
-        ],
+        attributes: {
+          showtitle: false,
+          imagesdir: `/images`,
+        },
+        extensions: [`.adoc`],
       },
     },
     "gatsby-transformer-sharp",

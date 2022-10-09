@@ -13,7 +13,7 @@ const mockedUseStaticQuery = useStaticQuery as jest.Mock;
 describe("PageTemplate", () => {
   const props = {
     data: {
-      markdownRemark: mocks.markdownRemark,
+      asciidoc: mocks.asciidoc,
     },
   };
 

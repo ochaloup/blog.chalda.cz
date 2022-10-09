@@ -7,8 +7,8 @@ import * as mocks from "@/mocks";
 describe("Tags", () => {
   it("renders correctly", () => {
     const props = {
-      tags: mocks.markdownRemark.frontmatter.tags,
-      tagSlugs: mocks.markdownRemark.fields.tagsSlugs,
+      tags: mocks.asciidoc.pageAttributes.tags.split(",").map(t => t.trim()),
+      tagSlugs: mocks.asciidoc.fields.tagsSlugs,
     };
 
     const tree = renderer.create(<Tags {...props} />).toJSON();

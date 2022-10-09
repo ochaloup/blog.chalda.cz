@@ -8,11 +8,11 @@ import { Page } from "@/components/Page";
 import { Pagination } from "@/components/Pagination";
 import { Sidebar } from "@/components/Sidebar";
 import { useSiteMetadata } from "@/hooks";
-import { AllMarkdownRemark, PageContext } from "@/types";
+import { AllAsciidoc, PageContext } from "@/types";
 
 interface Props {
   data: {
-    allMarkdownRemark: AllMarkdownRemark;
+    allAsciidoc: AllAsciidoc;
   };
   pageContext: PageContext;
 }
@@ -24,7 +24,8 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
   const { currentPage, prevPagePath, nextPagePath, hasPrevPage, hasNextPage } =
     pagination;
 
-  const { edges } = data.allMarkdownRemark;
+  const { edges } = data.allAsciidoc;
+  edges.filter(e => e.node.pageAttributes.tags?.includes(group || ""));
   const pageTitle =
     currentPage > 0
       ? `${group} - Page ${currentPage} - ${siteTitle}`
@@ -47,24 +48,23 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
 };
 
 export const query = graphql`
-  query TagTemplate($group: String, $limit: Int!, $offset: Int!) {
+  query TagTemplate($limit: Int!, $offset: Int!) {
     site {
       siteMetadata {
         title
         subtitle
       }
     }
-    allMarkdownRemark(
+    allAsciidoc(
       limit: $limit
       skip: $offset
       filter: {
-        frontmatter: {
-          tags: { in: [$group] }
+        pageAttributes: {
           template: { eq: "post" }
-          draft: { ne: true }
+          draft: { ne: "true" }
         }
       }
-      sort: { order: DESC, fields: [frontmatter___date] }
+      sort: { order: DESC, fields: [revision___date] }
     ) {
       edges {
         node {
@@ -72,9 +72,13 @@ export const query = graphql`
             slug
             categorySlug
           }
-          frontmatter {
+          document {
             title
+          }
+          revision {
             date
+          }
+          pageAttributes {
             category
             description
           }

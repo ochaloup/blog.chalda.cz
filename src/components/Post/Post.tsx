@@ -14,12 +14,14 @@ import * as styles from "./Post.module.scss";
 
 interface Props {
   post: Node;
+  tags: string[];
 }
 
-const Post: React.FC<Props> = ({ post }: Props) => {
+const Post: React.FC<Props> = ({ post, tags }: Props) => {
   const { html } = post;
   const { tagSlugs, slug } = post.fields;
-  const { tags, title, date } = post.frontmatter;
+  const { title} = post.document;
+  const { date } = post.revision;
 
   return (
     <div className={styles.post}>
@@ -38,7 +40,7 @@ const Post: React.FC<Props> = ({ post }: Props) => {
       </div>
 
       <div className={styles.comments}>
-        <Comments postSlug={slug} postTitle={post.frontmatter.title} />
+        <Comments postSlug={slug} postTitle={post.document.title} />
       </div>
     </div>
   );

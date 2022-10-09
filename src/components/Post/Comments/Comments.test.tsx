@@ -20,8 +20,8 @@ describe("Comments", () => {
 
   it("renders correctly", () => {
     const props = {
-      postTitle: mocks.markdownRemark.frontmatter.title,
-      postSlug: mocks.markdownRemark.fields.slug,
+      postTitle: mocks.asciidoc.document.title,
+      postSlug: mocks.asciidoc.fields.slug,
     };
 
     const tree = renderer.create(<Comments {...props} />).toJSON();

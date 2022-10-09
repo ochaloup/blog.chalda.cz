@@ -17,12 +17,12 @@ const Feed: React.FC<Props> = ({ edges }: Props) => (
         <div className={styles.meta}>
           <time
             className={styles.time}
-            dateTime={new Date(edge.node.frontmatter.date).toLocaleDateString(
+            dateTime={new Date(edge.node.revision.date).toLocaleDateString(
               "en-US",
               { year: "numeric", month: "long", day: "numeric" },
             )}
           >
-            {new Date(edge.node.frontmatter.date).toLocaleDateString("en-US", {
+            {new Date(edge.node.revision.date).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
             })}
@@ -30,17 +30,17 @@ const Feed: React.FC<Props> = ({ edges }: Props) => (
           <span className={styles.divider} />
           <span className={styles.category}>
             <Link to={edge.node.fields.categorySlug} className={styles.link}>
-              {edge.node.frontmatter.category}
+              {edge.node.pageAttributes.category}
             </Link>
           </span>
         </div>
         <h2 className={styles.title}>
           <Link className={styles.link} to={edge.node.fields.slug}>
-            {edge.node.frontmatter.title}
+            {edge.node.document.title}
           </Link>
         </h2>
         <p className={styles.description}>
-          {edge.node.frontmatter.description}
+          {edge.node.pageAttributes.description}
         </p>
         <Link className={styles.more} to={edge.node.fields.slug}>
           Read

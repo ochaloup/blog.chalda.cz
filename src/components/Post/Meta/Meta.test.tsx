@@ -7,7 +7,7 @@ import * as mocks from "@/mocks";
 describe("Meta", () => {
   it("renders correctly", () => {
     const props = {
-      date: mocks.markdownRemark.frontmatter.date,
+      date: mocks.asciidoc.revision.date,
     };
 
     const tree = renderer.create(<Meta {...props} />).toJSON();

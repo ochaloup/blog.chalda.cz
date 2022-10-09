@@ -21,7 +21,7 @@ describe("IndexTemplate", () => {
   it("renders correctly", () => {
     const props = {
       data: {
-        allMarkdownRemark: mocks.allMarkdownRemark,
+        allAsciidoc: mocks.allAsciidoc,
       },
       pageContext: mocks.pageContext,
     };

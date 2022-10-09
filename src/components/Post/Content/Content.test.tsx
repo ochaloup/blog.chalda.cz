@@ -7,8 +7,8 @@ import * as mocks from "@/mocks";
 describe("Content", () => {
   it("renders correctly", () => {
     const props = {
-      title: mocks.markdownRemark.frontmatter.title,
-      body: mocks.markdownRemark.html,
+      title: mocks.asciidoc.document.title,
+      body: mocks.asciidoc.html,
     };
 
     const tree = renderer.create(<Content {...props} />).toJSON();

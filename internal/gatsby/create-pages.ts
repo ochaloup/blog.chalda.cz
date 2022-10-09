@@ -42,13 +42,13 @@ const createPages: GatsbyNode["createPages"] = async ({ graphql, actions }) => {
   pages.forEach((edge) => {
     const { node } = edge;
 
-    if (node?.frontmatter?.template === "page" && node?.fields?.slug) {
+    if (node?.pageAttributes?.template === "page" && node?.fields?.slug) {
       createPage({
         path: node.fields.slug,
         component: constants.templates.pageTemplate,
         context: { slug: node.fields.slug },
       });
-    } else if (node?.frontmatter?.template === "post" && node?.fields?.slug) {
+    } else if (node?.pageAttributes?.template === "post" && node?.fields?.slug) {
       createPage({
         path: node.fields.slug,
         component: constants.templates.postTemplate,

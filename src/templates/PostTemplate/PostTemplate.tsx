@@ -9,42 +9,48 @@ import { Node } from "@/types";
 
 interface Props {
   data: {
-    markdownRemark: Node;
+    asciidoc: Node;
   };
 }
 
 const PostTemplate: React.FC<Props> = ({ data }: Props) => {
   const { title: siteTitle, subtitle: siteSubtitle } = useSiteMetadata();
-  const { frontmatter } = data.markdownRemark;
-  const { title, description = "", socialImage } = frontmatter;
+  const { pageAttributes, document } = data.asciidoc;
+  const { description = "", socialimage } = pageAttributes;
+  const { title } = document;
   const metaDescription = description || siteSubtitle;
+  const tags = data.asciidoc.pageAttributes?.tags?.split(",").map(t => t.trim()) || [];
 
   return (
     <Layout
       title={`${title} - ${siteTitle}`}
       description={metaDescription}
-      socialImage={socialImage}
+      socialimage={socialimage}
     >
-      <Post post={data.markdownRemark} />
+      <Post post={data.asciidoc} tags={tags} />
     </Layout>
   );
 };
 
 export const query = graphql`
   query PostTemplate($slug: String!) {
-    markdownRemark(fields: { slug: { eq: $slug } }) {
+    asciidoc(fields: { slug: { eq: $slug } }) {
       id
       html
       fields {
         slug
         tagSlugs
       }
-      frontmatter {
+      revision {
         date
+      }
+      pageAttributes {
         description
         tags
+        socialimage
+      }
+      document {
         title
-        socialImage
       }
     }
   }

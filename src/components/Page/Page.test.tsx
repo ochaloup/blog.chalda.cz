@@ -7,8 +7,8 @@ import * as mocks from "@/mocks";
 describe("Page", () => {
   it("renders correctly", () => {
     const props = {
-      children: mocks.markdownRemark.html,
-      title: mocks.markdownRemark.frontmatter.title,
+      children: mocks.asciidoc.html,
+      title: mocks.asciidoc.document.title,
     };
 
     const tree = renderer

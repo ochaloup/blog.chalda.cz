@@ -14,7 +14,7 @@ describe("CategoriesTemplate", () => {
   beforeEach(() => {
     const props = {
       ...mocks.siteMetadata,
-      allMarkdownRemark: mocks.allMarkdownRemark,
+      allAsciidoc: mocks.allAsciidoc,
     };
 
     mockedStaticQuery.mockImplementationOnce(({ render }) => render(props));
