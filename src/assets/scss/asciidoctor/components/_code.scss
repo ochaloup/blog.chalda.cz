@@ -1,12 +1,6 @@
 // This part of style is ripped of
 // https://github.com/asciidoctor/asciidoctor-stylesheet-factory/blob/main/sass/components/_asciidoc.scss
 
-// configuration within _asciidoc.scss
-$header-text-rendering: optimizeLegibility;
-$subheader-text-rendering: $header-text-rendering !default;
-
-// not sure where is this set up in the original scss library
-$panel-margin-bottom: emCalc(20px);
 
 // AsciiDoc block styles
 
