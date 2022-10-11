@@ -108,6 +108,11 @@ export default {
       resolve: "gatsby-plugin-google-gtag",
       options: {
         trackingIds: [config.googleAnalyticsId],
+        gtagConfig: {
+          optimize_id: config.googleManagerTag,
+          anonymize_ip: true,
+          cookie_expires: 0,
+        },
         pluginConfig: {
           head: true,
         },
