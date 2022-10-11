@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Link } from "gatsby";
 
@@ -11,6 +11,7 @@ import { Meta } from "./Meta";
 import { Tags } from "./Tags";
 
 import * as styles from "./Post.module.scss";
+import highlightCode from '../../utils/highlightCode'
 
 interface Props {
   post: Node;
@@ -22,6 +23,10 @@ const Post: React.FC<Props> = ({ post, tags }: Props) => {
   const { tagSlugs, slug } = post.fields;
   const { title} = post.document;
   const { date } = post.revision;
+
+  useEffect(() => {
+    highlightCode()
+  })
 
   return (
     <div className={styles.post}>

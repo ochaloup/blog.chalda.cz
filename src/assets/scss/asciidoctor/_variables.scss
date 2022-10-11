@@ -1,0 +1,15 @@
+// from https://github.com/asciidoctor/asciidoctor-stylesheet-factory/blob/main/sass/components/_asciidoc.scss
+
+$old-include-html-global-classes: $include-html-global-classes;
+$include-html-global-classes: false;
+$inline-list-bottom-margin: $paragraph-margin-bottom / 2 !default;
+$inline-list-item-spacing: $paragraph-margin-bottom !default;
+$include-html-global-classes: $old-include-html-global-classes;
+
+// controls whether built-in AsciiDoc role classes are generated
+$include-asciidoc-role-classes: true !default;
+
+// fall-through defaults
+$subheader-text-rendering: $header-text-rendering !default;
+$footer-bg: $body-font-color !default;
+$footer-font-color: invert($body-font-color) !default;
