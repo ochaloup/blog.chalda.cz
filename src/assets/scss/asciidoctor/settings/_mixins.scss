@@ -1,0 +1,59 @@
+// from https://github.com/foundation/foundation-sites/blob/v5.5.3/scss/foundation/components/_panels.scss
+
+@mixin panel($bg:$panel-bg, $padding:$panel-padding, $adjust:$panel-header-adjust, $border:true) {
+
+  @if $bg {
+    $bg-lightness: lightness($bg);
+
+    @if $border {
+      border-style: $panel-border-style;
+      border-width: $panel-border-size;
+      border-color: $panel-border-color;
+    } @else {
+      border-style: none;
+      border-width: 0;
+    }
+
+    margin-bottom: $panel-margin-bottom;
+    padding: $padding;
+
+    background: $bg;
+    @if $bg-lightness >= 50% { color: $panel-font-color; }
+    @else { color: $panel-font-color-alt; }
+
+    // Respect the padding, fool.
+    > :first-child { margin-top: 0; }
+    > :last-child { margin-bottom: 0; }
+
+    @if $adjust {
+      // We set the font color based on the darkness of the bg.
+      @if $bg-lightness >= 50% {
+        h1, h2, h3, h4, h5, h6, p, li, dl { color: $panel-font-color; }
+      }
+      @else {
+        h1, h2, h3, h4, h5, h6, p, li, dl { color: $panel-font-color-alt; }
+      }
+
+      // reset header line-heights for panels
+      h1, h2, h3, h4, h5, h6 {
+        line-height: 1; margin-bottom: rem-calc(20) / 2;
+        &.subheader { line-height: 1.4; }
+      }
+    }
+  }
+}
+
+@mixin radius($radius:$global-radius) {
+  @if $radius {
+    border-radius: $radius;
+  }
+}
+
+@mixin subheader {
+  line-height: $subheader-line-height;
+  color: $subheader-font-color;
+  font-weight: $subheader-font-weight;
+  margin-top: $subheader-top-margin;
+  margin-bottom: $subheader-bottom-margin;
+}
+.subheader { @include subheader; }

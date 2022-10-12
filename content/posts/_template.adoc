@@ -8,6 +8,6 @@ chalda <chalda@seznam.cz>
 :page-category: Programming
 :page-tags: Rust, Java
 :page-description: About the page.
-:page-socialImage: /media/notebook.jpg
-// the socialImage is placed under /static/media folder
+:page-socialImage: /articles/notebook.jpg
+// the socialImage is placed under /static/images/articles
 

@@ -1,6 +1,8 @@
 = Perfecting the Art of Perfection
+:icons: font
 chalda <chalda@seznam.cz>
 1.0, 2019-02-17
+
 
 :page-template: post
 :page-draft: false
@@ -8,7 +10,7 @@ chalda <chalda@seznam.cz>
 :page-category: Design Inspiration
 :page-tags: Handwriting, Learning to write
 :page-description: Quisque cursus, metus vitae pharetra auctor, sem massa mattis sem, at interdum magna augue eget diam. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Morbi lacinia molestie dui. Praesent blandit dolor. Sed non quam. In vel mi sit amet augue congue elementum.
-:page-socialImage: /media/notebook.jpg
+:page-socialImage: /articles/notebook.jpg
 
 
 
@@ -31,3 +33,5 @@ Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulpu
 
 
 NOTE: about revision line https://docs.asciidoctor.org/asciidoc/latest/document/revision-line/
+
+TIP: do this!
