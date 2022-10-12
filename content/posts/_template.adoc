@@ -1,0 +1,13 @@
+= Title of the article
+chalda <chalda@seznam.cz>
+1.0, 2022-10-01
+
+:page-template: post
+:page-draft: true
+:page-slug: perfecting-the-art-of-programming
+:page-category: Programming
+:page-tags: Rust, Java
+:page-description: About the page.
+:page-socialImage: /media/notebook.jpg
+// the socialImage is placed under /static/media folder
+

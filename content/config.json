@@ -1,8 +1,8 @@
 {
   "title": "Blog by chalda",
   "url": "https://blog.chalda.cz",
-  "subtitle": "Pellentesque odio nisi, euismod in, pharetra a, ultricies in, diam. Sed arcu.",
-  "copyright": "© All rights reserved.",
+  "subtitle": "Developer notes.",
+  "copyright": "",
   "googleAnalyticsId": "UA-91848308-1",
   "googleManagerTag": "GTM-5NQ9VLB",
   "disqusShortname": "",
@@ -14,8 +14,8 @@
       "path": "/"
     },
     {
-      "label": "About me",
-      "path": "/pages/about"
+      "label": "Links",
+      "path": "/pages/links"
     },
     {
       "label": "Contact me",
@@ -25,16 +25,16 @@
   "author": {
     "name": "chalda",
     "photo": "/photo.jpg",
-    "bio": "Pellentesque odio nisi, euismod in, pharetra a, ultricies in, diam. Sed arcu.",
+    "bio": "Developer notes.",
     "contacts": {
       "rss": "",
       "email": "",
-      "github": "#",
-      "facebook": "#",
-      "telegram": "#",
-      "twitter": "#",
-      "linkedin": "#",
-      "instagram": "#",
+      "github": "ochaloup",
+      "facebook": "",
+      "telegram": "@ch4lda",
+      "twitter": "_chalda",
+      "linkedin": "",
+      "instagram": "",
       "line": "",
       "weibo": "",
       "gitlab": "",

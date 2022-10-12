@@ -1,4 +1,4 @@
-= Contact me
+= Links
 
 :page-template: page
 :page-socialImage: /book.jpg
