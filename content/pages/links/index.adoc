@@ -5,20 +5,34 @@
 
 Different articles I worked on.
 
-== List of presentation
+== List of presentations
 
 * http://chalda.cz
 
 == Narayana and XA transactions
 
-* https://developer.jboss.org/wiki/TwoPhaseCommit2PC
-* https://developer.jboss.org/wiki/Three-phaseCommitProtocol - https://developer.jboss.org/docs/DOC-56051 - Three-phase commit protocol (3PC)
-* http://jbossts.blogspot.com/2018/06/narayana-commit-markable-resource.html
-* http://jbossts.blogspot.cz/2018/01/narayana-periodic-recovery-of-xa.html
-* http://jbossts.blogspot.cz/2018/01/recovery-of-narayana-jdbc-transactional.html
-* https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift  - https://developer.jboss.org/docs/DOC-56074 MSA quickstarts with LRA/REST-AT on Minishift
-* http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html
+* https://developer.jboss.org/docs/DOC-55995[Two Phase commit (2PC)] &mdash; How 2PC works in Narayana that's integrated to WildFly/Quarkus
+* https://developer.jboss.org/docs/DOC-56051[Three-phase commit protocol (3PC)] &mdash; A basic discussion on the 3PC protocol
+* http://jbossts.blogspot.com/2018/06/narayana-commit-markable-resource.html[Narayana Commit Markable Resource: a faultless LRCO for JDBC datasources] &mdash; How the CMR, an 2PC improvement, works in Narayana
+* http://jbossts.blogspot.cz/2018/01/narayana-periodic-recovery-of-xa.html[Narayana periodic recovery of XA transactions] &mdash; Details about Narayana periodic recovery
+* https://jbossts.blogspot.com/2017/12/narayana-jdbc-transactional-driver.html[Narayana jdbc transactional driver] &mdash; Narayana standalone driver for JDBC
+* http://jbossts.blogspot.cz/2018/01/recovery-of-narayana-jdbc-transactional.html[Recovery of Narayana jdbc transactional driver] &mdash; Technical details about Narayana JDBC recovery
+* https://jbossts.blogspot.com/2019/06/expiry-scanners-and-object-store-in.html[Expiry scanners and object store in Narayana] &mdash; How Narayana stores data
+* https://developer.jboss.org/docs/DOC-56074[MSA quickstarts with LRA/REST-AT on Minishift] &mdash; How to run REST-AT on Minishift
+* http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html[Sagas and how they differ from two-phase commit] &mdash; What is difference of Saga and 2PC protocols
+* https://jbossts.blogspot.com/2017/12/narayana-lra-implementation-of-saga.html[Narayana LRA: implementation of saga transactions] &mdash; About LRA as Saga protocol implementation in Narayana
+* https://jbossts.blogspot.com/2019/04/jta-and-cdi-integration.html[JTA and CDI integration] &mdash; About transactional topics of the CDI specification
+* https://jbossts.blogspot.com/2018/10/integration-with-agroal-database.html[Narayana integration with Agroal connection pool] &mdash; Agroal and Narayana integration
+* https://jbossts.blogspot.com/2018/05/narayana-jdbc-integration-for-tomcat.html[Narayana JDBC integration for Tomcat] &mdash; Tomcat and Narayana integration
+* https://jbossts.blogspot.com/2021/08/lra-annotation-checker-maven-plugin.html[LRA annotation checker Maven plugin] &mdash; About creation of LRA annotations checker as a Maven plugin
+* https://jbossts.blogspot.com/2019/09/heuristic-exceptions.html[Heuristic exceptions] &mdash; What are the heuristic exceptions about
 
 == Workshops
 
+* https://github.com/ochaloup/20220605_solana_contracts[Solana workshop for UTXO 2022]
+* https://github.com/ochaloup/20211009_workshop_geth_pending_logs[Geth workshop for ETH Brno 2021]
 * https://github.com/ochaloup/byteman-workshop[Byteman workshop for DevConf.cz 2018]
+
+== Projects
+
+* https://github.com/ochaloup/vim-syntax-match[Vim plugin for storing syntax matching rules on disk] &mdash; a Vim plugin that's handy while investigating through the log records

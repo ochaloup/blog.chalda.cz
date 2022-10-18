@@ -1,0 +1,6 @@
+= What to do
+
+* styling of links and code - it could be similar as it's at original blog http://blog.chalda.cz/2017/05/06/DNS-setting-for-Git-Hub-pages.html
+* is possible to generate TOC?
+* why RSS generation does not work
+* could be used the icons? if not it's necessary to remove things like `icon:smile-o[]` from the adoc sources

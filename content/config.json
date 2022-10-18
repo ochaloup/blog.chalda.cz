@@ -6,7 +6,7 @@
   "googleAnalyticsId": "UA-91848308-1",
   "googleManagerTag": "GTM-5NQ9VLB",
   "disqusShortname": "",
-  "postsLimit": 4,
+  "postsLimit": 6,
   "pathPrefix": "/",
   "menu": [
     {
@@ -18,8 +18,8 @@
       "path": "/pages/links"
     },
     {
-      "label": "Contact me",
-      "path": "/pages/contacts"
+      "label": "Tags",
+      "path": "/tags"
     }
   ],
   "author": {

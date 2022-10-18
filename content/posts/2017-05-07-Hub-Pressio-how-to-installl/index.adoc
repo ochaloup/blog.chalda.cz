@@ -1,0 +1,103 @@
+= HubPress.io - how to installl
+chalda <chalda@seznam.cz>
+1.0, 2017-05-07
+
+:icons: font
+
+:page-template: post
+:page-draft: false
+:page-slug: hubpress-io-how-to-install
+:page-category: devops
+:page-tags: hubpress.io, blog
+:page-description: How to start using Hubpress.io. The motivation is to use AsciiDoctor syntax for the text and having a generator of the pages.
+:page-socialImage: /articles/notebook.jpg
+
+
+== Installation of HubPress.io
+
+Writing blogposts is a proof-of-concept for me having them as a knowledgebase.
+For a some time when writing any note I use http://asciidoctor.org[AsciiDoc(tor)] format.
+Thus I started to search for option that allows me to write blog-notes that way too.
+
+I could see that many people host blogs at http://github.io I decided to try that way too.
+I started by looking for a tool to generate static webpages with http://asciidoctor.org/docs/asciidoc-asciidoctor-diffs[AsciiDoc] support.
+There is the mostly used `Jekyll` - written in ruby, generating a webpage from template
+on your local machine. There is https://github.com/asciidoctor/jekyll-asciidoc[plugin for AsciiDoc].
+Other tool that I was evaluating was http://awestruct.org[:awestruct].
+
+Then I found http://hubpress.io[HubPress.io] that has a concept of a webapp whole written in javascript
+which generates static website directly in your browser sending it then to GitHub repo. Merit of this approach
+is a nice admin console in your browser. Flaw is a little bit longer waiting time to get post being published.
+The other could be current
+http://blog.hubpress.io/2016/10/11/We-Arent-Dead-Yet-Hub-Press-Roadmap.html[stall in the development process]. But it seems not be fully true as there is new versions coming (see
+https://github.com/HubPress/hubpress.io/commit/ceaca97655fd3a49e4bc057201f0eb7109ad2d4a[0.8.0]).
+
+So far so good. I decided to give it a try.
+
+Process of installation is quite simple - you https://github.com/HubPress/hubpress.io[fork repo],
+https://github.com/HubPress/hubpress.io/blob/master/hubpress/config.json[change config file]
+and you can start to write a blog posts inside of the administration console.
+
+Nevertheless check https://hubpress.gitbooks.io/hubpress-knowledgebase[knowledgebase to HubPress]
+and https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc[documentation on GitHub].
+
+...or if you plan to run `HubPress.io` blog against your custom domain these steps could be helpful for you
+
+. Fork repo
+** Fork https://github.com/HubPress/hubpress.io[github repository] and set `gh-pages`
+https://github.com/HubPress/dev.hubpress.io/blob/gh-pages/README.adoc#use-a-custom-domain-or-github-page-domain-already-in-use[as default one].
+** set the `custom domain` field to name of your domain
+
+[NOTE]
+====
+Having set the `custom domain` will cause creation of `CNAME` file under root
+of your github repository.
+
+The content of the file is just the name of your custom domain - thus what you
+put to the field.
+====
+
+image::hubpressio/githubpages.jpg[]
+
+. change `hubpress/config.json` file to contain (meta)data
+** username
+** repositoryName
+** branch
+** cname
+in my case it was like this
+
+[source,json]
+----
+{
+  "meta": {
+    "username": "ochaloup",
+    "repositoryName": "blog.chalda.cz",
+    "branch": "gh-pages",
+    "cname": "blog.chalda.cz",
+  }
+}
+----
+
+[NOTE]
+====
+`config.json` file serves to HubPress.io as a configuration file so all settings
+that you will set in administration interface will be saved here
+====
+
+. When all is set fine you can now go to `HubPress.io` admin page which is
+hidden under subaddress `hubpress`. In my case it's at path http://blog.chalda.cz/hubpress.
+You need to log in with credentials which you use to login to GitHub. HubPress.io calls
+directly the GitHub identification service to confirm that you are the owner of the repo.
+
+. Afte the first login you can see empty screen. That's ok and just create a new article. +
+[Updated] for version `0.8.0` it seems that there is already shown information that you have 0 posts so it's not misleading already.
+
+. For https://disqus.com[Disqus] you need short name for your site to be set in HubPress.io.
+You will find it when already having page under Discusq when you go `Admin` -> `Settings`
+-> choose page -> `General` -> `Shortname`
+
+// TODO: how to add theme...
+
+That's more or less it. Now it's time to write and experiment.
+
+
