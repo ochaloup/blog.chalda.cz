@@ -1,5 +1,5 @@
 = DNS settings for GitHub pages
-chalda <chalda@seznam.cz>
+chalda <ondrej.chaloupka@proton.me>
 1.0, 2017-05-06
 
 :icons: font

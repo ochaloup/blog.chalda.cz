@@ -1,5 +1,5 @@
 = Title of the article
-chalda <chalda@seznam.cz>
+chalda <ondrej.chaloupka@proton.me>
 1.0, 2022-10-01
 
 :page-template: post

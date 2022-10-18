@@ -1,5 +1,5 @@
 = HubPress.io - how to installl
-chalda <chalda@seznam.cz>
+chalda <ondrej.chaloupka@proton.me>
 1.0, 2017-05-07
 
 :icons: font

@@ -61,6 +61,7 @@ export const query = graphql`
           pageAttributes {
             description
             category
+            socialimage
           }
           document {
             title

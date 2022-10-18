@@ -4,3 +4,4 @@
 * is possible to generate TOC?
 * why RSS generation does not work
 * could be used the icons? if not it's necessary to remove things like `icon:smile-o[]` from the adoc sources
+* the social image should be shown in the article listing
