@@ -12,31 +12,22 @@ type Props = {
   edges: Array<Edge>;
 };
 
-// export const Image: React.FC<{icon:string}>  = ({icon}) => {
-//   const Img = require(`${icon}`).ReactComponent;
-//   return <Img />
-// }
 
-type NoticeProps = {
+type FeedImageProps = {
   src: string
 }
 
-export class Notice extends Component<NoticeProps> {
+export class FeedImage extends Component<FeedImageProps> {
   static defaultProps = {
-    src: 'Hello everyone!'
+    src: ''
   }
 
   render() {
-    // TODO: the 'images' folder should be loaded from Asciidoctor configuration
-    // {
-    //   allSitePlugin(filter: {name: {eq: "gatsby-transformer-asciidoc"}, resolve: {}}) {
-    //     nodes {
-    //       pluginOptions
-    //     }
-    //   }
-    // }
-    let s = "/images/" + this.props.src
-    return <img loading="lazy" src={s} />
+    if (this.props.src != undefined && this.props.src && this.props.src.trim()) {
+      return <img loading="lazy" src={this.props.src} className="feedimage" />
+    } else {
+      return
+    }
   }
 }
 
@@ -72,7 +63,7 @@ const Feed: React.FC<Props> = ({ edges }: Props) => (
         </h2>
         <p className={styles.description}>
           {edge.node.pageAttributes.description}
-          <Notice src={edge.node.pageAttributes.socialimage} />
+          <FeedImage src={edge.node.pageAttributes.socialimage} />
 
         </p>
         <Link className={styles.more} to={edge.node.fields.slug}>

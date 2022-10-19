@@ -111,7 +111,12 @@ strong {
   font-weight: 600;
 }
 
-ul {
+p {
+  @include line-height(1);
+  @include margin-bottom(1);
+}
+
+ol, ul {
   list-style: square;
   @include margin-bottom(1);
 
@@ -119,11 +124,12 @@ ul {
     margin-bottom: 10px;
     padding: 0 5px;
   }
-}
 
-p {
-  @include line-height(1);
-  @include margin-bottom(1);
+  // asciidoctor generates <p> tag under li
+  p {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
 }
 
 blockquote {

@@ -8,6 +8,6 @@ chalda <ondrej.chaloupka@proton.me>
 :page-category: Programming
 :page-tags: Rust, Java
 :page-description: About the page.
-:page-socialImage: /articles/notebook.jpg
-// the socialImage is placed under /static/images/articles
+:page-socialImage: /images/articles/notebook.jpg
+// the socialImage is placed under /static/images/articles/...
 

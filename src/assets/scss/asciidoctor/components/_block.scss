@@ -89,6 +89,7 @@ table.tableblock.fit-content > caption.title {
   border: 0;
   background: none; // FIXME this wouldn't be required if a background was set on table.tableblock and not table
   width: 100%;
+  margin-bottom: emCalc(6px);;
   td.icon {
     text-align: center;
     // FIXME use ems!

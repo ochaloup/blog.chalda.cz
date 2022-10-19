@@ -1,0 +1,27 @@
+img.feedimage {
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  height: 140px;
+  margin-top: 5px;
+  object-fit: cover;
+  object-position: 10% 50%;
+  width: 100%;
+}
+
+*:not(pre) > code {
+  border-radius: 0.3em;
+  color: #7f0a0c;
+  font-size: 80%;
+  font-weight: bold;
+  max-width: 100%;
+  padding: 0.1em;
+  white-space: pre-wrap;
+  word-break: break-word;
+  word-wrap: break-word;
+}
+
+a {
+  // color: #2ba6cb;
+  line-height: inherit;
+  text-decoration: none;
+  transition: color .3s;
+}

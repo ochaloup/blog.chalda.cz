@@ -10,7 +10,7 @@ chalda <ondrej.chaloupka@proton.me>
 :page-category: devops
 :page-tags: hubpress.io, blog
 :page-description: How to start using Hubpress.io. The motivation is to use AsciiDoctor syntax for the text and having a generator of the pages.
-:page-socialImage: /articles/notebook.jpg
+:page-socialImage:
 
 
 == Installation of HubPress.io
@@ -57,7 +57,7 @@ The content of the file is just the name of your custom domain - thus what you
 put to the field.
 ====
 
-image::hubpressio/githubpages.jpg[]
+image::articles/githubpages.jpg[]
 
 . change `hubpress/config.json` file to contain (meta)data
 ** username

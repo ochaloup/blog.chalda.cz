@@ -38,9 +38,9 @@
       }
     }
 
-    a {
-      text-decoration: underline;
-    }
+    // a {
+    //   text-decoration: underline;
+    // }
 
     * {
       margin-left: auto;
@@ -78,6 +78,25 @@
         font-size: $typographic-base-font-size * 1.125;
         @include line-height(1.125);
         @include margin-bottom(1.125);
+      }
+
+      // this is a bit hacky way to style Asciidoctor li/ul
+      // I don't know how to correctly override only in scss assets file
+      div {
+        ol li p {
+          margin-bottom: 0px;
+          margin-top: 0px;
+        }
+        ul li p {
+          margin-bottom: 0px;
+          margin-top: 0px;
+        }
+        ol li div {
+          @include margin-top(0.3);
+        }
+        ul li div {
+          @include margin-top(0.3);
+        }
       }
 
       h2 > a {

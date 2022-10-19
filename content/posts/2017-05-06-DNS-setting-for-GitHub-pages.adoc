@@ -11,7 +11,7 @@ chalda <ondrej.chaloupka@proton.me>
 :page-category: DevOps
 :page-tags: github, dns
 :page-description: How to setup DNS to work with GitHub pages.
-:page-socialImage: /articles/notebook.jpg
+:page-socialImage:
 
 
 toc::[]

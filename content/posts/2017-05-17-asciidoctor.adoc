@@ -11,11 +11,11 @@ chalda <ondrej.chaloupka@proton.me>
 :page-category: Programming
 :page-tags: asciidoctor, blog
 :page-description: What is the Asciidoctor markdown language and why I chose to use it.
-:page-socialImage: /articles/asciidoctor.png
+:page-socialImage: /images/articles/asciidoctor.png
 
 == Asciidoctor and AsciiDoc and the others
 
-image::articles/asciidoctor.png[alt]
+image::articles/asciidoctor.png[asciidoctor as an ascii art]
 
 `Asciidoctor` is a text processor and toolchain as stated https://github.com/asciidoctor/asciidoctor[in their github pages].
 Under the term of text processor we can imagine a processor which gets on input a text _annotated_ by in
@@ -25,7 +25,7 @@ http://www.methods.co.nz/asciidoc[AsciiDoc] markup language.
 There are multiple other markup languages which serves for writing text and providing their toolchain
 to provide text in well consumable/readable form.
 The text processor based on XML is http://docbook.org[DocBook],
-the well known for type setting is [http://www.latex-project.org[LaTeX].
+the well known for type setting is http://www.latex-project.org[LaTeX].
 The html itself is a markup language where you put tags around your text and browser works
 as the processor to show the text formatted.
 
