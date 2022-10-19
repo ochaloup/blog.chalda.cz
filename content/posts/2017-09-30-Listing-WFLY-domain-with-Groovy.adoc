@@ -5,7 +5,7 @@ chalda <ondrej.chaloupka@proton.me>
 :page-template: post
 :page-draft: false
 :page-slug: listing-wfly-domain-with-groovy
-:page-category: Programming
+:page-category: programming
 :page-tags: Java, XML, Groovy, WildFly
 :page-description: How to use Groovy to work WildFly CLI API.
 :page-socialImage: /images/articles/wildfly_groovy.png

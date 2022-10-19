@@ -8,8 +8,8 @@ chalda <ondrej.chaloupka@proton.me>
 :page-template: post
 :page-draft: false
 :page-slug: dns-settings-of-github-pages
-:page-category: DevOps
-:page-tags: github, dns
+:page-category: devops
+:page-tags: GitHub, DNS
 :page-description: How to setup DNS to work with GitHub pages.
 :page-socialImage:
 

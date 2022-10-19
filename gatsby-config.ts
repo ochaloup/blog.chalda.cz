@@ -52,7 +52,6 @@ export default {
               };
             }) =>
             allAsciidoc.edges.map(({ node }) => ({
-                ...node.pageAttributes,
                 date: node?.revision?.date,
                 description: node?.pageAttributes?.description,
                 url: site.siteMetadata.url + node?.fields?.slug,

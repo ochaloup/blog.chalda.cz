@@ -1,0 +1,127 @@
+= Set up HAProxy to balance by HTTP header balancing
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2017-11-16
+
+:page-template: post
+:page-draft: false
+:page-slug: set-up-ha-proxy-to-balance-by-http-header-balancing
+:page-category: devops
+:page-tags: Configuration, HTTP
+:page-description: Notes on settting up the HA Proxy.
+:page-socialImage: /images/articles/haproxy_logo.png
+
+
+image::articles/haproxy_logo.png[]
+
+I started to experiment with https://www.haproxy.org/[HAProxy] where these are few notes on how to start with.
+
+I wanted to have HAProxy as a standalone program and not installed into my Linux machine with package system. Thus
+
+* download HAProxy from https://www.haproxy.org, I used downloading _bz2_ archive from column _Latest version_.
+* `tar xfz haproxy-*.tar.gz`
+* `cd haproxy-*/`
+* `make TARGET=generic`
+
+At this time the HAProxy is built and could be run. For the start it's `./haproxy -- config-file.cfg`. (start with ones situated at folder `tests`).
+
+For experimenting I downloaded WildFly 11 (http://wildfly.org/downloads), started in two instances and deployed a simple servlet showing simple message of what instance handled the request.
+
+```bash
+curl http://download.jboss.org/wildfly/11.0.0.Final/wildfly-11.0.0.Final.zip -o wfly.zip
+unzip wfly.zip && mv wildfly-11.0.0.Final w1
+unzip wfly.zip && mv wildfly-11.0.0.Final w2
+
+# running in two different consoles
+cd w1 && ./bin/standalone.sh -Did=w1
+cd w2 && ./bin/standalone.sh -Did=w2 -Djboss.socket.binding.port-offset=100
+
+# in the third console
+git clone https://github.com/ochaloup/servlet-test.git
+cd servlet-test && mvn package
+cp target/servlet-test.war ${HOME}/w1/standalone/deployments/
+cp target/servlet-test.war ${HOME}/w2/standalone/deployments/
+```
+
+Now we have two instances of WildFly application servers running at `http://localhost:8080` and `http://localhost:8180`. You can check if the servlet deployed sucessfully
+
+```bash
+curl -i -X GET http://localhost:8080/servlet-test/host
+```
+
+You should get response containing header and text
+
+```
+X-processed-by: w1
+...
+url: http://localhost:8080/servlet-test/host at localhost:8080, 10.0.0.7, <hostname>
+```
+
+Let's run the haproxy and check roundrobin loadbalancing. Go to the HAProxy installation directory and open `tests/test-connection.cfg`. Add to the `server` directive one more with port `8181`. You will have something similar to.
+
+```
+listen httpclose
+	option	httpclose
+	bind	:8001
+	server	srv 127.0.0.1:8080
+	server	srv2 127.0.0.1:8180
+	reqadd	X-request:\ mode=httpclose
+	rspadd	X-response:\ mode=httpclose
+```
+
+Let's start the HAProxy and check with `curl`
+
+```
+./haproxy -- tests/test-connection.cfg
+```
+
+and check with `curl`. Run several times and check how the header `X-processed-by` is changing plus you can see WildFly console log in the particular console window.
+
+```
+curl -i -X GET  http://localhost:8001/servlet-test/host
+```
+
+Now let's balance by url parameter. You need to redefine file `tests/test-url-hash.cfg` to contain the localhost and both ports where WildFly is running. Then you can run `curl` and alter the foo parameter and see what is the WildFly instance handling the requests.
+
+```bash
+./haproxy -- tests/test-url-hash.cfg
+
+curl -i -X GET localhost:8000/servlet-test/host?foo=one
+curl -i -X GET localhost:8000/servlet-test/host?foo=thousands
+```
+
+The algorithm for hashing the `foo` value could be changed to spread the load as expected
+http://cbonte.github.io/haproxy-dconv/1.8/snapshot/configuration.html#4.2-balance
+http://cbonte.github.io/haproxy-dconv/configuration-1.5.html#4.2-balance[.]
+
+As the last resort let's balance by HTTP header. Create a new cfg file (I just copied it from the `test-url-hash.cfg`, it's not tuned in any way)
+
+```
+global
+	maxconn 100
+	log		127.0.0.1 local0
+
+listen  vip1
+	log		global
+	option		httplog
+    bind		:8000
+    mode		http
+    maxconn		100
+    timeout	client  5000
+	timeout	connect 5000
+	timeout	server  5000
+	balance		hdr(long-running-action)
+	server		srv1 127.0.0.1:8080
+	server		srv2 127.0.0.1:8180
+
+	# control activity this way
+	stats		uri /stat
+```
+
+And now run the `curl` and check what instance serves the requests.
+
+```bash
+./haproxy -- tests/test-httpheader-hash.cfg
+
+curl -i -X GET -H 'long-running-action: 1' localhost:8000/servlet-test/host
+curl -i -X GET -H 'long-running-action: 2' localhost:8000/servlet-test/host
+```

@@ -5,7 +5,7 @@ chalda <ondrej.chaloupka@proton.me>
 :page-template: post
 :page-draft: false
 :page-slug: groovy-and-xml
-:page-category: Programming
+:page-category: programming
 :page-tags: Groovy, XML
 :page-description: How to use Groovy to manipulate with XML documents.
 :page-socialImage: /images/articles/groovy_straw.png

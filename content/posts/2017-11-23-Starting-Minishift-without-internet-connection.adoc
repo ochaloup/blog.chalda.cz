@@ -1,0 +1,80 @@
+= Starting Minishift without internet connection
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2017-11-23
+
+:icons: font
+:toc: macro
+
+:page-template: post
+:page-draft: false
+:page-slug: starting-minishift-without-internet-connection
+:page-category: devops
+:page-tags: Kubernetes, OpenShift
+:page-description: Working around the limitation of Minishift to start only when online.
+:page-socialImage: /images/articles/open_shift.png
+
+
+image::articles/open_shift.png[]
+
+The https://github.com/minishift/minishift[Minishift] is an tool which provides an easy way to run https://www.openshift.org[OpenShift] locally on developer's machine. Minishift uses an hypervisor to start a virtual machine where the whole OpenShift environment is set up. Thus you can start, stop and delete the whole environment in seconds.
+
+For the easy resolution of Minishift addresses there is used DNS http://nip.io (http://xip.io times before) which translate the DNS query to address mentioned befor the `nip.io` suffix.
+
+```bash
+host 127.0.0.7.nip.io
+127.0.0.7.nip.io has address 127.0.0.7
+```
+
+If you create an OpenShift route in Minishift it uses the `nip.io` for translation.
+
+```bash
+oc get routes
+```
+
+gets the output similar to this
+
+|===
+5+| ...
+
+| NAME
+| HOST/PORT
+| SERVICES
+| PORT
+| WILDCARD
+
+| hola
+| hola-helloworld-msa-lra.app.192.168.99.100.nip.io
+| hola
+| 8080-tcp
+| None
+
+5+| ...
+|===
+
+This causes a trouble if you run the Minishift when you are not online. There is a chance to start your local DNS server and let make the translation on your machine. I was trying the https://github.com/basecamp/xip-pdns but probably as I'm not a good Linux administrator it does not succeed.
+
+Then I found about existence http://www.thekelleys.org.uk/dnsmasq/doc.html[dnsmasq service] which works for me. On my Fedora 26
+
+```bash
+# install the service
+dnf install dnsmasq
+
+# -- Adding configuration for the translation to the end of the config file
+vim /etc/dnsmasq.conf
+#
+# Reverse DNS record for master
+host-record=master.192.168.99.100.nip.io,192.168.1.100
+# Wildcard DNS for OpenShift Applications - Points to Router
+address=/192.168.99.100.nip.io/192.168.99.100
+
+# Start the service
+systemctl start dnsmasq
+```
+
+From now the dnsmasq should be returning the DNS requests on `192.168.99.100.nip.io` to `192.168.99.100` which is the address where Minishift was started on (see the `oc get routes` commands, output in the table above)
+
+== More to investigate
+
+* If network is first up and then put down the DNS resolution inside of the Minishift seems retries to connect to outside network and it takes time until `dnsmasq` is used. An one request could take 10 seconds.
+* https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md[Usage of] `--public-hostname` and `--routing-suffix` could help in configuration but somehow does not work for me.
+

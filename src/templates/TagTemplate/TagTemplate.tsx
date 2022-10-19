@@ -21,11 +21,17 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
   const { title: siteTitle, subtitle: siteSubtitle } = useSiteMetadata();
 
   const { group, pagination } = pageContext;
+  // TODO: here we should manually handle limit and offset on the filteredEdges
+  // then the hasPrevPage and hasNextPage could be handled as well better
   const { currentPage, prevPagePath, nextPagePath, hasPrevPage, hasNextPage } =
     pagination;
 
   const { edges } = data.allAsciidoc;
-  edges.filter(e => e.node.pageAttributes.tags?.includes(group || ""));
+  console.log(`>>> ${group}`)
+  const filteredEdges = edges.filter(e => {
+    console.log(`${e.node.pageAttributes.tags}`)
+    return e.node.pageAttributes.tags?.includes(group || "")
+  });
   const pageTitle =
     currentPage > 0
       ? `${group} - Page ${currentPage} - ${siteTitle}`
@@ -35,20 +41,20 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
     <Layout title={pageTitle} description={siteSubtitle}>
       <Sidebar />
       <Page title={group}>
-        <Feed edges={edges} />
-        <Pagination
+        <Feed edges={filteredEdges} />
+        {/* <Pagination
           prevPagePath={prevPagePath}
           nextPagePath={nextPagePath}
           hasPrevPage={hasPrevPage}
           hasNextPage={hasNextPage}
-        />
+        /> */}
       </Page>
     </Layout>
   );
 };
 
 export const query = graphql`
-  query TagTemplate($limit: Int!, $offset: Int!) {
+  query TagTemplate {
     site {
       siteMetadata {
         title
@@ -56,8 +62,6 @@ export const query = graphql`
       }
     }
     allAsciidoc(
-      limit: $limit
-      skip: $offset
       filter: {
         pageAttributes: {
           template: { eq: "post" }
@@ -81,6 +85,7 @@ export const query = graphql`
           pageAttributes {
             category
             description
+            tags
           }
         }
       }

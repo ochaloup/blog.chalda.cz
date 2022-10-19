@@ -7,7 +7,7 @@ chalda <ondrej.chaloupka@proton.me>
 :page-template: post
 :page-draft: false
 :page-slug: augeas-and-xml
-:page-category: Programming
+:page-category: programming
 :page-tags: XML, Configuration, Augeas
 :page-description: How to use Augeas tool, managing the configuration files, to work with XML.
 :page-socialImage: /images/articles/twelve_labours.jpg

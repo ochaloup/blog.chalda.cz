@@ -8,8 +8,8 @@ chalda <ondrej.chaloupka@proton.me>
 :page-template: post
 :page-draft: false
 :page-slug: asciidoctor
-:page-category: Programming
-:page-tags: asciidoctor, blog
+:page-category: programming
+:page-tags: Asciidoctor, Blog
 :page-description: What is the Asciidoctor markdown language and why I chose to use it.
 :page-socialImage: /images/articles/asciidoctor.png
 

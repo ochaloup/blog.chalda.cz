@@ -8,7 +8,7 @@ chalda <ondrej.chaloupka@proton.me>
 :page-draft: false
 :page-slug: hubpress-io-how-to-install
 :page-category: devops
-:page-tags: hubpress.io, blog
+:page-tags: HubPress, Blog
 :page-description: How to start using Hubpress.io. The motivation is to use AsciiDoctor syntax for the text and having a generator of the pages.
 :page-socialImage:
 
