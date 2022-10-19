@@ -1,0 +1,510 @@
+= Querying OpenShift API
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2018-02-28
+
+:icons: font
+:toc: macro
+
+:page-template: post
+:page-draft: false
+:page-slug: querying-open-shift-api
+:page-category: Programming
+:page-tags: OpenShift
+:page-description: How to call to OpenShift API.
+:page-socialImage:
+
+== OpenShift API
+
+OpenShift offers https://docs.openshift.com/container-platform/latest/rest_api/[REST API]
+to obtain information about mostly all aspects
+of the OpenShift instance. As the OpenShift is "an extension" on top of the Kubernetes
+there are two stable REST APIs base urls. First is of the
+https://docs.openshift.com/container-platform/latest/rest_api/kubernetes_v1.html[Kubernetes]
+and second of the https://docs.openshift.com/container-platform/latest/rest_api/openshift_v1.html[OpenShift].
+These two differs in the _a base_ URL where for Kubernetes you use `/api/v1`
+while for OpenShift it's `/oapi/v1`.
+
+The https://docs.openshift.com/container-platform/latest/rest_api/[documenation] provides
+nice description of the concept and then there are three detailed blog posts on the topic
+(https://blog.openshift.com/kubernetes-deep-dive-api-server-part-1/[part #1],
+ https://blog.openshift.com/kubernetes-deep-dive-api-server-part-2/[part #2],
+ https://blog.openshift.com/kubernetes-deep-dive-api-server-part-3a/[part #3]).
+
+The blogpost about use the API on OpenShift blog could be seen at
+https://blog.openshift.com/kubernetes-application-operator-basics
+
+toc::[]
+
+== Querying API
+
+The query needs to point to some resource to be viewed or updated, while each resource
+is defined to be protected by https://docs.openshift.com/container-platform/3.7/admin_guide/manage_rbac.html[OpenShift RBAC].
+We need to provide authenticate data which is part of the HTTP header `Authorization: Bearer <token>`.
+When running with `curl` the request is as
+
+```bash
+curl -k \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Accept: application/json' \
+  https://${ENDPOINT}/api/v1/namespaces/${NAMESPACE}/pod
+```
+
+It's query for getting of all pods from project (declared as _NAMESPACE_)
+while using Kubernetes API (_/api_). We declares using non-HTTPS connection with
+`-k` command switch. If `-k` not used we need to declare certificate for connection
+with switch `--cacert`. We also declare we want to get response in json format (_application/json_).
+The supported variants are currently _application/json_, _application/yaml_, _application/vnd.kubernetes.protobuf_.
+
+The documentation on each API operation is quite detailed and for example in our
+example when talking about listing the pod you can check what's written at
+https://docs.openshift.org/latest/rest_api/api/v1.Pod.html
+
+NOTE: If `TOKEN` is not provided then the request is assigned to account `system:anonymous`
+
+== Query from out of the cluster
+
+Let's call REST API from outside of Minishift.
+
+```bash
+# getting where to connect with security token
+ENDPOINT=$(minishift ip):8443
+TOKEN=$(oc whoami -t)
+NAMESPACE=$(oc project -q)
+
+# kubernetes /api to get list of pods
+curl -k \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Accept: application/json' \
+  https://${ENDPOINT}/api/v1/namespaces/$NAMESPACE/pods
+
+# openshift /oapi to get current user
+# aplication/json is default format to be received
+curl -k \
+  -H "Authorization: Bearer $TOKEN" \
+  "https://${ENDPOINT}/oapi/v1/users/~"
+```
+
+== Query from inside of the cluster in a service
+
+What if we want to call the REST API from one of our services (from a code inside of a pod).
+Then the OpenShift environment baked the `TOKEN` value for us into the running container
+(the token is https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account[auto-mounted]).
+There is https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account[even the certificate]
+useful for the HTTPS connection. The endpoint we talk to is
+`kubernetes.default.svc` or `openshift.default.svc`.
+
+To test it, let's take a pod and ssh to it.
+
+```bash
+oc get pods -o name
+> pods/eap71-openshift-1-3vhh0
+> pods/eap71-openshift-1-d2sg6
+
+oc rsh eap71-openshift-1-d2sg6
+```
+
+We are now logged inside of the pod and we can run the `curl` REST API call.
+
+```bash
+# getting token from the filesystem in the docker container
+ENDPOINT=openshift.default.svc
+TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+NAMESPACE="$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)"
+CERT='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+
+# using TLS connection with crt file defined
+curl --cacert $CERT \
+    -H "Authorization: Bearer $TOKEN" \
+    https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/pods
+```
+
+== Permisions to the OpenShift objects
+
+If you have tried this you can get `Forbidden` error like
+
+```json
+{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Failure",
+  "message": "User \"system:serviceaccount:myproject:default\" cannot list pods in project \"myproject\"",
+  "reason": "Forbidden",
+  "details": {
+    "kind": "pods"
+  },
+  "code": 403
+}
+```
+
+This is because the pod uses service account `system:serviceaccount:<namespace>:default`
+(in our case it's `system:serviceaccount:myproject:default`,
+more specifically it's the `serviceaccount` named `default` in namespace `myproject`)
+and this account does not have permissions to list the pods under the `myproject` namespace.
+
+You can check what the https://docs.openshift.com/container-platform/3.7/admin_guide/manage_rbac.html[RBAC documentation]
+tells about it.
+
+```bash
+# you will probably need to have admin privileges to do the following steps
+oc login -u system:admin
+# checking what are resources the system:serviceaccount:<namespace>:default has permission to list
+oc policy can-i --list --user system:serviceaccount:myproject:default
+# checking if we can list pods in particular
+oc policy can-i list pods --user system:serviceaccount:myproject:default
+# checking who has permission to list the pods
+oc policy who-can list pods
+
+# adding role 'view' to the system account (-z) named 'default'
+# see https://docs.openshift.com/container-platform/latest/architecture/additional_concepts/authorization.html#roles
+oc policy add-role-to-user view -z default
+# -- or in similar fashion
+oc policy add-role-to-user view system:serviceaccount:myproject:default
+
+# if you want to check what are all permissions in the cluster (handy to check available resources too)
+oc describe clusterrolebinding
+# to get information about service accounts (abbreviated to 'sa')
+oc describe sa
+
+# when permssions added this return 'yes'
+oc policy can-i list pods --user system:serviceaccount:myproject:default
+```
+
+NOTE: for more granular permission settings (e.g. you don't want to use the role _view_
+which permits to get/list all resources under the namespace, not only pods) check
+https://docs.openshift.com/container-platform/latest/admin_guide/manage_rbac.html#creating-local-role
+
+NOTE: you can query for the service account token using `oc describe secret default`
+or for getting only the token as string use `oc serviceaccounts get-token default`
+(see https://docs.openshift.com/container-platform/latest/dev_guide/service_accounts.html#using-a-service-accounts-credentials-externally)
+
+=== Role definition in the OpenShift template
+
+What if you want to define permissions to list pods directly in templates that defines `DeploymentConfig`
+or you just use the template to declare roles? Yes, that's possible quite easily. Let's check
+examples of such template.
+
+First let's deploy a pod that we can test the permissions later on. We can use PostgreSQL database
+and run command (https://access.redhat.com/documentation/en-us/openshift_enterprise/3.2/html/using_images/database-images#configuration-and-usage-2):
+
+```bash
+oc new-app \
+    -e POSTGRESQL_USER=test \
+    -e POSTGRESQL_PASSWORD=test \
+    -e POSTGRESQL_DATABASE=test \
+    registry.access.redhat.com/rhscl/postgresql-94-rhel7
+```
+
+and you can check what OpenShift objects were created after this command was executed `oc get all | grep 'postgresql\|NAME'`.
+We can delete all the OpenShift objects filtered by name _'postgresql'_ like this: `oc delete $(oc get all | grep postgresql | awk '{print $1}')`.
+Now take the following json template and import it to the OpenShift: `oc create -f <path-to-file>`.
+The next step is deploy the template with `oc new-app --template=role-testing`.
+
+```json
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Namespace",
+            "description": "Namespace the service account default will be permitted to list pods",
+            "name": "NAMESPACE",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Role",
+            "metadata": {
+                "name": "pods-listing"
+            },
+            "rules": [
+                {
+                    "apiGroups": null,
+                    "attributeRestrictions": null,
+                    "resources": ["pods"],
+                    "verbs": ["list"]
+                }
+            ]
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "default",
+                "annotations": {
+                    "description": "Default service account"
+                }
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "default",
+                    "namespace": "${NAMESPACE}"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "pods-listing",
+                "namespace": "${NAMESPACE}"
+            }
+        }
+    ]
+}
+```
+
+The same template configuration in yaml format
+
+```yaml
+kind: Template
+metadata:
+  name: role-testing
+apiVersion: v1
+parameters:
+- description: Namespace
+  displayName: namespace
+  name: NAMESPACE
+  value: myproject
+  required: true
+objects:
+- apiVersion: v1
+  kind: Role
+  metadata:
+    name: pods-listing
+  rules:
+  - apiGroups: null
+    attributeRestrictions: null
+    resources: ["pods"]
+    verbs: ["list"]
+- apiVersion: v1
+  kind: RoleBinding
+  metadata:
+    name: default
+    annotations:
+      description: "Default service account"
+  subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: ${NAMESPACE}
+  roleRef:
+    kind: Role
+    name: pods-listing
+    namespace: ${NAMESPACE}
+```
+
+[NOTE]
+====
+You can created the role by copy&paste command like this
+
+```bash
+cat <<EOF | oc create -f -
+apiVersion: v1
+kind: Role
+metadata:
+  name: pods-listing
+rules:
+- apiGroups: null
+  attributeRestrictions: null
+  resources:
+  - pods
+  verbs:
+  - list
+EOF
+```
+```bash
+cat <<EOF | oc create -f -
+apiVersion: v1
+kind: RoleBinding
+metadata:
+  name: pods-listing-binding
+  annotations:
+    description: "Default service account"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: ochaloup
+roleRef:
+  kind: Role
+  name: pods-listing
+  namespace: ochaloup
+EOF
+```
+====
+
+This template adds specific role with permission to `list` `pods` for service account `default`.
+You can check the running pod with `oc get pod` and `oc rsh <pod_name>` to one of the running.
+You should be able to list pods as `default` system account was enriched with role `pod-listing`.
+
+=== Role definition with a service account in the OpenShift template
+
+Redefinition of permission of the service account `default` is really not a best practice. All the pods started
+under the namespace are assinged (if not said differently) to the `default` service account.
+That way you provide more rights than it's necessary. It's better to define new
+service account which then will be linked to the container defined in section `DeploymentConfig` of the template.
+
+Here we define PostgreSQL container linking service account `listing-pod` with parameter `serviceAccountName`.
+You need to do the same for importing and deploying the template `oc create -f <file.json>; oc new-app --template=service-account-role-testing`.
+
+```json
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "service-account-role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Namespace",
+            "description": "Namespace the service account default will be permitted to list pods",
+            "name": "NAMESPACE",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Role",
+            "metadata": {
+                "name": "listing-pod-role"
+            },
+            "rules": [
+                {
+                    "apiGroups": null,
+                    "attributeRestrictions": null,
+                    "resources": ["pods"],
+                    "verbs": ["list"]
+                }
+            ]
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "ServiceAccount",
+            "metadata": {
+                "name": "listing-pod"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "listing-pod"
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "listing-pod",
+                    "namespace": "${NAMESPACE}"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "listing-pod-role",
+                "namespace": "${NAMESPACE}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "DeploymentConfig",
+            "metadata": {
+                "name": "postgresql-94-rhel7"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "postgresql-94-rhel7"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "postgresql-94-rhel7",
+                        "labels": {
+                            "app": "postgresql-94-rhel7",
+                            "deploymentconfig": "postgresql-94-rhel7"
+                        }
+                    },
+                    "spec": {
+                        "serviceAccountName": "listing-pod",
+                        "containers": [
+                            {
+                                "name": "postgresql-94-rhel7",
+                                "env": [
+                                    {
+                                        "name": "POSTGRESQL_DATABASE",
+                                        "value": "test"
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_PASSWORD",
+                                        "value": "test"
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_USER",
+                                        "value": "test"
+                                    }
+                                ],
+                                "ports": [
+                                    {
+                                        "containerPort": 5432,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "test": false,
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "postgresql-94-rhel7"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "postgresql:9.4",
+                                "namespace": "openshift"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
+```
+
+== Using fabric8 java client
+
+Fabric8 https://github.com/fabric8io/kubernetes-client[provides java client] to work
+with the Kubernetes/OpenShift API. At the starts it's enough to add the Maven dependency
+
+```xml
+<dependency>
+  <groupId>io.fabric8</groupId>
+  <artifactId>openshift-client</artifactId>
+  <version>3.0.3</version>
+</dependency>
+```
+
+and you can start to use the provided java api in your project. The nice thing is that the client
+is quite auto-magic - you don't do any further configuration and you use default constructor without parameters.
+For example if called from inside of the pod it will find the service account token on its own
+and use it for processing the API call.
+
+```java
+try (OpenShiftClient client = new DefaultOpenShiftClient()) {
+    System.out.println("Client opened is: " + client);
+    client.pods().list().getItems().stream().forEach(
+      p -> System.out.println("pod: " + p));
+}
+```
+

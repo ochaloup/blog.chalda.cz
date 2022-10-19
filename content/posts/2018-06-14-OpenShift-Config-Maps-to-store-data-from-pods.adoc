@@ -1,0 +1,266 @@
+= OpenShift ConfigMaps to store application data from the pod
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2018-06-14
+
+:icons: font
+:toc: macro
+
+:page-template: post
+:page-draft: false
+:page-slug: openshift-config-maps-to-store-data-from-pod
+:page-category: devops
+:page-tags: OpenShift
+:page-description: How to store data in config maps.
+:page-socialImage: /images/articles/config_maps.png
+
+
+image::articles/config_maps.png[]
+
+If you search for information about `ConfigMap` in https://www.openshift.com[OpenShift] or https://kubernetes.io[Kubernetes]
+then you find it's a mechanism to abstract your application from configuration.
+`ConfigMap` is then way to define configuration values (usually in form of a `yaml` file)
+while the configuration is then injected to the running application which can utilize
+the information as it likes.
+
+There is not many information that the `ConfigMap` primitives can be used
+from inside of the pod (and from the application itself) to persist data
+which is then available via OpenShift API calls.
+
+_see more details about OpenShift API calls at article http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html_
+
+[NOTE]
+====
+As the first step is good to scan the documentation pages from
+https://docs.openshift.com/enterprise/3.2/dev_guide/configmaps.html[OpenShift]
+or https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap[Kubernetes]
+to get overview of the usage.
+====
+
+== ConfigMap creation
+
+To create a simple ConfigMap object let's use the `oc` command while naming the
+it `special-config` and filling it with two keys (`special.how`, `special.type`)
+and matched values.
+
+```bash
+$ oc create configmap special-config --from-literal=special.how=very --from-literal=special.type=charm
+```
+
+We can use the `oc create` to get the `ConfigMap` being created from json data format.
+
+```bash
+cat <<EOF | oc create -f -
+{
+  "kind": "ConfigMap",
+  "apiVersion": "v1",
+  "metadata": {
+      "name": "special-config"
+   }
+}
+EOF
+```
+
+When using the `oc` command we can utilize argument `describe` to find
+the content of just created ConfigMap `special-config`.
+
+```bash
+$ oc describe cm special-config
+
+Name:         special-config
+Namespace:    myproject
+Labels:       <none>
+Annotations:  <none>
+
+Data
+====
+special.how:
+----
+very
+special.type:
+----
+charm
+Events:  <none
+```
+
+To get the same information by querying OpenShift API we will call
+
+```bash
+ENDPOINT=$(minishift ip):8443
+TOKEN=$(oc whoami -t)
+NAMESPACE=$(oc project -q)
+CONFIG_MAP_NAME=special-config
+
+curl -k -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME
+```
+
+The output will be similar to this
+
+[source,json]
+----
+{
+  "kind": "ConfigMap",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "special-config",
+    "namespace": "myproject",
+    "selfLink": "/api/v1/namespaces/myproject/configmaps/special-config",
+    ...
+  },
+  "data": {
+    "special.how": "very",
+    "special.type": "charm"
+  }
+}
+----
+
+== Making changes in the ConfigMap
+
+As said we can not only query `ConfigMap` data but we can write them too.
+Here we use the `PUT` operation wile we re-write all data saved in the `special-config`
+`ConfigMap` and replace them with data from `json` we're providing.
+
+```bash
+curl -k -X PUT -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  -H 'Content-Type: application/json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<'EOF'
+{
+"kind": "ConfigMap",
+"apiVersion": "v1",
+"metadata": {
+    "name": "special-config"
+ },
+ "data": {
+    "Samwise": "Gamgee",
+    "Rosie": "Cotton"
+ }
+}
+EOF
+```
+
+This is good but what if we don't want just override the content of the existing
+`ConfigMap` but we would like to add new data or change the value of a single existing key.
+
+Here we got to the point to find out there are strategies that could be used
+while working with the `ConfigMaps`. We can patch the existing `ConfigMaps`
+by, surprisingly, calling with method `PATH` and defining `Content-Type`.
+We can use either merge strategy `application/merge-patch+json` or patch
+strategy `application/json-patch+json`. For the summary of the approaches I like
+article at http://erosb.github.io/post/json-patch-vs-merge-patch.
+
+With `merge-patch` we use `PATCH` with json format (as we used with `PUT` above)
+and the `ConfigMap` will be merged (instead of replaced).
+
+```bash
+curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  -H 'Content-Type: application/merge-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<EOF
+{
+  "kind": "ConfigMap",
+  "apiVersion": "v1",
+  "metadata": {
+      "name": "special-config"
+   },
+   "data": {
+      "Rosie": "Gamgee"
+   }
+}
+EOF
+```
+
+After executing this the patch the data will look like
+
+```json
+"data": {
+  "Rosie": "Gamgee",
+  "Samwise": "Gamgee"
+}
+```
+
+With the `json-patch` is needed to define what is operation to be processed
+over the particular key. Let's make the value removal while changing the other one.
+
+```bash
+curl -k -X PATCH -d @- -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json'\
+  -H 'Content-Type: application/json-patch+json'\
+  https://$ENDPOINT/api/v1/namespaces/$NAMESPACE/configmaps/$CONFIG_MAP_NAME <<EOF
+[
+  {
+    "op": "replace",
+    "path": "/data/Samwise",
+    "value": "Baggins"
+  },
+  {
+    "op": "remove",
+    "path": "/data/Rosie"
+  }
+]
+EOF
+```
+
+== Authorization
+
+For you can update the `ConfigMap` from inside of the pod, the service account
+the pod is running at has to be permitted to do changes in the `ConfigMap`.
+You should create a new service account with such permissions and configure
+your pod to run with that service account. Here is an example of the configuration
+json which defines a new service account and declares it to be of role `edit`
+which provides permissions to make changes (to edit) most of the things in the
+current namespace (project). Of course you can define permissions
+http://blog.chalda.cz/2018/02/28/Querying-Open-Shift-API.html#_permisions_to_the_openshift_objects[in more granular way].
+
+For importing it you can use `oc create -f <path-to-file-with-this-json>` and then
+applying imported template by `oc new-app --template=role-testing`.
+
+```json
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "role-testing"
+    },
+    "parameters": [
+        {
+            "displayName": "Application name",
+            "name": "APPLICATION_NAME",
+            "value": "myproject",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "ServiceAccount",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-sa"
+            }
+        },
+        {
+          "kind": "ConfigMap",
+          "apiVersion": "v1",
+          "metadata": {
+              "name": "special-config"
+           },
+          "data": {}
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "RoleBinding",
+            "metadata": {
+                "name": "${APPLICATION_NAME}-role-binding"
+            },
+            "subjects": [
+                {
+                    "kind": "ServiceAccount",
+                    "name": "${APPLICATION_NAME}-sa"
+                }
+            ],
+            "roleRef": {
+                "kind": "Role",
+                "name": "edit"
+            }
+        }
+    ]
+}
+```
+

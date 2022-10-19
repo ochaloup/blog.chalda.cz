@@ -3,7 +3,7 @@
 
 .feed {
   .item {
-    @include margin-bottom(1.25);
+    @include margin-bottom(1.5);
 
     &:last-child {
       @include margin-bottom(0.5);
@@ -29,7 +29,7 @@
     .description {
       font-size: $typographic-base-font-size;
       @include line-height(1);
-      @include margin-bottom(0.75);
+      @include margin-bottom(0.5);
     }
 
     .meta {

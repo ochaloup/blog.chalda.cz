@@ -1,0 +1,429 @@
+= Docker basics
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2018-02-27
+
+:icons: font
+:toc: macro
+
+:page-template: post
+:page-draft: false
+:page-slug: docker-basics
+:page-category: devops
+:page-tags: Docker
+:page-description: Basic Docker usage.
+:page-socialImage: /images/articles/docker-starter.png
+
+
+
+image::articles/docker-starter.png[]
+
+There are many articles on how to start and use docker. This one is a meant rather as
+my personal (hopefully complementary) notes.
+
+See these nice articles for example:
+
+* http://blog.codepipes.com/containers/docker-for-java-big-picture.html
+* https://zeroturnaround.com/rebellabs/docker-for-java-developers-how-to-sandbox-your-app-in-a-clean-environment
+* https://zeroturnaround.com/rebellabs/docker-commands-and-best-practices-cheat-sheet
+* http://blog.thoward37.me/articles/where-are-docker-images-stored
+* https://vsupalov.com/docker-env-vars
+
+toc::[]
+
+== How to install: Fedora 26
+
+Installing docker on Fedora is straight forward by running `dnf install docker`
+
+NOTE: in some cases I have got troubles with Fedora docker package - for example
+when starting Oracle XE image from https://github.com/wnameless/docker-oracle-xe-11g.
+I haven't solved that by anything else than installing competing `docker-ce`. See how to install at
+https://docs.docker.com/install/linux/docker-ce/fedora/.
+My changes of the Oracle XA image can be seen at https://github.com/ochaloup/dockerfiles-test/tree/master/oraclexe-wnameless
+
+Installed `docker` client does not permit to start containers by ordinary user, only by root.
+For the user `chalda` being able to start the container I need to create a docker group
+
+```bash
+# under account 'chalda'
+whoami
+# printed 'chalda'
+
+# to run nex commands as user 'root'
+su -
+# adding new group to the system
+groupadd docker
+# adding account chalda to docker group
+sudo gpasswd -a chalda docker
+# start/restart docker daemon
+sudo systemctl start docker
+
+# run under 'chalda' and log in with 'chalda' to the just created 'docker' group
+exit
+newgrp docker
+```
+
+== Getting a docker image
+
+Docker container is started from docker image. Image is an immutable snapshot of container.
+When the docker image is started you've got a running docker container.
+For starting the image it has to be available at the local docker cache. Docker cache contains
+pulled docker images and locally built docker images. Usually they're stored under `/var/lib/docker`.
+You can check https://stackoverflow.com/a/25978888/187035[the storage with the command]
+`docker info` or `docker system info` (more specifically `docker info | grep 'Root Dir'`).
+
+NOTE: If you want to check how much space is used by docker on your system you can verify
+with `docker system df`. To https://bobcares.com/blog/how-to-clear-docker-cache-and-save-disk-space/2/[remove all the docker images]
+and saving the drive space you can use command `docker system prune -a`
+(see https://stackoverflow.com/a/45143234/187035[what are dangling images])
+
+To get the docker image you need either to download it from the remote docker repository - causing
+the image being saved in the local cache. Or build the image from `Dockerfile`
+(normally includes downloading of images from the remote repository too, the parent docker images
+are delcared by `FROM` declaration at `Dockerfile`) - causing the result image is stored in the local cache.
+
+NOTE: I'm using here _old_ version of docker cli command prescription. For example I use here `docker pull`,
+`docker build`. In the new better structured way you will say first what resource you work with - ie. here with the `image`
+thus you use `docker image` and then you add the command. For example:
+`docker image build` or `docker image pull`. +
+In fact both ways are only aliases. The functionality of `docker build` and `docker image build` is the same.
+
+=== Pull image from docker registry
+
+For downloading the image from the remote repository serves command `docker pull`.
+Let's say you want to get pulled PostgreSQL then you will do `docker pull docker.io/postgres`
+or just `docker pull postgres`. If the image is not found at the local cache it tries
+to be looked in predefined remote repository which is by default the `docker.io`.
+To check more information about the image residing _in the docker.io remote repository_
+see at https://hub.docker.com/_/postgres/.
+
+For more info on naming docker images and pulling them, see my blog post
+http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html.
+
+TIP: if you want to run some specific docker image you can search configured remote repository
+with command `docker search`. For example to check images named with reference to PostgreSQL
+you can do `docker search postgresql`
+
+=== Build from Dockerfile
+
+`Dockerfile` is a file (a file named _Dockerfile_) which defines
+a recipe of https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612[combining existing docker images]
+with bash shell commands. Build process generates a new docker image from it.
+To check an example of `Dockerfile` you can clone my repository `git clone https://github.com/ochaloup/dockerfiles-test.git`
+and look into folder `cd dockerfiles-test/postgresql` where `Dockerfile` resides.
+
+`docker build` command requires path to a directory which contains `Dockerfile`, it takes it, process the commands in it,
+and creates the docker image. It's important to note all commands in the `Dockerfile` is taken relative
+to the directory where the `Dockerfile` resides. That's important for example in case of the `COPY` command (it takes files
+from the host and copies them to the docker image) as location is considered appropriately.
+Nevertheless it's quite usual to run the command from the folder where
+https://github.com/ochaloup/dockerfiles-test/blob/master/postgresql/Dockerfile[`Dockerfile` file resides], a.k.a `docker build .`
+
+NOTE: as far as I know there is no `docker` command switch which permits you
+to point to a file named differently and working as the `Dockerfile` recipe.
+You just need to go with the name _Dockerfile_.
+
+If you have the `Dockerfile` then you use `docker build <path>` command to get the docker image.
+You can try to run with the example PostgreSQL `Dockerfile` command `docker build .`.
+After it is successfully executed you will end up with message like
+
+```bash
+Successfully built a93a78b4d156
+```
+
+The `a93a78b4d156` is the hash sum (image hash) marking identity of the image. You can use this hash
+as image name to start the container from it. Or you can name the image with human readable name
+http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html[by tagging it]:
+`docker tag a93a78b4d156 mypostgresql`.
+Tagging can be done directly at build step too: `docker build . -t mypostgresql`.
+
+More or less we can say a `Dockerfile` command creates a separate layer.
+Layers are layered one on top of each other (see `docker history`).
+When the layer is once built, it is saved. For the second time the checksum is verified and
+if it matches built of the layer is not invoked but it's taken from the cache.
+If you want to build without using cache data (downloading from scratch, building from scratch)
+you can add parameter `--no-cache` to `docker build` command.
+
+[NOTE]
+====
+If you like to check what is "the low-level content" (what is the metadata) of the image, try running `docker inspect <hash>` command.
+(`docker inspect a93a78b4d156`). It will show you what are environmental variables bound to the image,
+where the image is located on the drive, what are https://medium.com/@jessgreb01/digging-into-docker-layers-c22f948ed612[layers it's compounded from] etc.
+
+The other useful command is `docker history <hash>` (`docker history -H --no-trunc a93a78b4d156`) which shows
+_shell commands_ the Docker files is built from. It's kind of decompilation command from the docker image to the dockerfile.
+The history is shown from the latest at the top and the oldest at the end.
+====
+
+=== Listing images at your system
+
+For getting list of the pulled images you use command `docker images`. Those are images
+available at your machine in the docker local cache.
+
+Here don't be surprised with the column naming. There is http://blog.chalda.cz/2017/12/15/Docker-tags-and-registries.html[a bit confusion in it].
+The column _REPOSITORY_ shows what we called here an _image name_ which is got when you _tag_ an image.
+The column _TAG_ shows _a version_ of the image.
+
+== Running docker container
+
+If we have a docker image placed at the local machine we can run it `docker run <image_name>`
+
+NOTE: command `docker run` can be supplemented not only with the image placed locally
+  but you can use whatever tag. It will be first tried to be pulled from the remote repository
+  before it's run.
+
+If you run an image (let's say `docker run mypostgresql`) it's by default run in foreground
+and it attaches the STDOUT and STDERR to the shell you started it from. You can use multiple
+`docker run` https://docs.docker.com/engine/reference/run/#detached-vs-foreground[switches to change the behaviour]:
+
+As said `docker run` runs by default in foreground and all information going to STDOUT is shown
+
+```bash
+docker run mypostgresql
+...
+... a lot of lines of text ...
+...
+PostgreSQL init process complete; ready for start up.
+
+LOG:  database system was shut down at ...
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+```
+
+To run container in background - aka. detached from the shell use `-d`.
+When run the `docker` command prints out only the hash of the running docker container.
+
+```bash
+docker run -d  mypostgresql
+1f375bfb9a3f31e88b3290da109ea51815097906c4e15b4cbb4a8c5f9e0a720b
+```
+
+When running in foreground you can say what are outputs you want to be attached to
+with your shell. This is specified with switch `-a`. Taking our `mypostgresql`
+image and run only STDERR being bound to the current shell then there is only
+small number of printed lines you can see (only those printed to the STDERR are shown).
+
+```bash
+docker run -a stderr mypostgresql
+
+WARNING: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+LOG:  database system was shut down at ...
+```
+
+There is two important switches for foreground running of the container
+
+* `-t` &ndash; allocation of pseudo-TTY
+* `-i` &ndash; keep STDIN open even if no attached
+
+These switches are usually used together as `-it` and they are both needed
+if run some interactive command - ie. expecting writing commands to the running
+docker container. Such command is for example `/bin/bash`. Thus for being able
+to write shell commands you need to run `docker run -it mypostgresql /bin/bash`.
+If you don't use `-it` you won't be able to write any command to the started `bash` command line
+(or the input will be cryptic).
+
+=== Changing Dockerfile CMD
+
+What happened when we run `docker run -it mypostgresql /bin/bash`?
+
+We overrode `CMD` command and changing it for `/bin/bash`. It means instead of starting
+command `potgresql` we started command `/bin/bash`.
+
+NOTE: there is no attempt to explain format of the Dockerfile in this blogpost,
+see https://docs.docker.com/engine/reference/builder/[documentation]
+for more information instead
+
+Let's make a short sidestep - docker works only with one instance of commands
+`CMD` and `ENTRYPOINT`. If there are more of them then only the last one is used.
+`ENTRYPOINT` defines _a prefix_ for the command to be run (`CMD`). Let's say we have
+following content of the `Dockerfile`.
+
+```bash
+FROM centos
+
+ENTRYPOINT ["cat"]
+ENTRYPOINT ["ls"]
+CMD ["-la"]
+```
+
+If you create this simple `Dockerfile` and you run it the resulting
+is translated to the command `ls -la`.
+
+```bash
+docker build . -t test
+docker run test
+```
+
+Now how is it with that `CMD` replacing at the command line?
+If we run `docker run test -d` then `CMD` of the `Dockerfile` is replaced by `-d`
+defined at the command line.
+
+Let's take a look at the more real `Dockerfile`.
+This is what happened in case of `myposgresql` image. Check the output of `docker history`
+
+```bash
+docker history --no-trunc mypostgresql | grep 'CMD\|ENTRYPOINT'
+
+e0c7250b6ea3   4 days ago   /bin/sh -c (nop)  CMD ["postgres"]
+<missing>      4 days ago   /bin/sh -c (nop)  ENTRYPOINT ["docker-entrypoint.sh"]
+<missing>      6 days ago   /bin/sh -c (nop)  CMD ["bash"]
+```
+
+If we run `docker run -it myposgresql /bin/bash` it's translated to be running `docker-entrypoint.sh /bin/bash`
+(instead of `docker-entrypoint.sh postgres`). If you run with `/bin/bash` (you are staying in bash of the container)
+you can verify the content of the `/docker-entrypoint.sh` file and see what happens there
+and what  existence of the `postgres` parameter (normally provided by `CMD ["postgres"]`) causes.
+Then tt the end of the entrypoint script there is defined `exec "$@"` which causes
+our `/bin/bash` command line cmd parameter  is executed (resulting in running `exec /bin/bash`).
+
+NOTE: you can override `ENTRYPOINT` from command line by using `--entrypoint` switch
+
+
+=== docker run command to expose ports
+
+If you run only the `docker run myposgresql` then database is started in the container
+but it's not possible to contact it from outside. That's where we need to declare
+that port inside of the container should be mapped to the port of the hosting system.
+This is done with parameter `-p hosting_port:container_port`.
+
+Running `docker run -p 5432:5432 myposgresql` then open port `5432` at hosting system
+and map it on the container `5432` port. We can now connect to the database as usual.
+
+=== docker run and exited containers
+
+You can checked the running containers with command `docker ps`.
+When you start the container and then stop it (either with `CTRL^C` or command `docker stop`)
+
+```bash
+docker run myposgresql
+CTRL^C
+```
+
+such container is put to the _exited_ state. Such container is still available in the system (e.g. it still
+occupies the space on the drive) but is stale. You can list all the _exited_ containers
+by running `docker ps -a`.
+
+You can start the _exited_ container  with command `docker start`.
+To get printed output to the shell you can use `-ia` switch (attaching STDOUT/STDERR and STDIN)
+like `docker start -ia $(docker ps -a | tail -n 1 | sed 's/ .*//')`.
+
+NOTE: you can delete all exited containers with one-liner like this
+`docker rm $(docker ps --all -q -f status=exited)`
+
+Up to that you can create a new image from the _exited_ container with `docker commit`.
+This gives you for example chance to start failed container with different
+`CMD` or `ENTRYPOINT` defined.
+
+```
+docker commit <sha-exited-container> <new-image-name>
+# starting the image but using shell as entrypoint thus filesystem structure could be verified
+docker run -it --entrypoint /bin/bash NEWIMAGENAME
+```
+
+==== docker run omitting to save any exited container
+
+If you don't plan to start the exited container afterwards and you don't want
+the exited containers being left at your drive
+after they are stopped then use `docker run --rm` switch. The stopped container will
+be directly deleted (not going to _exited_ state). Try to run the `docker run --rm myposgresql`.
+
+== Inspecting a running docker container
+
+You can attach yourself to a running docker container using `docker exec`.
+
+Let's say you run `docker run -d mypostgresql`, you get printed the sha of the running image
+(e.g. _8550aa320664b46701034b81b1ec0d4cf426cd4540e21ece17894cec52a12afc_, or you can
+check it by `docker ps` and get the shortened version of sha _8550aa320664_).
+
+Now you can run
+
+`docker exec -it <started container sha> bash`::
+  to get bash for the started container, inspecting it, doing changes etc.
+`docker exec -u 0 -it <started container sha> bash`::
+  to get bash with root
+
+If you want to check only standard output of the container you can use
+`docker logs -t <container sha>`. This could be applied for running containers
+but for exited ones too.
+
+== Removing images and containers from the system
+
+There are commands to remove the docker images and containers (when not in use)
+
+`docker rmi <imagename>`::
+  removing a docker image
+`docker rm <container_name>`::
+  removing a docker container
+
+On fedora docker saves images and containers under `/var/lib/docker` directory.
+You can check the amount of the space the docker images occupy with command `du -sh /var/lib/docker/*`.
+If you want to clean your system from the docker images (it can't be restored afterwards)
+
+```bash
+# stopping containers
+docker stop $(docker ps -a -q)
+# delete containers
+docker rm $(docker ps -a -q)
+# delete images
+docker rmi -f $(docker images -q -a)
+```
+
+For removing all the docker data from the system
+you can use `docker system prune -a --volumes` as well.
+
+== Dockerfile composition
+
+I don't want to describe how to write a `Dockerfile` here. I would rather recommend articles
+
+* http://kimh.github.io/blog/en/docker/gotchas-in-writing-dockerfile-en
+* https://til.codes/docker-run-vs-cmd-vs-entrypoint
+
+but I would like to mention few points that I was not able to understand when I started with Docker.
+
+=== Dockerfile does not support multiple inheritance
+
+Docker neither expect nor support multiple inheritance in container composition. If you have a complex
+project structure then it's possible you will need to copy&paste the same parts of configuration
+to multiple `Dockerfile` files. Or you can consider usage some 3rd party tools as for example
+http://concreate.readthedocs.io which is used for building JBoss EAP docker images.
+
+The tool let you split the project to multiple modules and then combines them into
+one structured `Dockerfile`.
+
+=== Dockerfile does not support any post-start hooks by default
+
+Docker does not provide any way to run
+https://stackoverflow.com/questions/42280792/reuse-inherited-images-cmd-or-entrypoint[some hook like `post-start` or similar]
+(this is where https://www.openshift.org[OpenShift] can help you).
+
+As a newcomer I've had a dummy idea - creating my `Dockerfile`,
+inheriting it from some parent (`FROM postgres`), letting the parent to start the database
+service and then including some configuration shell script defined at my child `Dockerfile`.
+
+...and that's not possible
+
+
+* Only one *active* `CMD` and one `ENTRYPOINT` command in the whole `Dockerfile` hierarchy.
+* There could be multiple `RUN` commands but they are executed during `Dockerfile` building,
+  not at the time the docker runs the image.
+* There is often used pattern of `ENTRYPOINT` creating a wrapper around `CMD` which
+  is defined at the parent image. You would define `ENTRYPOINT ["starting-script.sh"]` where end
+  of the `starting-script.sh` would define `exec $@`.
+  https://stackoverflow.com/questions/32255814/what-purpose-does-using-exec-in-docker-entrypoint-scripts-serve[It then executes the CMD]
+  as parameter of the `ENTRYPOINT`. As example having
+```bash
+CMD ["ls -l"]
+ENTRYPOINT ["starting-script.sh"]
+```
+  the Docker will evaluate it to run: `starting-script.sh "ls -l"`.
+
+* The trouble is that many parent `Dockerfile` files use `ENTRYPOINT` and you would then override its functionality,
+  (for example it's the case of the `postgres` image - try `docker history postgres`).
+* Usually each docker image defines own specific way of running the configuration scripts
+  after the service is started.
+  For example for `postgres` docker image executes all shell and sql scripts copied to `/docker-entrypoint-initdb.d/` directory.
+  You can check an example at https://github.com/ochaloup/dockerfiles-test/blob/master/postgresql/Dockerfile.
+  The `postgres` container runs the scripts after database is started,
+  and even it ensures the database is restarted later.

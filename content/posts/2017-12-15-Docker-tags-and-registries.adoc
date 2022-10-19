@@ -1,0 +1,252 @@
+= Docker tags and registries
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2017-12-15
+
+:icons: font
+:toc: macro
+
+:page-template: post
+:page-draft: false
+:page-slug: docker-tags-and-registries
+:page-category: devops
+:page-tags: Docker, OpenShift
+:page-description: Notes on using Docker.
+:page-socialImage: /images/articles/docker-tag.png
+
+
+image::articles/docker-tag.png[]
+
+As a newcomer to the world of http://docker.io[Docker] and I struggle a bit with basic concepts. Here, I would like to summarize my observation about Docker tagging and repositories.
+
+If you build a Dockerfile (`docker build .`) you get a docker image. That's identified with a hash. You can take it and
+start it (`docker run <image_hash>`) as a docker container.
+But using a hash hash as reference to an existing "app"
+is just hard. How can a human remember and differentiate them? That's where you can name (_tag_) the image with command `docker tag <image_hash> <tag_name>`. When you do so
+you can start the container then with `docker run <tag_name>`.
+
+There is an convention about tag name in docker which is:
+
+```
+{REGISTRY}/{PROJECT}/{IMAGE_NAME}:{IMAGE_VERSION}
+```
+
+The format is not compulsory but the docker client understands the convention and it's what the commands `docker pull`/`docker push` work with.
+
+Let's investiage a bit on it. From right to left - we have a _IMAGE_VERSION_ here. It's an arbitrary
+string and is up to you how that looks like. You can tag an image as
+`docker tag <hash> <tag_name>:1.0` and later with new version of your app as `docker tag <hash> <tag_name>:1.1`.
+But nobody checks or guarantees that the tag version `1.1` is somehow newer than the `1.0`.
+There is a convention of version `latest`. That represents a *default version*
+which is used when you don't define a version manually. I like this article
+http://container-solutions.com/docker-latest-confusion[Docker: The latest Confusion]
+which explains that `latest` is not related to _time_ but the meaning is rather _default_.
+
+The _IMAGE_NAME_ is name of your app for you being able to differentiate and refer to it.
+
+The _PROJECT_ and _REGISTRY_ is used to know where this image belongs to or where it comes from.
+If you push or pull an image to the Docker registry you define where it is by this section of the tag definition.
+There is no `docker` command line option _--registry=<REGISTRY>_. The information where to push to is taken from the tag.
+
+== Docker build example
+
+Let's say I have here a `Dockerfile` with env variables definition for Centos PostgreSQL image.
+
+```dockerfile
+FROM centos/postgresql-96-centos7
+
+ENV POSTGRESQL_DATABASE crashrec
+ENV POSTGRESQL_USER crashrec
+ENV POSTGRESQL_PASSWORD crashrec
+ENV POSTGRESQL_MAX_PREPARED_TRANSACTIONS 50
+```
+
+Running of `docker build .`, at the directory where the `Dockerfile` resides, provides output
+
+```
+Sending build context to Docker daemon 11.78 kB
+Step 1/15 : FROM centos/postgresql-96-centos7
+ ---> 75740e572487
+Step 2/15 : ENV POSTGRESQL_DATABASE crashrec
+ ---> Using cache
+ ---> 3caf03ae8e7d
+    ...
+ ---> Using cache
+ ---> 4188383000de
+
+ Successfully built 4188383000de
+```
+
+I can take the image hash `4188383000de` and tag it with name. `docker tag 4188383000de postgresql-9.6-centos`.
+By running `docker images` I can verify the assignment of the hash to the tag.
+
+```
+docker images
+REPOSITORY               TAG       IMAGE ID        CREATED          SIZE
+postgresql-9.6-centos    latest    4188383000de    9 minutes ago    337 MB
+...
+```
+
+* The  listing uses terms _REPOSITORY_ and _TAG_ in way of I used here _name_ and _version_.
+* I haven't defined any version but the image name was assigned with the _default_ `latest`.
+* As there is not defined a registry (only name a.k.a  `${PROJECT}/${IMAGE_NAME}`) the image is search in the predefined registres (see _ADD_REGISTRY_ below). If found then it's downloaded. But you can download the image manually with `docker pull` and then as such named image already resides in the local cache it will be taken from there.
+
+== Pushing image
+
+The next step could be to mark the image with repository name and thus being able to push it there.
+My account at http://dockerhub.com/[Docker hub] is https://hub.docker.com/r/ochaloup/. Thus my
+regitry name to be used for being able to push there is `ochaloup`.
+
+The tag then defines registry `docker.io` for `docker push` can publish the image there.
+
+The whole name is then `docker.io/ochaloup/postgresql-9.6-centos`.
+
+```bash
+docker tag postgresql-9.6-centos docker.io/ochaloup/postgresql-9.6-centos
+docker push docker.io/ochaloup/postgresql-9.6-centos
+```
+
+NOTE: maybe login to the docker.io will be needed first: `docker login docker.io -u ochaloup`
+
+== Pulling image
+
+If we want to run some image we can just run it
+
+```
+docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec centos/postgresql-96-centos7`
+```
+
+We can say what is the repository we want the image from explicitly
+
+```
+docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7
+```
+
+Using the `docker.io` is not necessary because docker searches through all predefined registries if there is such
+image. And the Docker hub is the default one where to search for the image.
+
+You can see that I haven't used any `version` parameter thus the _default_ latest version was used.
+
+Of course we could want https://hub.docker.com/r/centos/postgresql-94-centos7/tags/[some specific version] to be run
+
+```
+docker run --env POSTGRESQL_DATABASE=crashrec --env POSTGRESQL_USER=crashrec\
+--env POSTGRESQL_PASSWORD=crashrec  docker.io/centos/postgresql-96-centos7:9.6
+```
+
+If we don't want to directly run the image but you want it to be downloaded to the local machine (to the https://thenewstack.io/understanding-the-docker-cache-for-faster-builds/[docker cache]),
+you can use `docker pull` command. The following output says the image was already downloaded
+as the `docker run` command was already run and it downloads first and then run the image.
+
+```
+docker pull centos/postgresql-96-centos7
+
+Using default tag: latest
+Trying to pull repository brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/centos/postgresql-96-centos7 ...
+Pulling repository brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888/centos/postgresql-96-centos7
+Trying to pull repository docker.io/centos/postgresql-96-centos7 ...
+sha256:88c5f8ffb934cc63f7eb819e3328c0380887c206fa6280c553a0a6385fa59e63: Pulling from docker.io/centos/postgresql-96-centos7
+...
+Status: Image is up to date for docker.io/centos/postgresql-96-centos7:latest
+```
+
+I can name it as e.g. `pgsl` like `docker tag docker.io/centos/postgresql-96-centos7 pgsl` and
+run it `docker run pgsl ...` and I'm still starting the same image.
+
+== Docker insecure registries
+
+The list of repositories which are check for existence of the image (if not defined explicitly)
+are hardcoded in docker config and can't be changed by a parameters.
+
+If you want to pull image with the respository defined explicitly the repository needs to be running over `https`. If communication goes over `http` then `docker pull` fails.
+
+In such case you need to add permition for docker to allow it to pull from that particular insecure registry.
+
+=== Insecure registries set up
+
+==== Configuration with RPM package docker
+
+On my Fedora 26 when using rpm package `docker` I need to edit file `/etc/sysconfig/docker` and add such registry to
+the list of `OPTIONS`. For example for the usage of Minishift private registry the `OPTIONS` parametr looks
+
+```
+OPTIONS='--selinux-enabled --log-driver=journald --insecure-registry docker-registry-default.192.168.99.100.nip.io:443'
+```
+
+You will need to `restart` docker after the change and you can pull from the non-https registry now.
+
+==== Fedora 26 - registry and insecure registry patch
+
+In case of Red Hat clone of the docker client you can use settings described in article
+https://access.redhat.com/articles/1354823
+
+In short you can use `ADD_REGISTRY` and `INSECURE_REGISTRY` variables in `/etc/sysconfig/docker`.
+(_ADD_REGISTRY_ are registries search for the image when not defined explicitly by user)
+
+```
+echo "ADD_REGISTRY='--add-registry docker-registry-default.192.168.99.100.nip.io:443'" >> /etc/sysconfig/docker
+echo "INSECURE_REGISTRY='--insecure-registry docker-registry-default.192.168.99.100.nip.io:443'" >> /etc/sysconfig/docker
+```
+This works for me on Fedora 26 when I have installed docker `package`.
+A trouble with docker package for me came with some other images (e.g. for Oracle XE: https://hub.docker.com/r/wnameless/oracle-xe-11g[wnameless/oracle-xe-11g]
+where issue https://github.com/wnameless/docker-oracle-xe-11g/issues/59 talks about troubles with `docker` package and `docker-ce` is needed to be used instead.
+
+==== RPM docker-ce to be configured for insecure registries
+
+Installation of `docker-ce` (replacing `docker`) is nicely introduced at guide https://docs.docker.com/engine/installation/linux/docker-ce/fedora/.
+
+Now what about the registries config. I found nice description at: https://forums.docker.com/t/error-with-docker-pull-from-insecure-registry/31007/8
+
+The `docker-ce` rpm pakcage has config at `/lib/systemd/system/docker.service`. After installation I needed to change and add lines
+
+```bash
+[Service]
+Type=notify
+EnvironmentFile=-/etc/sysconfig/docker
+ExecStart=/usr/bin/dockerd $OPTIONS
+
+# I have left the rest of the config file untouched
+# ....
+```
+
+From that I redirected the configuration of the `OPTIONS` variable to file `/etc/sysconfig/docker` where I added my insecured registry just at a separate line like
+
+```bash
+OPTIONS='--insecure-registry default.192.168.99.100.nip.io:443'
+```
+
+WARNING: be sure you define `ExecStart` with `$OPTIONS` as they are configured in the properties file
+    but needs to be passed to the docker daemon startup
+
+[NOTE]
+====
+restart of the docker deamon is needed when the configuration files were changed
+
+_if you do not run `daemon-reload` you will get message:
+Warning: docker.service changed on disk. Run 'systemctl daemon-reload' to reload units._
+
+```
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+====
+
+NOTE: to check if insecure registries are configured correctly try `docker info | grep -A 5 Insecure Registries:`
+
+
+==== Other OSes and docker registry configuration
+
+*DISCLAIMER*: the following is untested
+
+For the other OSes, you need to change probably the `/etc/docker/daemon.json` with
+
+```json
+{
+  "registry-mirrors": ["docker-registry-default.192.168.99.100.nip.io:443"],
+  "insecure-registries" :["docker-registry-default.192.168.99.100.nip.io:443"]
+}
+```
+
+_There is a follow-up article about Minishift private registry at http://blog.chalda.cz/2017/12/18/How-to-work-with-a-docker-image-to-Minishift-repository.html_
+
