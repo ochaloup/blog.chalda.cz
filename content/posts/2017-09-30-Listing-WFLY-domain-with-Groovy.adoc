@@ -1,0 +1,95 @@
+= Listing WFLY domain with Groovy
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2017-09-30
+
+:page-template: post
+:page-draft: false
+:page-slug: listing-wfly-domain-with-groovy
+:page-category: Programming
+:page-tags: Java, XML, Groovy, WildFly
+:page-description: How to use Groovy to work WildFly CLI API.
+:page-socialImage: /images/articles/wildfly_groovy.png
+
+image::articles/wildfly_groovy.png[]
+
+
+== Groovy connects with WFLY cli
+
+Starting `groovysh` with `jboss cli jar` on classpath could be done in the following way
+
+```bash
+export JBOSS_HOME=$PWD
+groovysh -cp $JBOSS_HOME/bin/client/jboss-cli-client.jar
+```
+
+To connect with CLI you need
+
+. import `scriptsupport` package
+. disable security manager as there is some flaw in handling security policy through client jar up to WildFly. You can define a security manager policy file where permission for everythin is set.
+Anoth option is to use call `System.setSecurityManager(null)` which seems to me being easier.
+. instantiate cli and connect to a running WildFly instance
+
+```groovy
+import org.jboss.as.cli.scriptsupport.*
+System.setSecurityManager(null)
+cli = CLI.newInstance()
+cli.connect("remote", "localhost", 9999, null, null)
+```
+
+=== Links
+
+For more extensive information about WildFly groovy scripting see
+
+* https://developer.jboss.org/wiki/AdvancedCLIScriptingWithGroovyRhinoJythonEtc
+* http://www.mastertheboss.com/jboss-server/jboss-script/managing-wildfly-with-groovy-shell
+
+== Utility methods
+
+```groovy
+def getResponseAsStringList(def result) {
+  list = []
+  result.getResponse().get("result").asList().each {list << it.asString()}
+  return list
+}
+```
+
+== The script
+
+And here is a script which loads data about servers in domain. If you print the content of the variables `hostServer`, `profileServer` or `groupProfile` you will get listing you could be interested in.
+
+```groovy
+groupProfile = [:]
+groups = getResponseAsStringList(cli.cmd(':read-children-names(child-type=server-group)'))
+profiles = getResponseAsStringList(cli.cmd(':read-children-names(child-type=profile)'))
+
+groups.each { group ->
+  profile = cli.cmd("/server-group=$group:read-attribute(name=profile, include-defaults=true)")
+    .getResponse().get("result").asString()
+  groupProfile[group] = profile
+}
+
+hostServer = [:]
+profileServer = [:]
+profiles.each {profile -> profileServer[profile] = []}
+hosts = getResponseAsStringList(cli.cmd(':read-children-names(child-type=host)'))
+
+hosts.each { host ->
+ resultServers = cli.cmd("/host=$host:read-children-names(child-type=server)")
+ servers = getResponseAsStringList(resultServers)
+ serverProfile = [:]
+ servers.each { server ->
+   status = cli.cmd("/host=$host/server-config=$server:read-attribute(name=status, include-defaults=true)")
+     .getResponse().get("result").asString()
+   group = cli.cmd("/host=$host/server-config=$server:read-attribute(name=group, include-defaults=true)")
+     .getResponse().get("result").asString()
+   // when disabled profile is not filled
+   // profile = cli.cmd("/host=$host/server=$server:read-attribute(name=profile-name, include-defaults=true)")
+     .getResponse().get("result").asString()
+   profile = groupProfile[group]
+   serverProfile[server] = [status, group, profile]
+   // if (profileServer[profile] == null)  profileServer[profile] = []
+   profileServer[profile] << "${host}:${server}"
+ }
+ hostServer[host] = serverProfile
+}
+```

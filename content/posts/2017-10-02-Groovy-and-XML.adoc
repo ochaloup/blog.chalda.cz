@@ -1,0 +1,352 @@
+= Groovy and XML
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2017-10-02
+
+:page-template: post
+:page-draft: false
+:page-slug: groovy-and-xml
+:page-category: Programming
+:page-tags: Groovy, XML
+:page-description: How to use Groovy to manipulate with XML documents.
+:page-socialImage: /images/articles/groovy_straw.png
+
+
+image::articles/groovy_straw.png[]
+
+Manipulating with XML in some easy way is part of my journey to get an easy way to change WildFly `standalone.xml`. Use of the Groovy and its tools came to me with tool https://github.com/wildfly-extras/creaper[Creaper] which I use in testsuites I work on. (Creaper came from hands of my collegue https://twitter.com/_Ladicek[Láďa Thon]). The Creaper tool let you make changes of the configuration either through https://docs.jboss.org/author/display/WFLY/Command+Line+Interface[CLI commands] or with use of https://github.com/wildfly-extras/creaper#use[Groovy XML modification].
+
+Here I would like to sum up so of my observation of using XML with Groovy. Mostly similar to nice article at http://www.vogella.com/tutorials/Groovy/article.html#examples_xml
+
+WARN: DISCLAIMER. I'm not fully sure with accuracy of all the terms used below. I recommend to check the net. And let me know about issues here.
+
+
+== XML manipulation in Groovy in brief
+
+There are two common http://groovy-lang.org/processing-xml.html[approaches in Groovy to work with xml].
+
+One is `XMLParser` (`GPath` expressions could be used, `GPath` is http://groovy-lang.org/processing-xml.html#_gpath[a path expression language]) and here is an example
+
+```groovy
+def scopeNode = asNode().depthFirst().find {
+  println it.name().getQualifiedName()
+  it.name().getQualifiedName() == 'scope'
+}
+scopeNode.setValue('compile')
+```
+
+NOTE: the method `find` is method of the Groovy object `Object`.
+
+The `XmlSlurper` allows to parse an XML document and returns an `GPathResult` object. You can use `GPath` expressions.
+
+== XMLSlurper in more details
+
+As the Creaper https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/java/org/wildfly/extras/creaper/commands/foundation/offline/xml/GroovyXmlTransform.java#L123[uses XMLSlurper] I played more with it.
+
+My point here is show some Groovy language picks that wasn't obvious for me as I'm quite a nebiew in.
+
+To start work with the `XMLSlurper` I use http://groovy-lang.org/groovyconsole.html[groovyConsole] - just start it and copy&paste.
+
+```groovy
+import java.io.StringWriter
+import groovy.xml.XmlUtil
+
+xml =
+'''<server xmlns="urn:jboss:domain:4.0">
+  <profile>
+    <subsystem xmlns="urn:jboss:domain:iiop-openjdk:1.0">
+      <initializers transactions="spec" security="identity"/>
+      <properties>
+         <property name="propname" value="propvalue" />
+    </subsystem>
+  </profile>
+</server>'''
+
+// to get the variable printed to see the content
+print xml
+
+def root = new XmlSlurper().parseText(xml)
+
+// get back the xml processed with XMLSlurper as a string
+def writer = new StringWriter()
+XmlUtil.serialize(root, writer);
+print writer.toString()
+```
+
+Now the root contains the xml tree that could be navigated as `groovy.util.slurpersupport.GPathResult`
+(http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/GPathResult.html)
+attributes with `dot notation` (`.`).
+The root itself is type of `groovy.util.slurpersupport.NodeChildren`
+(http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/NodeChildren.html)
+which is defined as _lazy evaluated representation of child nodes_ and it's a child of the `GPathResult` class itself.
+
+When using dot notation it's easy to work with existing xml emlements
+
+```groovy
+// having a subtree variable for further use
+iiop = root.profile.subsystem
+// changing existing attribute
+iiop.initializers.@security = 'who needs security?'
+// adding non-existing attribute to an existing node
+iiop.initializers.'@my.attribute' = 'chalda'
+```
+
+To check documentaiton on types you work with see
+
+* http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attributes.html
+* http://docs.groovy-lang.org/latest/html/gapi/groovy/util/slurpersupport/Attribute.html
+
+```groovy
+assert groovy.util.slurpersupport.Attributes ==
+  iiop.initializers.@security.getClass()
+assert groovy.util.slurpersupport.Attribute ==
+  iiop.initializers.@security.iterator().next().getClass()
+```
+
+=== Chaning attributes
+
+For saving a value of an attribute (attribute of a xml element) you can use method `text()`
+
+```groovy
+assert 'identity' == iiop.initializers.@security.text()
+assert '' == iiop.initializers.@'non-existent'.text()
+
+def m = [:]
+println iiop.initializers*.attributes()
+  .collectMany { it.entrySet() }
+  .each { m.put(it.key, it.value) }
+assert m == [security:'identity', transactions:'spec']
+
+m = [:]
+iiop.properties.property.iterator().each {
+  list << it.@name
+  m << [(it.@name.text()): it.@value.text()]
+}
+assert m == ['propname':'propvalue']
+```
+
+When constructing the `GPathResult` definition you can use http://mrhaki.blogspot.cz/2009/08/groovy-goodness-string-strings-strings.html[GString expressions]
+
+```groovy
+def t = 'transactions'
+assert 'spec' == iiop.initializers."@${t}".text()
+```
+
+=== Removing attributes
+
+Having chance to remove an attribute there is need to touch actual `groovy.util.slurpersupport.Node` (http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/Node.html) or
+`groovy.util.slurpersupport.NodeChild` (http://docs.groovy-lang.org/latest/html/api/groovy/util/slurpersupport/NodeChild.html).
+
+When you get the _node_ you can start working with its `name` or `attributes` as you need.
+To get a _node_ I got used to call one of methods which returns `Iterator`. There is a method `iterator()` which provides `NodeChild` or there is a method `nodeIterator()` which provides `Node`. For sure there are plenty other ways to get _nodes_ as for example method `findAll()` and others.
+
+Another way is usage of
+http://docs.groovy-lang.org/latest/html/documentation/index.html#Collections-Gettingefficientwiththestar-dotoperator[`star-dot operator`]
+(a shortcut operator allowing you to call a method on all elements of a collection).
+
+=== Node iteration
+
+To iterate over all nodes at the current level - here it means iterating over all `initializers` nodes.
+
+```groovy
+
+// -> class groovy.util.slurpersupport.NodeChild
+iiop.initializers.iterator().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -> class groovy.util.slurpersupport.Node
+iiop.initializers.nodeIterator().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -> class groovy.util.slurpersupport.NodeChild
+iiop.initializers.findAll({true}).each {
+  println it.getClass()
+  println it.name()
+}
+
+// -> class groovy.util.slurpersupport.NodeChild
+println iiop.initializers*.getClass()
+```
+
+=== Child nodes iteration
+
+Iterating over child nodes of the current level of nodes, use method `childNodes()` or `children()`.
+
+```groovy
+
+// -> class groovy.util.slurpersupport.Node
+iiop.childNodes().each {
+  println it.getClass()
+  println it.name()
+}
+
+// -> class groovy.util.slurpersupport.NodeChild
+iiop.children().each {
+  println it.getClass()
+  println it.name()
+}
+```
+
+For iteration over all nodes in the xml tree (traversing recursively) you need to use `GPath` methods `breadthFirst` or `depthFirst`.
+
+```goovy
+root.breadthFirst().each { println it.name() }
+```
+
+=== More on removing attributes
+
+Removing an attribute is then piece of cake. Of course it could be done in multiple ways.
+
+```groovy
+iiop.initializers.nodeIterator().each {
+  it.attributes().remove('transactions')
+}
+iiop.initializers*.attributes().each {it.remove('transactions')}
+```
+
+Obviously you can use  a `find` method to get single (first matching) result
+in this case it will be a type `NodeChild`.
+
+```groovy
+assert 1 == iiop.initializers.find {it.'@transactions' == 'spec'}.size()
+```
+
+=== Removing nodes
+
+What about removing a node? It's done by one of method `replaceNode` (if the current node itself is involved) or `replaceBody` (if content of the current node is involved). Methods accept a closure as parameter. The closure represents a new structure of the node. When the closure is empty then the node is removed.
+
+```groovy
+iiop.initializers.replaceNode {}
+iiop.replaceBody {}
+```
+
+=== Appending nodes
+
+The other method which works with closure as representation of a node structure is `appendNode`.
+
+Both methods works with the fact that call of the closure is
+http://groovy-lang.org/closures.html#_delegation_strategy[delegated]. Delegation references
+a special handling of unknown method calls which are part of the closure definition. Any unknown
+method call is then considered as definition of a new xml element and it's method parameters
+as attributes. You can then define a closure which is in fact definition of xml structure.
+That one could be passed to a `appendNode` method.
+
+```groovy
+// -- node append
+iiop.appendNode {
+  'as-context' ('caller-propagation': 'supported')
+}
+
+// -- closure definition which is added as node later on
+// properties to add definition
+def myprops = ['goodone':'Frodo', 'evilone':'Saruman']
+def props = {
+  // unknown method 'properties' called with argument closure
+     which defines an child xml element
+  properties {
+    // any call of 'property' defines an xml element where
+       named arguments defines attributes
+    for(itemkey in myprops.keySet()) property('name': itemkey, 'value': myprops.get(itemkey))
+    // or add a new element named 'property-def' with attributes
+       being defined by map 'myprops'
+    'property-def'(myprops)
+  }
+}
+iiop.appendNode props
+```
+
+There is one shortcut as operator `<<` (`leftShift`) is overloaded and could be used instead of
+method `appendNode`.
+
+There could be a different ways for adding a node to an element
+
+```groovy
+// first getAt returns 'NodeChild', the second getAt returns 'Node'
+iiop.initializers.getAt(0).getAt(0).addChild({ good() })
+iiop.initializers.nodeIterator().next().addChild({ 'really-good'() })
+```
+
+[NOTE]
+====
+Groovy does not require using brackets to pass parameters to a method call - e.g.
+
+`iiop << { 'as-context' ('caller-propagation': 'supported') }`
+
+has the same effect as
+
+`iiop << { 'as-context' 'caller-propagation': 'supported' }`
+
+But when you want to pass a parameters as a map, then this
+
+`iiop << { 'as-context' ['caller-propagation': 'supported'] }`
+
+doesn't work and you have to use parenthesis as this is a special case.
+
+====
+
+==== Additional notes
+
+* `iiop << { test }` does nothing as expression `test` itself is not a method call
+* `iiop << { test() }` produces `<test/>` as `test()` is a method call
+* `iiop << { test(){} }` produces `<test/> as `test(){}` is a method call with a parameter of empty closure
+* `iiop << { test{} }` produces `<test/>` as `test {}` is a method call with
+one parameter which is an empty closure (Groovy does not require parenthesis
+to separate method arguments definition `test {}` is the same as `test ({})`)
+* one unnamed parameter defines a text which is added to the xml element
+  `iiop << { test ('mytext') }` generates `<test>mytext</test>`.
+* extending the previous point `iiop << { test 'mytext' }` generates the same element with text `<test>mytext</test>`
+* for multiple method parameters only the last one is considered
+  `iiop << { test('mytext', 'mytext2') }` produces `<test>mytext2</test>`
+* as it depends on order the content of closure could be ignored as well
+  `iiop << { test({innerelement()}, 'mytext') }` produces element with text
+  `<test>mytext</test>`. I haven't found a way how to add a text for element and
+  a new child element at the same time.
+* named parameters are not considered when element receives as argument a map.
+  Both definition generates the same `<test mapid="mapvalue"/>`:
+ `def mymap = ['mapid': 'mapvalue']; iiop << {test('param1': 'value1', mymap)}` versus
+ `def mymap = ['mapid': 'mapvalue']; iiop << {test(mymap, 'param1': 'value1')}`
+* when needed to add _a nothing_ then use `null`
+  `def isTest = false; iiop << { isTest ? 'test'() : null }`
+
+If you want to check for existence of a node you are stick with checking size
+of the result set.
+
+```groovy
+assert iiop.'non-existing-element'.isEmpty()
+assert 0 == iiop.'non-existing-element'.size()
+assert 0 == iiop.initializers.'@non-existing-attribute'.size()
+assert 1 == iiop.initializers.'@transactions'.size()
+```
+
+For sure there is a chance to add http://mrhaki.blogspot.cz/2009/12/groovy-goodness-implementing-metaclass.html[a new method] to write shorter more comprehensible code.
+
+```groovy
+groovy.util.slurpersupport.GPathResult.metaClass.exists = {->
+    return delegate.size() > 0
+}
+groovy.util.slurpersupport.GPathResult.metaClass.notExists = {->
+    return delegate.size() <= 0
+}
+
+assert iiop.'non-existing-element'.notExists()
+assert iiop.initializers.exists()
+```
+
+On checking and appending nodes there is a one trap. At least in my eyes.
+
+```groovy
+if(iiop.'as-context'.isEmpty()) iiop.appendNode {
+  'as-context' ('caller-propagation': 'supported')
+}
+assert iiop.'as-context'.isEmpty() // true
+```
+
+I haven't found any good solution yet outside to count with this and not trying to write a code which do so.
+
+== Creaper offline command for datasource manipulation
+
+And this is (https://github.com/wildfly-extras/creaper/blob/master/commands/src/main/resources/org/wildfly/extras/creaper/commands/datasources/AddDataSource.groovy) this is a result of my effort to change WildFly datasource subsystem with https://github.com/wildfly-extras/creaper#offline[Creaper offline command].
+
