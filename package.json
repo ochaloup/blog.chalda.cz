@@ -28,7 +28,7 @@
     "prepare": "husky install",
     "semantic-release": "semantic-release",
     "serve": "gatsby serve",
-    "start": "npm run clean && gatsby develop",
+    "start": "npm run clean && gatsby develop --verbose",
     "test": "jest --config ./internal/testing/jest-config.ts",
     "test:coverage": "jest --coverage --config ./internal/testing/jest-config.ts",
     "test:watch": "jest --watch --config ./internal/testing/jest-config.ts"

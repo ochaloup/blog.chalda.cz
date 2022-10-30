@@ -3,7 +3,7 @@
 [x] styling of links and code
 [] styling of tables that're somehow broken
 [] is possible to generate TOC?
-[] why RSS generation does not work
+[x] why RSS generation does not work; it works fine! the plugin renders the xml only when `yarn gatsby build; yarn gatsby server`, it does not work properly with `gatsby develop` that I've used on testing
 [] could be used the icons? if not it's necessary to remove things like `icon:smile-o[]` from the adoc sources
 [x] the social image should be shown in the article listing
 [x] tag (and category) pages show wrong items

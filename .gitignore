@@ -38,4 +38,3 @@ node_modules
 
 # only apps should have lockfiles
 npm-shrinkwrap.json
-yarn.lock
