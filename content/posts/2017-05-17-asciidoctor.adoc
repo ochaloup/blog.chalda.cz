@@ -78,3 +78,11 @@ Nevertheless all the time when I start to learn something I normally don't like 
 Here it's the fact that first paragraph after the title is presented as lead paragraph and it's highlighted.
 I started to search and I get to understanding that each paragraph (block as formatable building block) gets `a role` by default.
 In this case it should be role `lead` which could be defined by hand in text by putting the role name into square brackets preceded by dot - like `[.lead]`.
+
+To link:https://docs.asciidoctor.org/asciidoc/latest/blocks/preamble-and-lead/#lead-role[disable the automatic lead] paragraph styling, assign any role to the first paragraph.
+
+[source,asciidoc]
+----
+[.normal]
+First paragrahp that hasn't got the lead styling.
+----
