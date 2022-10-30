@@ -12,4 +12,4 @@ https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pag
 
 == Building and deploying
 
-Using Github actions, see link:./.github/workflows/gatsby.yaml[].
+Using Github actions, see link:./.github/workflows/gatsby.yml[].
