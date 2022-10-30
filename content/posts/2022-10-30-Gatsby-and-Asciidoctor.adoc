@@ -1,0 +1,16 @@
+= Gatsby and Asciidoctor
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2022-10-30
+
+:icons: font
+:toc: macro
+
+:page-template: post
+:page-draft: yes
+:page-slug: gatsby-and-asciidoctor
+:page-category: devops
+:page-tags: Asciidoctor, Blog
+:page-description: Basics on how to work with Gatsby and how to make it working with Asciidoctor.
+:page-socialImage:
+
+
