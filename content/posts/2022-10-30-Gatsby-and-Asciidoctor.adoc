@@ -6,11 +6,84 @@ chalda <ondrej.chaloupka@proton.me>
 :toc: macro
 
 :page-template: post
-:page-draft: yes
+:page-draft: false
 :page-slug: gatsby-and-asciidoctor
 :page-category: devops
 :page-tags: Asciidoctor, Blog
-:page-description: Basics on how to work with Gatsby and how to make it working with Asciidoctor.
+:page-description: My journey through basics of Gatsby and how to make it working with Asciidoctor.
 :page-socialImage:
 
+== Prolog
 
+This blog hasn't got any update for a long time. One of the reason was a trouble of the underalying
+static page generation system. I've used the link:posts/hubpress-io-how-to-install[Hubpress.io]
+that has been working nicely few years ago but that's not true now.
+I decided to switch to another system and it was https://www.gatsbyjs.com[Gatsby] that caught my interest.
+I'm not a frontend developer and I don't plan to learn https://reactjs.org[React] in details
+but check the basics sounds good to me.
+
+I started with searching https://jamstackthemes.dev/ssg/gatsby/[the Gatsby themes] and looking for some theme
+for a blog. I search for some that would support to work with link:posts/asciidoctor[Asciidoctor]
+but I found that 99% of pages support only the https://daringfireball.net/projects/markdown/syntax[Markdown]
+ather there is no reasonable theme configured with Asciidoctor.
+Thus I decided for https://github.com/alxshelepenok/gatsby-starter-lumen[Gatsby Starter Lumen]
+and for adjusting it to work with Asciidoctor.
+
+== How to learn Gatsby
+
+I found I need to understand the structure of the Gatsby project a bit more to be able to change
+the Markdown processing to Asciidoctor.
+After reading few getting started posts I found the best was to go through the tutorial
+https://www.freecodecamp.org/news/build-a-developer-blog-from-scratch-with-gatsby-and-mdx[How to Build Your Coding Blog From Scratch Using Gatsby and MDX].
+It's a little bit older and not all details work perfectly
+but it was a great way to understand the structure of the Gatsby project.
+
+== Changing Markdown for Asciidoctor
+
+One thing that I understood quite soon was that the tutorial uses the
+https://www.gatsbyjs.com/plugins/gatsby-plugin-mdx[gatsby-plugin-mdx].
+The _Gatsby Starter Lumen_ works with with
+https://www.gatsbyjs.com/plugins/gatsby-transformer-remark[gatsby-transformer-remark]
+(oh, there could be multiple plugins for the same purpose).
+And I need to use the Asciidoctor plugin available as
+https://www.gatsbyjs.com/plugins/gatsby-transformer-asciidoc[gatsby-transformer-asciidoc].
+The good thing shows that the `gatsby-transformer-asciidoc`
+is pretty similar to `gatsby-transformer-remark` which is used in _Lumen Starter_ project
+that I want to based my blog with.
+
+My goal when working with tutorial was to process `.adoc` in parallel with `.md`.
+
+The repository of that is at https://github.com/ochaloup/gatsby-from-scratch
+
+NOTE: I haven't finished whole tutorial. I finished in middle when MDX plugin stopped to work
+      (I found it's because of some Gatsby changes from year 2019).
+
+== Gatsby structure
+
+There is multiple tutorial on that topic at web. With this I want to record just rather my context.
+
+=== A JavaScript project
+
+As non-javascript developer I needed to start with few things around the JS project.
+
+* dependencies are defined in `package.json`
+* multiple package managers exists - default `npm`, better `yarn`, newer a and faster `pnpm`
+  (`yarn` sounds good to be used)
+* `yarn install` places the `js` dependencies under `$PWD/node_modules`
+* when dependencies are installed a `lock` files (`yarn.lock`, `package-lock.json`) are created.
+  They ensures the same versions of the libraries are used when building subsequently on other environments.
+  They are https://stackoverflow.com/questions/44552348/should-i-commit-yarn-lock-and-package-lock-json-files[recommended to be pushed to github].
+* when working with TypeScript the configuration file is `tsconfig.json`. It configures how the transpiler
+  built the final `js` file.
+* `package.json` contains section `"scripts"` that defines automation of different commands.
+  Any defined `script` command may be executed with `npm run <command>` or `yarn <command>`.
+
+=== A Gatsby project
+
+* The main configuration file is `gatsby-config.[js,ts]`. It defines global properties and configures gatsby plugins.
+  (the plugin needs to be defined as dependency in `package.json` beforehand.
+* The configuration file `gatsby-node.js` defines hooks that are executed on startup of nodejs
+  (possible to setup dynamic pages, like set of categories where each category sits at a path).
+* The `gatsby-browser.js` sets up the behaviour for browsers (e.g. SCSS files).
+
+* start with `yarn install`
