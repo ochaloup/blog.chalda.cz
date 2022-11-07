@@ -135,28 +135,28 @@ table.tableblock.fit-content > caption.title {
   //}
 }
 
-.sidebarblock {
-  @include panel(darken($panel-bg, 2%), $panel-padding, false);
-  @include radius;
+// .sidebarblock {
+//   @include panel(darken($panel-bg, 2%), $panel-padding, false);
+//   @include radius;
 
-  > .content {
-    > .title {
-      @extend h3;
-      color: $subheader-font-color;
-      //color: darken($header-font-color, 15%); // name this panel-header-color?
-      //line-height: 1.45; // a touch up from the header line height
-      margin-top: 0;
-      @if $sidebar-header-align {
-        text-align: $sidebar-header-align;
-      }
-      @if $sidebar-header-border-size != 0 {
-        border-width: $sidebar-header-border-size;
-        border-style: $sidebar-header-border-style;
-        border-color: $sidebar-header-border-color;
-      }
-    }
-  }
-}
+//   > .content {
+//     > .title {
+//       @extend h3;
+//       color: $subheader-font-color;
+//       //color: darken($header-font-color, 15%); // name this panel-header-color?
+//       //line-height: 1.45; // a touch up from the header line height
+//       margin-top: 0;
+//       @if $sidebar-header-align {
+//         text-align: $sidebar-header-align;
+//       }
+//       @if $sidebar-header-border-size != 0 {
+//         border-width: $sidebar-header-border-size;
+//         border-style: $sidebar-header-border-style;
+//         border-color: $sidebar-header-border-color;
+//       }
+//     }
+//   }
+// }
 
 .exampleblock > .content,
 .sidebarblock > .content {
