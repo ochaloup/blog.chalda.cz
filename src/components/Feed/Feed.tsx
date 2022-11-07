@@ -15,16 +15,22 @@ type Props = {
 
 type FeedImageProps = {
   src: string
+  slug: string
 }
 
 export class FeedImage extends Component<FeedImageProps> {
   static defaultProps = {
-    src: ''
+    src: '',
+    slug: ''
   }
 
   render() {
     if (this.props.src != undefined && this.props.src && this.props.src.trim()) {
-      return <img loading="lazy" src={this.props.src} className="feedimage" />
+      return (
+        <Link to={this.props.slug}>
+          <img loading="lazy" src={this.props.src} className="feedimage" />
+        </Link>
+      )
     } else {
       return
     }
@@ -63,9 +69,7 @@ const Feed: React.FC<Props> = ({ edges }: Props) => (
         </h2>
         <p className={styles.description}>
           {edge.node.pageAttributes.description}
-          <Link className={styles.link} to={edge.node.fields.slug}>
-            <FeedImage src={edge.node.pageAttributes.socialimage} />
-          </Link>
+          <FeedImage src={edge.node.pageAttributes.socialimage} slug={edge.node.fields.slug}/>
 
         </p>
         <Link className={styles.more} to={edge.node.fields.slug}>
