@@ -11,9 +11,9 @@ chalda <ondrej.chaloupka@proton.me>
 :page-category: devops
 :page-tags: Asciidoctor, Blog
 :page-description: My journey through basics of Gatsby and how to make it working with Asciidoctor.
-:page-socialImage:
+:page-socialImage: /images/articles/gatsby-asciidoc.png
 
-== Prolog
+image::articles/gatsby-asciidoc.png[]
 
 This blog hasn't got any update for a long time. One of the reason was a trouble of the underalying
 static page generation system. I've used the link:posts/hubpress-io-how-to-install[Hubpress.io]
@@ -71,7 +71,7 @@ Let's briefly recap about the Gatsby project structure.
 As non-javascript developer I needed to start with few things around the JS project.
 
 * dependencies are defined in `package.json`
-* multiple package managers exists - default `npm`, better `yarn`, newer a and faster `pnpm`
+* JS world uses many dependency managers - default `npm`, better `yarn`, newer a and faster `pnpm`
   (`yarn` sounds good to be used)
 * `yarn install` downloads `js` dependencies and places them under `$PWD/node_modules`
 * when dependencies are installed a `lock` files (`yarn.lock`, `package-lock.json`) are created.
@@ -130,7 +130,7 @@ that works from `node_modules`.
 The Lumen can be started at localhost dev mode with `yarn start`. Then the side can be accessed at http://localhost:8000
 and graphql at http://localhost:8000/___graphql (all that info shown at console during startup).
 
-=== Gatsby GraphQL
+=== React GraphQL and Gatsby
 
 All data that Gatsby works with comes through the GraphQL (processing comes from React).
 The Markdown and Asciidoctor plugins processes the documents
@@ -192,4 +192,235 @@ that comes for example from fact that Asciidoctor works with a pre-defined
 https://docs.asciidoctor.org/asciidoc/latest/document/header/[header metadata]
 while Markdown with no specific spec here.
 
-Both plugins found data under `nodes` where the `node` represents one `md`/`adoc` document.
+Both plugins retrieves data from the `{ nodes }` where the `node` represents one `md`/`adoc` document.
+
+Then the MDX plugin offers excerp which is a plane text of the article and then
+metadata is represented at header in key/value form.
+The https://raw.githubusercontent.com/ochaloup/gatsby-from-scratch/main/hello-world/posts/2022/2022-10-01-first-post/index.mdx[example document]
+is below.
+
+[source,mdx]
+----
+---
+title: Hello World - from mdx!
+date: 2022-10-01
+published: true
+category: "Markdown Pro"
+tags:
+  - "One"
+---
+
+# h1 Heading
+
+My first post!!
+----
+
+The result data of the GraphQL query for the document returns
+
+[source,json]
+----
+{
+  "data": {
+    "allMdx": {
+      "nodes": [
+        {
+          "id": "e7b45c55-eed2-5ed4-a59d-68ae03e208cf",
+          "excerpt": "My first post!!",
+          "frontmatter": {
+            "title": "Hello World - from mdx!",
+            "date": "2022-10-01T00:00:00.000Z"
+          },
+          "fields": {
+            "slug": "/2022/2022-10-01-first-post/"
+          }
+        }
+      ]
+    }
+  }
+}
+----
+
+while and example of the Asciidoc document has a predefined header to be used
+and does not provide a plane text of the article. We need to use synopsis field
+to be specifially filled with text.
+The
+https://raw.githubusercontent.com/ochaloup/gatsby-from-scratch/main/hello-world/posts/2022/2022-10-08-a-test/index.adoc[example document]
+is below.
+
+[source,adoc]
+----
+= Hello from Asciidoc!!!
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2022-10-08
+
+:page-published: true
+:page-synopsis: Something about my friends
+:page-title: Article
+:page-path: /2022/2022-10-08-a-test
+:page-category: Asciidoctor
+:page-tags: One, Two, Three
+
+How does it work? Good?
+----
+
+The GraphQL response for the document is
+
+[source,json]
+----
+{
+  "data": {
+    "allAsciidoc": {
+      "nodes": [
+        {
+          "id": "0d92c3b4-3549-5c8b-9dec-6dbbf98bec11",
+          "document": {
+            "title": "Hello from Asciidoc!!!"
+          },
+          "pageAttributes": {
+            "synopsis": "Something about my friends"
+          },
+          "revision": {
+            "date": "2022-10-08"
+          },
+          "fields": {
+            "slug": "/2022/2022-10-08-a-test/"
+          }
+        }
+      ]
+    }
+  }
+}
+----
+
+image::articles/gatsby-font-line.jpg["A decorator line", height=30]
+
+=== Gatsby Lumen Starter changes for Asciidoctor to work
+
+==== Markdown to Asciidoctor: Plugins
+
+I changed the
+https://github.com/alxshelepenok/gatsby-starter-lumen/blob/fa2bac05139875408fe9f36bba59289ada3d3d6e/gatsby-config.ts#L92[Markdown plugin `gatsby-transformer-remark`]
+for
+https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/gatsby-config.ts#L95[Asciidoctor plugin `gatsby-transformer-asciidoc`].
+
+That change requires to delete other Mardown/remark plugins from configuration
+as `gatsby-remark-images` (better image handling), `gatsby-remark-responsive-iframe` (iframe wrapped to responsive elastic containe),
+`gatsby-remark-autolink-headers` (github style links hover effect), `gatsby-remark-prismjs` (code block syntax highlighting),
+`gatsby-remark-copy-linked-files` (copying local files linked in `md` to the `public/` directory),
+gatsby-remark-smartypants` (Replaces "dumb" punctuation marks), `gatsby-remark-external-links` (adds the target and rel attributes to external links).
+
+With using Asciidoctor I needed to abandon that functionality (or add it differently when needed).
+That's pity but I just wanted the asciidoc syntax a lot!
+
+
+==== Markdown to Asciidoctor: GraphQL
+
+The next step was to change all the GraphQL queries from Markdown structure to Asciidoc one.
+It's quite similar while a bit different in details.
+What's the worse was a fact that Markdown header properties is capable to work with a list
+while asciidoc consider all header properties as a string. I need to do quite a boring manual
+parsing of e.g., tags.
+
+The GraphQL queries are all over the code so it was quite boresome work. The good thing was there are tests (`yarn test`)
+that helped me to undrestand what I forgot to cover. An example of such difference of the query is covered above
+or you can check github
+
+* `md` remark plugin : https://github.com/alxshelepenok/gatsby-starter-lumen/blob/fa2bac05139875408fe9f36bba59289ada3d3d6e/src/hooks/use-categories-list.ts#L12
+* `adoc` asciidoc plugin : https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/hooks/use-categories-list.ts#L12
+
+Then there was still the trouble with metadata format. The Markdown may work with _"a list"_
+while the Asciidoctor works only with _strings_.
+Check
+https://raw.githubusercontent.com/alxshelepenok/gatsby-starter-lumen/fa2bac05139875408fe9f36bba59289ada3d3d6e/content/posts/2016-01-09---Perfecting-the-Art-of-Perfection/index.md[how tags are defined in `md`] like
+
+[source,md]
+----
+tags:
+  - "Handwriting"
+  - "Learning to write"
+----
+
+The tags in https://raw.githubusercontent.com/ochaloup/blog.chalda.cz/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/content/posts/2017-05-06-DNS-setting-for-GitHub-pages.adoc[Asciidoc is like]
+
+[source,adoc]
+----
+:page-tags: Handwriting, Learning to write
+----
+
+While in `md` is fine to do https://github.com/alxshelepenok/gatsby-starter-lumen/blob/fa2bac05139875408fe9f36bba59289ada3d3d6e/src/hooks/use-tags-list.ts#L12[just aggregate the list with the graphql query] to get "the tag name" and "the number of occurences"
+
+[source,graphl]
+----
+...
+group(field: frontmatter___tags) {
+  fieldValue
+  totalCount
+}
+...
+----
+
+in case of `asciidoc` it's needed to get all data, parse it and group it in typescript afterwards. See my way here:
+* get all data: https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/hooks/use-tags-list.ts#L14
+* parse and group to get `totalCount`: https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/utils/group-tags.ts#L11
+
+
+==== Markdown to Asciidoctor: Image paths
+
+The remark consists of plugin `gatsby-remark-copy-linked-files` that checks what are files used in `md` file
+and then it copies them to `public/` directory where the static generated result page is placed.
+If you check the _Starter Lumen_ it places pictures within the folder of the article
+like https://github.com/alxshelepenok/gatsby-starter-lumen/tree/fa2bac05139875408fe9f36bba59289ada3d3d6e/content/posts/2016-01-12---The-Origins-of-Social-Stationery-Lettering/media[`content/posts/<post-name>/media`].
+The same directory structure is copied to `public/`.
+
+That's not the case for asciidoc as there is no such plugin. I didn't want to create one
+and I just decided to place manually the pictures (and other) data to `public/` folder.
+The `gatsby-transformer-asciidoc` can be configured to add _a prefix` to any image path
+https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/gatsby-config.ts#L99[with `imagesdir`].
+The images are placed under `static/images/` but the asciidoc refers it only
+https://github.com/ochaloup/blog.chalda.cz/tree/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/static/images/articles[as `image::articles/some-image.png`]
+when linked
+https://github.com/ochaloup/blog.chalda.cz/blame/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/content/posts/2017-05-17-asciidoctor.adoc#L18[from the `adoc` file].
+
+
+==== Markdown to Asciidoctor: Syntax highlighting
+
+One of the things I really want to work is syntax highlighting.
+The plugin `gatsby-remark-prismjs` was removed and I needed to add that somehow manually.
+
+I did it with direct use of the `highlight.js` library.
+I needed to create utility that runs the
+https://highlightjs.org/usage/[`hljs.highlightAll()`]
+that's in https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/utils/highlightCode.ts[highlightCode.ts].
+The `hightlight.js` was added to
+https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/package.json#L70[`package.json`]
+and then the utility used as effect
+https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/components/Post/Post.tsx#L27[in template of posts].
+
+
+==== Markdown to Asciidoctor: CSS Style changes
+
+This part is not finished and not examined well for me. I needed to add some styling that I feel better about
+and I did it in different places just to get it working.
+
+The base was adding some asciidoctor styles that I borrowed from github of
+https://github.com/asciidoctor/asciidoctor-stylesheet-factory/tree/main/sass[asciidoctor-stylesheet-factory].
+I integrated it within the sass rules of the Lumen at
+https://github.com/ochaloup/blog.chalda.cz/tree/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/assets/scss/asciidoctor[`src/assets/scss`].
+
+The other part was that I used CSS from the Hubpress.io Ghostium theme
+https://github.com/ochaloup/blog.chalda.cz/blob/gh-pages/themes/ghostium/assets/css/asciidoctor-default.css[asciidoctor-default.css].
+
+Combined together while did some comments at some component configuration as well gets it more or less working.
+
+=== Gatsby blog deploy to Github pages
+
+I used my prior article of link:dns-settings-of-github-pages[Github pages setup].
+The deploy is done via Github actions that's configured at Github under `Settings -> Pages`
+
+image::articles/gatsby-github-pages.png["Github pages deploy screen"]
+
+The script is generated by Github but it could be adjusted.
+When confirmed in Github the actions is saved into yaml file at `.github/workflows` folder.
+You can check configuration, with slight change, of my tutorial project at
+https://github.com/ochaloup/gatsby-from-scratch/blob/main/.github/workflows/pages.yml[.github/workflows/pages.yaml].
+
