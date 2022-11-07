@@ -60,6 +60,8 @@ NOTE: I haven't finished whole tutorial as I wrapped it up in middle of the text
       of https://github.com/gatsbyjs/gatsby/discussions/34714#discussioncomment-2108962[some Gatsby changes].
 
 
+image::articles/gatsby-font-line.jpg["A decorator line"]
+
 === Gatsby structure
 
 Let's briefly recap about the Gatsby project structure.
@@ -82,10 +84,112 @@ As non-javascript developer I needed to start with few things around the JS proj
 
 ==== A Gatsby project
 
-* The main configuration file is `gatsby-config.[js,ts]`. It defines global properties and configures gatsby plugins.
-  (the plugin needs to be defined as dependency in `package.json` beforehand.
-* The configuration file `gatsby-node.js` defines hooks that are executed on startup of nodejs
-  (possible to setup dynamic pages, like set of categories where each category sits at a path).
-* The `gatsby-browser.js` sets up the behaviour for browsers (e.g. SCSS files).
+Now what I learnt about the Gatsby itself.
 
-* start with `yarn install`
+image::articles/gatsby-font-title.jpg["Illustrative image of art deco Gatsby font"]
+
+* The configuration file is `gatsby-config.[js,ts]`. It defines global properties and configures gatsby plugins
+  where the plugin needs to be defined as dependency in `package.json` as well.
+* The configuration file `gatsby-node.js` defines hooks that are executed on startup of nodejs.
+  It's a way to setup dynamic pages where we want to list a set of options, like categories or tags are.
+* The `gatsby-browser.js` sets up the behaviour for browsers (e.g. SCSS files).
+* The `content/config.js` is used by _Lumen theme_ to get some basic config of site (e.g., title).
+
+Then we have a directory structure explained better
+https://www.gatsbyjs.com/docs/reference/gatsby-project-structure/[at the Gatsby documentation].
+But quick view on what I needed.
+
+The Gatsby is a React application thus the directory structure consists of _Gatsby specific parts_
+and the directories _comming from React_.
+
+* `public/` is automatically generated and contains output of the build process (part of `.gitignore`)
+* `static/` contains data that are copied to `public/` as they are, may contain images for example
+* `content/` is not standard Gatsby directory but it's usually configured in
+   https://github.com/alxshelepenok/gatsby-starter-lumen/blob/3a6dbc17ca00ad4ccc84e82a840b59c3824ab709/gatsby-config.ts#L20[`gatsby-config`]
+   and contains Mardown or Asciidoctor sources, later processed by particular plugins
+* `src/` directory contains all code
+** `src/pages/` happens to be generated as a page directly based on the path (e.g., `index.js` could be created)
+** `src/templates` templates used in programatically build pages
+** `src/compontents` react directory, contains react components that can be used within `templates`
+** `src/hooks/` react directory, hooks that can be invoked from components retrieving data, &hellip;
+** `src/utils/` react directory, utilities
+** `src/types/` react directory, for typescript types definitions
+
+The best is to click through https://github.com/alxshelepenok/gatsby-starter-lumen/[the Lumen Starter directory structure]
+or https://github.com/spences10/thelocalhost/tree/blog-post-code[the tutorial project].
+It may not contain or have some additional directories to what mentioned but it sheds light on this part.
+
+image::articles/gatsby-font-line.jpg["A decorator line", height=30]
+
+The gatsby provides command line tool `gatsby` to generate the content (`gatsby build`)
+and to help with development (`gatsby develop`).
+If it's installed with `yarn` we could have configured
+https://github.com/ochaloup/gatsby-from-scratch/blob/main/hello-world/package.json#L8[the `script`]
+that works from `node_modules`.
+
+The Lumen can be started at localhost dev mode with `yarn start`. Then the side can be accessed at http://localhost:8000
+and graphql at http://localhost:8000/___graphql (all that info shown at console during startup).
+
+=== Gatsby GraphQL
+
+All data that Gatsby works with comes through the GraphQL (processing comes from React).
+The Markdown and Asciidoctor plugins processes the documents
+where the results can be consumed by GraphQL queries. All components then loads stuff
+information like title, tags and generated HTML and places it based on the visual demands to particular places.
+
+The most of the work for moving from Markdown to Asciidoctor was a need to map the Markdown based GraphQL query
+that's part of the Lumen Starter and change it for Asciidoctor.
+
+My work with tutorial tried to work with `adoc` and `md` data (MDX plugin is used) side by side.
+You can see e.g., here https://github.com/ochaloup/gatsby-from-scratch/blob/main/hello-world/src/pages/index.js#L40
+
+[source,graphql]
+----
+query SITE_INDEX_QUERY {
+  allMdx(
+    sort: { fields: [frontmatter___date], order: DESC }
+    filter: { frontmatter: { published: { eq: true } } }
+  ) {
+    nodes {
+      id
+      excerpt(pruneLength: 250)
+      frontmatter {
+        title
+        date
+      }
+      fields {
+        slug
+      }
+    }
+  }
+  allAsciidoc(
+    sort: { fields: [revision___date], order: DESC }
+    filter: { pageAttributes: { published: { eq: "true" } } }
+  ) {
+    nodes {
+      id
+      document {
+        title
+      }
+      pageAttributes {
+        synopsis
+      }
+      revision {
+        date
+      }
+      fields {
+        slug
+      }
+    }
+  }
+}
+----
+
+That query could be investigated in GraphQL console (http://localhost:8000/___graphql)
+when running in developer mode.
+The data generated by both plugins are structured in a bit different form
+that comes for example from fact that Asciidoctor works with a pre-defined
+https://docs.asciidoctor.org/asciidoc/latest/document/header/[header metadata]
+while Markdown with no specific spec here.
+
+Both plugins found data under `nodes` where the `node` represents one `md`/`adoc` document.
