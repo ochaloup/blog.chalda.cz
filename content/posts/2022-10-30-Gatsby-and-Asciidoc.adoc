@@ -1,4 +1,4 @@
-= Gatsby and Asciidoctor
+= Gatsby and Asciidoc
 chalda <ondrej.chaloupka@proton.me>
 1.0, 2022-10-30
 
@@ -7,60 +7,59 @@ chalda <ondrej.chaloupka@proton.me>
 
 :page-template: post
 :page-draft: false
-:page-slug: gatsby-and-asciidoctor
+:page-slug: gatsby-and-asciidoc
 :page-category: devops
-:page-tags: Asciidoctor, Blog
-:page-description: My journey through basics of Gatsby and how to make it working with Asciidoctor.
+:page-tags: Asciidoc, Blog
+:page-description: My journey through basics of Gatsby and how to make it working with Asciidoc.
 :page-socialImage: /images/articles/gatsby-asciidoc.png
 
 image::articles/gatsby-asciidoc.png[]
 
-This blog hasn't got any update for a long time. One of the reason was a trouble of the underalying
-static page generation system. I've used the link:posts/hubpress-io-how-to-install[Hubpress.io]
-that has been working nicely few years ago but the system was deprecated and stopped to work right.
-I decided to switch to another system and it was https://www.gatsbyjs.com[Gatsby] that caught my interest.
-I'm not a frontend developer and I don't plan to learn https://reactjs.org[React] in details
-but I wanted to check some basics.
+For this blog I've been using the link:posts/hubpress-io-how-to-install[Hubpress.io]
+&mdash; nice blog theme, online wysiwyg asciidoc editing with github automatic deployment.
+Unfortunately is not developed for some time already and I wanted to switch to something.
+It was https://www.gatsbyjs.com[Gatsby] that caught my interest.
+I'm not a frontend developer but I wanted to check what's about that https://reactjs.org[React] and https://jamstack.org/[JAM stack] thing.
 
 I started with searching https://jamstackthemes.dev/ssg/gatsby/[the Gatsby themes] and looking for a blog one.
-I wanted one that supports link:posts/asciidoctor[Asciidoctor]
+I wanted one that supports link:posts/asciidoctor[Asciidoc]
 but 99.9% of themes work only with the https://daringfireball.net/projects/markdown/syntax[Markdown].
-The rest in the 0.1% are rather showcases than themes.
-I decided for https://github.com/alxshelepenok/gatsby-starter-lumen[Gatsby Starter Lumen]
-and for adjusting it to work with Asciidoctor.
+The rest 0.1% are rather showcases than themes.
+I decided to go for https://github.com/alxshelepenok/gatsby-starter-lumen[Gatsby Starter Lumen]
+and make adjustments by hand.
 
 == Learning Gatsby
 
-When I decided for adjustments I found I need to understand the structure of the Gatsby project much better.
-After reading few getting started posts I found the best was to go through was this tutorial
+First I needed a bit understand the Gatsby project.
+After reading few _getting started_ posts I found the best was to go through was this tutorial
 https://www.freecodecamp.org/news/build-a-developer-blog-from-scratch-with-gatsby-and-mdx[How to Build Your Coding Blog From Scratch Using Gatsby and MDX].
 It's a little older and not all details work perfectly
 but it is a really great way to understand the structure.
 It elaborates on details of content processing, graphql queries, styling and others things.
 
-=== Changing Markdown for Asciidoctor
-
-One thing that I understood quite soon was that the tutorial uses the
+Petty soon I understood that Gatsby works with set of plugins where one of them manages the `md` files.
+The tutorial uses the
 https://www.gatsbyjs.com/plugins/gatsby-plugin-mdx[gatsby-plugin-mdx].
 While the _Gatsby Starter Lumen_ works with with
 https://www.gatsbyjs.com/plugins/gatsby-transformer-remark[gatsby-transformer-remark].
 I.e., there are different Markdown plugins of the same prupose in the ecosystem.
 
-The "good news" is that there is only one Asciidoctor plugin available as
+The _"good news"_ is that there is only one Asciidoc plugin available as
 https://www.gatsbyjs.com/plugins/gatsby-transformer-asciidoc[gatsby-transformer-asciidoc].
 The fine thing is that the `gatsby-transformer-asciidoc`
-is pretty similar to `gatsby-transformer-remark` which one that's used in _Lumen Starter_ project.
+is pretty similar to `gatsby-transformer-remark` used by _Lumen Starter_ project.
 
-My goal when working with tutorial was to learn how to use `.adoc` in parallel with `.md`.
+While working on the tutorial I aimed to get working `.adoc` transformation in parallel with `.mdx` ones.
 
-The repository that contains the changes is at https://github.com/ochaloup/gatsby-from-scratch
+The repository that contains my work is at
+https://github.com/ochaloup/gatsby-from-scratch.
 
 NOTE: I haven't finished whole tutorial as I wrapped it up in middle of the text when MDX plugin stopped
-      to work for me. Later I found it's because
+      working for me. Later I found it's because
       of https://github.com/gatsbyjs/gatsby/discussions/34714#discussioncomment-2108962[some Gatsby changes].
 
 
-image::articles/gatsby-font-line.jpg["A decorator line"]
+image::articles/gatsby-font-line.jpg["A decorator line", height="50px"]
 
 === Gatsby structure
 
@@ -68,11 +67,11 @@ Let's briefly recap about the Gatsby project structure.
 
 ==== A JavaScript project
 
-As non-javascript developer I needed to start with few things around the JS project.
+As non-javascript developer I want to start with few things around the JS projects in general.
 
 * dependencies are defined in `package.json`
-* JS world uses many dependency managers - default `npm`, better `yarn`, newer a and faster `pnpm`
-  (`yarn` sounds good to be used)
+* JS world uses many package managers - default `npm`, better `yarn`, newer a and faster `pnpm`
+  (I chose `yarn`)
 * `yarn install` downloads `js` dependencies and places them under `$PWD/node_modules`
 * when dependencies are installed a `lock` files (`yarn.lock`, `package-lock.json`) are created.
   They ensures the same versions of the libraries are used when building subsequently on other environments.
@@ -84,40 +83,39 @@ As non-javascript developer I needed to start with few things around the JS proj
 
 ==== A Gatsby project
 
-Now what I learnt about the Gatsby itself.
+Now a bit about the Gatsby itself.
+
+The good way is to click through the structure of
+https://github.com/alxshelepenok/gatsby-starter-lumen/[the Lumen Starter directory structure]
+or https://github.com/spences10/thelocalhost/tree/blog-post-code[the tutorial project].
+It may not contain all but it sheds light on the parts.
 
 image::articles/gatsby-font-title.jpg["Illustrative image of art deco Gatsby font"]
 
-* The configuration file is `gatsby-config.[js,ts]`. It defines global properties and configures gatsby plugins
-  where the plugin needs to be defined as dependency in `package.json` as well.
+* The configuration file is `gatsby-config.[js,ts]`. It defines global properties and configures gatsby plugins.
+* Any plugin needs to be declared as dependency in `package.json` as well.
 * The configuration file `gatsby-node.js` defines hooks that are executed on startup of nodejs.
   It's a way to setup dynamic pages where we want to list a set of options, like categories or tags are.
 * The `gatsby-browser.js` sets up the behaviour for browsers (e.g. SCSS files).
 * The `content/config.js` is used by _Lumen theme_ to get some basic config of site (e.g., title).
 
-Then we have a directory structure explained better
-https://www.gatsbyjs.com/docs/reference/gatsby-project-structure/[at the Gatsby documentation].
-But quick view on what I needed.
+Besides the configuration files there is the directory structure (details
+https://www.gatsbyjs.com/docs/reference/gatsby-project-structure/[at the Gatsby documentation]).
 
 The Gatsby is a React application thus the directory structure consists of _Gatsby specific parts_
 and the directories _comming from React_.
 
-* `public/` is automatically generated and contains output of the build process (part of `.gitignore`)
-* `static/` contains data that are copied to `public/` as they are, may contain images for example
-* `content/` is not standard Gatsby directory but it's usually configured in
-   https://github.com/alxshelepenok/gatsby-starter-lumen/blob/3a6dbc17ca00ad4ccc84e82a840b59c3824ab709/gatsby-config.ts#L20[`gatsby-config`]
-   and contains Mardown or Asciidoctor sources, later processed by particular plugins
-* `src/` directory contains all code
-** `src/pages/` happens to be generated as a page directly based on the path (e.g., `index.js` could be created)
+* `public/` is not to be touched. it's automatically generated and it contains output of the build process (part of `.gitignore`)
+* `static/` contains data that are copied to `public/` as they are. used for placing image files etc.
+* `content/` is not a standard Gatsby directory but it's usually used by the plguins (`md`, `adoc`). it's configured at
+   https://github.com/alxshelepenok/gatsby-starter-lumen/blob/3a6dbc17ca00ad4ccc84e82a840b59c3824ab709/gatsby-config.ts#L20[gatsby-config.ts]
+* `src/` directory contains code
+** `src/pages/` contains pages that's are generated directly at the path (e.g., it's a place for `index.js`)
 ** `src/templates` templates used in programatically build pages
 ** `src/compontents` react directory, contains react components that can be used within `templates`
 ** `src/hooks/` react directory, hooks that can be invoked from components retrieving data, &hellip;
 ** `src/utils/` react directory, utilities
 ** `src/types/` react directory, for typescript types definitions
-
-The best is to click through https://github.com/alxshelepenok/gatsby-starter-lumen/[the Lumen Starter directory structure]
-or https://github.com/spences10/thelocalhost/tree/blog-post-code[the tutorial project].
-It may not contain or have some additional directories to what mentioned but it sheds light on this part.
 
 image::articles/gatsby-font-line.jpg["A decorator line", height=30]
 
@@ -127,18 +125,30 @@ If it's installed with `yarn` we could have configured
 https://github.com/ochaloup/gatsby-from-scratch/blob/main/hello-world/package.json#L8[the `script`]
 that works from `node_modules`.
 
-The Lumen can be started at localhost dev mode with `yarn start`. Then the side can be accessed at http://localhost:8000
-and graphql at http://localhost:8000/___graphql (all that info shown at console during startup).
+On starting with _Lumen Starter_
+
+[source,sh]
+----
+# getting the code to be adjusted
+git clone https://github.com/alxshelepenok/gatsby-starter-lumen
+cd gatsby-starter-lumen
+# installing dependencies under node_modules
+yarn install
+# starting developmer mode
+yarn start
+----
+
+The Lumen is started at localhost in dev mode.
+The site can be accessed at http://localhost:8000
+(graphql at http://localhost:8000/___graphql).
 
 === React GraphQL and Gatsby
 
-All data that Gatsby works with comes through the GraphQL (processing comes from React).
-The Markdown and Asciidoctor plugins processes the documents
-where the results can be consumed by GraphQL queries. All components then loads stuff
-information like title, tags and generated HTML and places it based on the visual demands to particular places.
+All data that Gatsby works with comes through the GraphQL processing (i.e., React).
+The Markdown and Asciidoc plugins processes the documents and the results are consumed with GraphQL queries.
+Components queries _title_, _tags_, _generated HTML_ etc. That data is places to pages dependent on the visual demands.
 
-The most of the work for moving from Markdown to Asciidoctor was a need to map the Markdown based GraphQL query
-that's part of the Lumen Starter and change it for Asciidoctor.
+The most of the work for met on moving from Markdown to Asciidoc was the remapping of the Markdown GraphQL queries that the _Lumen Starter_ uses and to change them for Asciidoc.
 
 My work with tutorial tried to work with `adoc` and `md` data (MDX plugin is used) side by side.
 You can see e.g., here https://github.com/ochaloup/gatsby-from-scratch/blob/main/hello-world/src/pages/index.js#L40
@@ -185,10 +195,9 @@ query SITE_INDEX_QUERY {
 }
 ----
 
-That query could be investigated in GraphQL console (http://localhost:8000/___graphql)
-when running in developer mode.
+That query could be investigated in GraphQL console (http://localhost:8000/___graphql).
 The data generated by both plugins are structured in a bit different form
-that comes for example from fact that Asciidoctor works with a pre-defined
+that comes for example from fact that Asciidoc works with a pre-defined
 https://docs.asciidoctor.org/asciidoc/latest/document/header/[header metadata]
 while Markdown with no specific spec here.
 
@@ -257,7 +266,7 @@ chalda <ondrej.chaloupka@proton.me>
 :page-synopsis: Something about my friends
 :page-title: Article
 :page-path: /2022/2022-10-08-a-test
-:page-category: Asciidoctor
+:page-category: Asciidoc
 :page-tags: One, Two, Three
 
 How does it work? Good?
@@ -294,14 +303,14 @@ The GraphQL response for the document is
 
 image::articles/gatsby-font-line.jpg["A decorator line", height=30]
 
-=== Gatsby Lumen Starter changes for Asciidoctor to work
+=== Gatsby Lumen Starter changes for Asciidoc to work
 
-==== Markdown to Asciidoctor: Plugins
+==== Markdown to Asciidoc: Plugins
 
 I changed the
 https://github.com/alxshelepenok/gatsby-starter-lumen/blob/fa2bac05139875408fe9f36bba59289ada3d3d6e/gatsby-config.ts#L92[Markdown plugin `gatsby-transformer-remark`]
 for
-https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/gatsby-config.ts#L95[Asciidoctor plugin `gatsby-transformer-asciidoc`].
+https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/gatsby-config.ts#L95[Asciidoc plugin `gatsby-transformer-asciidoc`].
 
 That change requires to delete other Mardown/remark plugins from configuration
 as `gatsby-remark-images` (better image handling), `gatsby-remark-responsive-iframe` (iframe wrapped to responsive elastic containe),
@@ -309,11 +318,11 @@ as `gatsby-remark-images` (better image handling), `gatsby-remark-responsive-ifr
 `gatsby-remark-copy-linked-files` (copying local files linked in `md` to the `public/` directory),
 gatsby-remark-smartypants` (Replaces "dumb" punctuation marks), `gatsby-remark-external-links` (adds the target and rel attributes to external links).
 
-With using Asciidoctor I needed to abandon that functionality (or add it differently when needed).
+With using Asciidoc I needed to abandon that functionality (or add it differently when needed).
 That's pity but I just wanted the asciidoc syntax a lot!
 
 
-==== Markdown to Asciidoctor: GraphQL
+==== Markdown to Asciidoc: GraphQL
 
 The next step was to change all the GraphQL queries from Markdown structure to Asciidoc one.
 It's quite similar while a bit different in details.
@@ -329,7 +338,7 @@ or you can check github
 * `adoc` asciidoc plugin : https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/hooks/use-categories-list.ts#L12
 
 Then there was still the trouble with metadata format. The Markdown may work with _"a list"_
-while the Asciidoctor works only with _strings_.
+while the Asciidoc works only with _strings_.
 Check
 https://raw.githubusercontent.com/alxshelepenok/gatsby-starter-lumen/fa2bac05139875408fe9f36bba59289ada3d3d6e/content/posts/2016-01-09---Perfecting-the-Art-of-Perfection/index.md[how tags are defined in `md`] like
 
@@ -364,7 +373,7 @@ in case of `asciidoc` it's needed to get all data, parse it and group it in type
 * parse and group to get `totalCount`: https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/utils/group-tags.ts#L11
 
 
-==== Markdown to Asciidoctor: Image paths
+==== Markdown to Asciidoc: Image paths
 
 The remark consists of plugin `gatsby-remark-copy-linked-files` that checks what are files used in `md` file
 and then it copies them to `public/` directory where the static generated result page is placed.
@@ -382,7 +391,7 @@ when linked
 https://github.com/ochaloup/blog.chalda.cz/blame/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/content/posts/2017-05-17-asciidoctor.adoc#L18[from the `adoc` file].
 
 
-==== Markdown to Asciidoctor: Syntax highlighting
+==== Markdown to Asciidoc: Syntax highlighting
 
 One of the things I really want to work is syntax highlighting.
 The plugin `gatsby-remark-prismjs` was removed and I needed to add that somehow manually.
@@ -397,7 +406,7 @@ and then the utility used as effect
 https://github.com/ochaloup/blog.chalda.cz/blob/efdec3c4e5b84a9ed0ff35c4f6c72b9ca4e5e242/src/components/Post/Post.tsx#L27[in template of posts].
 
 
-==== Markdown to Asciidoctor: CSS Style changes
+==== Markdown to Asciidoc: CSS Style changes
 
 This part is not finished and not examined well for me. I needed to add some styling that I feel better about
 and I did it in different places just to get it working.
