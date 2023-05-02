@@ -1,0 +1,189 @@
+= Solana Anchor verifiable builds
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2023-05-02
+
+:page-template: post
+:page-draft: false
+:page-slug: solana-anchor-verifiable-builds
+:page-category: solana
+:page-tags: Solana, Anchor, Rust
+:page-description: How to create a verifiable build of the Solana Anchor program
+:page-socialImage:  /images/articles/anchor-build.jpg
+
+If one creates a program for Solana blockchain using Anchor framework,
+it's recommended to
+https://lorisleiva.com/create-a-solana-dapp-from-scratch/deploying-to-devnet[publish]
+it as https://www.anchor-lang.com/docs/verifiable-builds[verifiable build].
+You can find out that that's easy as to run `anchor build --verifiable`
+while there is not much else to find about.
+
+NOTE: This article is based on the Anchor version 0.27.0.
+
+== Why to do so?
+
+When the verifiable build is deployed to the Solana network, it's possible to
+check that the program binary is the same as the declared one.
+One can checkout the source code of the program at particular commit
+and run `anchor verify` against it. Immediately it's possible to see
+if the binary matches and no change was done to the program.
+
+For one can do the verification the deployed program has to be
+one created as a verifiable build, otherwise the `anchor verify` command fails.
+
+== What is a verifiable build?
+
+A verifiable build is a build of the program done within a clean pre-defined
+environment, in this case a Docker container.
+The default docker image is https://hub.docker.com/r/projectserum/build/tags[`project-serum/anchor`]
+(configured at https://github.com/coral-xyz/anchor/blob/v0.27.0/cli/src/config.rs#L370[anchor cli]).
+One can use a different image by setting the CLI option `-d, --docker-image <DOCKER_IMAGE>`.
+
+When the `anchor build --verifiable` is run, the docker image is pulled from docker hub
+and the build is done inside.
+As this is a clean environment the build process requires to download all the dependencies, do compilation
+and it takes some time. The result of the build is standard `.so` binary file
+which is stored at `./target/verifiable/`. The build generates also the IDLs
+which are stored at `./target/idl/` and `./target/types`.
+
+The compiled binary can be then published to network but I haven't found a way how to do it
+with `anchor deploy`. So I'm using the `solana` CLI tool to do it.
+
+[source,shell]
+----
+solana program deploy -v -u devnet --keypair ~/.config/solana/devnet.json \
+  --program-id <PROGRAM_ID> \
+  --program-authority <PATH_TO_KEYPAIR> \
+  ./target/verifiable/program.so
+----
+
+NOTE: usually `<PROGRAM_ID>` is defined at https://github.com/marinade-finance/liquid-staking-program/blob/447f9607a8c755cac7ad63223febf047142c6c8f/Anchor.toml#L9[`Anchor.toml`]
+
+== Uploading Anchor IDL
+
+When the program is deployed, the Anchor IDL
+https://lorisleiva.com/create-a-solana-dapp-from-scratch/deploying-to-devnet#bonus-publish-your-idl[has to be published]
+as well otherwise the verification of the build will fail.
+To upload the IDL use the one created by the verifiable build process.
+
+[source,shell]
+----
+ anchor idl init --provider.cluster devnet \
+   --filepath ./target/idl/program.json \
+   <PROGRAM_ID>
+----
+
+When the IDL has been uploaded once the further update of the account can be done with `upgrade` subcommand
+`anchor idl upgrade ...`.
+The permission to do the IDL upgrade is defined by the idl authority.
+
+[source,shell]
+----
+anchor idl authority --provider.cluster devnet <PROGRAM_ID>
+
+# one can change the idl account authority
+anchor idl set-authority --provider.cluster devnet \
+  --program-id <PROGRAM_ID> \
+  --new-authority <AUTHORITY_PUBKEY>
+----
+
+== Verifying the build
+
+To verify the build one runs the `anchor verify` command. The command runs again inside the docker image,
+it builds the program, generates the IDL and compares the result with the one deployed to the network.
+
+First one needs to checkout the source code of the program at the commit which was used for the build.
+Then one runs the `anchor verify` command.
+
+[source,shell]
+----
+# git checkout
+git clone <GIT_REPOSITORY>
+git checkout <COMMIT_HASH>
+
+# anchor verify
+anchor --provider.cluster devnet verify \
+  -p <PROGRAM_NAME> <PROGRAM_ID>
+----
+
+[.output example]
+====
+----
+...
+Copying out the build artifacts
+Cleaning up the docker target directory
+Removing the docker container
+595f4e94d9028adff8573512672adfc31a7dcce324a8b8976334acad963f1e0a
+Extracting the IDL
+Writing the IDL file
+Writing the .ts file
+Build success
+<PROGRAM_ID> is verified.
+----
+====
+
+`<PROGRAM_NAME>` is the name of library defined at https://github.com/marinade-finance/liquid-staking-program/blob/447f9607a8c755cac7ad63223febf047142c6c8f/programs/marinade-finance/Cargo.toml#L9[`Cargo.toml`] file. Usually the repository uses the hyphenated name while the library name is with underscores.
+If the name directory structure name is e.g., `programs/marinade-finance` then the <PROGRAM_NAME> is most probably `marinade_finance`.
+
+`<PROGRAM_ID>` is the address of the program deployed at blockchain, in our case the one deployed at devnet.
+
+== Two additional points
+
+It's nice that the verification cannot be done only against the deployed program but also against
+https://medium.com/coinmonks/solana-internals-part-2-how-is-a-solana-deployed-and-upgraded-d0ae52601b99[the buffer].
+When one writes binary to buffer the buffer content could be verified.
+
+[source,shell]
+----
+# write the program to buffer (-ud is shortcut for devnet cluster)
+solana -ud program write-buffer ./target/verifiable/program.so
+# buffer authority can be changed in case (not needed for verification)
+solana -ud program -um set-buffer-authority \
+  --new-buffer-authority <AUTHORITY_PUBKEY> <BUFFER_ID>
+# verify the buffer
+anchor --provider.cluster devnet verify -p <PROGRAM_NAME> <BUFFER_ID>
+----
+
+The second point is that the verifiable build and verification can be done also
+with non-anchor programs. We used this with
+https://github.com/solana-labs/solana-program-library/blob/governance-v3.1.0/governance/README.md[SPL Governance]
+and it worked well. As the IDL is not generated there is no check for the IDL and it works without it.
+
+[source,shell]
+----
+# get source code
+git clone https://github.com/solana-labs/solana-program-library -b governance-v3.1.0
+cd solana-program-library/governance/program
+# do the build
+anchor build --verifiable
+# deploy the program
+cd ../..
+solana -um -k ~/.config/solana/devnet.json program write-buffer ./target/verifiable/spl_governance.so
+# later the program can be upgraded from buffer to <PROGRAM_ID>
+
+# verify the build
+anchor --provider.cluster mainnet verify -p spl_governance <PROGRAM_ID>
+----
+
+== A docker issue
+
+Unfortunately I was not able to create verifiable build with `anchor build --verify` command on my machine.
+The only result I got was the error message
+
+----
+ERROR (5963): ENOENT: no such file or directory, open '/root/.config/solana/id.json'
+----
+
+I found the reason was some anchor version mismatch.
+I solved that by using newer version of the docker image
+`projectserum/build:v0.27.0`.
+Or in case to use own docker image based on the `projectserum/build` image
+from https://github.com/ochaloup/projectserum-build-docker
+(needed to be build locally first).
+
+With running `anchor build --verifiable -d projectserum/build:v0.27.0`
+the error message was gone and the build was successful.
+
+== Conclusion
+
+The verifiable build allows to verify the program binary against the source code. It's a recommended way for publishing the program
+to Solana blockchain.
