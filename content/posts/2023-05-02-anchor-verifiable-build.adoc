@@ -10,6 +10,8 @@ chalda <ondrej.chaloupka@proton.me>
 :page-description: How to create a verifiable build of the Solana Anchor program
 :page-socialImage:  /images/articles/anchor-build.jpg
 
+image::articles/anchor-build.jpg[]
+
 If one creates a program for Solana blockchain using Anchor framework,
 it's recommended to
 https://lorisleiva.com/create-a-solana-dapp-from-scratch/deploying-to-devnet[publish]
@@ -25,7 +27,7 @@ When the verifiable build is deployed to the Solana network, it's possible to
 check that the program binary is the same as the declared one.
 One can checkout the source code of the program at particular commit
 and run `anchor verify` against it. Immediately it's possible to see
-if the binary matches and no change was done to the program.
+if the binary matches the checked-out code and if no change was done to the program.
 
 For one can do the verification the deployed program has to be
 one created as a verifiable build, otherwise the `anchor verify` command fails.
