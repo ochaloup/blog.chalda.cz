@@ -187,20 +187,20 @@ the error message was gone and the build was successful.
 
 == BONUS: solana-security-txt
 
-For an usual contract it's a good practice for contract defining a metadata providing
-about the program. Besides others where is the source code and how to contact the author.
-This should be easily to parse and it's useful for security researchers.
+For an usual contract it's a good practice providing metadata about the program.
+Besides others there could be a link to source code, info about audit and how to contact the author.
+This is useful not only to security researchers.
 
 The Neodyme labs comes with a Rust library defining a macro
 https://github.com/neodyme-labs/solana-security-txt[`solana-security-txt`]
 inspired by https://securitytxt.org[security.txt] standard.
 
-The Rust program adds `solana-security-txt = "1.1.0"` dependency to the `Cargo.toml` file
-and then adds the metadata into the library source code https://github.com/marinade-finance/solana-program-library/commit/93d808aac6a69c253edc3cddc6e15f5a2c81be24[with macro definition `security_txt!`]. A simple example cound b e
+The program creator adds Rust dependency `solana-security-txt = "1.1.0"` to the `Cargo.toml` file
+and then adds the metadata into the library source code https://github.com/marinade-finance/solana-program-library/commit/93d808aac6a69c253edc3cddc6e15f5a2c81be24[with macro definition `security_txt!`]. A simple example cound be
 
 [source,rust]
 ----
-/// solana-security-txt definition
+/// solana-security-txt for admin contract
 use solana_security_txt::security_txt;
 security_txt! {
     name: "Simple admin contract",
@@ -216,7 +216,7 @@ security_txt! {
 The format, required fields and other details are described at the library
 https://github.com/neodyme-labs/solana-security-txt#format[README].
 
-The good part is that this security txt standard is integrated within
+The good part is that this standard is integrated within
 https://explorer.solana.com/address/GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs?cluster=devnet[the Solana explorer]
 and one can
 https://explorer.solana.com/address/GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs/security?cluster=devnet[check the content easily].
