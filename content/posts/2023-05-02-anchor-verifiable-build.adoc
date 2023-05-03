@@ -185,6 +185,42 @@ from https://github.com/ochaloup/projectserum-build-docker
 With running `anchor build --verifiable -d projectserum/build:v0.27.0`
 the error message was gone and the build was successful.
 
+== BONUS: solana-security-txt
+
+For an usual contract it's a good practice for contract defining a metadata providing
+about the program. Besides others where is the source code and how to contact the author.
+This should be easily to parse and it's useful for security researchers.
+
+The Neodyme labs comes with a Rust library defining a macro
+https://github.com/neodyme-labs/solana-security-txt[`solana-security-txt`]
+inspired by https://securitytxt.org[security.txt] standard.
+
+The Rust program adds `solana-security-txt = "1.1.0"` dependency to the `Cargo.toml` file
+and then adds the metadata into the library source code https://github.com/marinade-finance/solana-program-library/commit/93d808aac6a69c253edc3cddc6e15f5a2c81be24[with macro definition `security_txt!`]. A simple example cound b e
+
+[source,rust]
+----
+/// solana-security-txt definition
+use solana_security_txt::security_txt;
+security_txt! {
+    name: "Simple admin contract",
+    project_url: "https://github.com/ochaloup/simple-admin",
+    contacts: "twitter: @_chalda",
+    policy: "",
+    preferred_languages: "en, cz",
+    source_code: "https://github.com/ochaloup/simple-admin",
+    auditors: "None"
+}
+----
+
+The format, required fields and other details are described at the library
+https://github.com/neodyme-labs/solana-security-txt#format[README].
+
+The good part is that this security txt standard is integrated within
+https://explorer.solana.com/address/GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs?cluster=devnet[the Solana explorer]
+and one can
+https://explorer.solana.com/address/GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs/security?cluster=devnet[check the content easily].
+
 == Conclusion
 
 The verifiable build allows to verify the program binary against the source code. It's a recommended way for publishing the program
