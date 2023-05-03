@@ -40,7 +40,7 @@ As it's a clean environment, the build process requires the download of all depe
 The result of the build is a standard `.so` binary file, which is stored at directory `./target/verifiable/`.
 The build also generates the IDLs, which are stored at `./target/idl/` and `./target/types`.
 
-You can publish the compiled binary to the network (while I haven't found a way to use `anchor deploy` for this purpose.
+You can publish the compiled binary to the network (while I haven't found a way to use `anchor deploy` for this purpose).
 Instead, you can use the `solana` CLI tools.
 
 [source,shell]
@@ -117,7 +117,7 @@ Build success
 The `<PROGRAM_NAME>`` refers to the name of the library defined in the
 https://github.com/marinade-finance/liquid-staking-program/blob/447f9607a8c755cac7ad63223febf047142c6c8f/programs/marinade-finance/Cargo.toml#L9[`Cargo.toml`] file.
 The repository is usually in hyphenated form, while the library name is in underscore form.
-or instance, if the name of the directory structure is `programs/marinade-finance`,
+When the name of the directory structure is `programs/marinade-finance`,
 then the `<PROGRAM_NAME>` would most likely be `marinade_finance`.
 
  `<PROGRAM_ID>` refers to the address of the program that has been deployed on the blockchain, in our case, the one deployed on Devnet.
