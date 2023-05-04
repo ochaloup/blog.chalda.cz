@@ -28,12 +28,17 @@ against it to see if the binary matches the checked-out code, and if no changes 
 To verify a deployed program, it must(**!**) be published as a verifiable build;
 otherwise, the `anchor verify` command will fail.
 
-NOTE: This article is based on the Anchor version 0.27.0.
+NOTE: This article talks about experiences at the Anchor version 0.27.0.
 
 == What is a Verifiable Build?
 
-A verifiable build is a program build that is created in a predefined and clean environment, in this case, in the Docker container. By default, the docker image used is https://hub.docker.com/r/projectserum/build/tags[`project-serum/anchor`]
-(configured at https://github.com/coral-xyz/anchor/blob/v0.27.0/cli/src/config.rs#L370[anchor cli]), but you can use a different image by setting the CLI option `-d, --docker-image <DOCKER_IMAGE>`.
+A verifiable build is a program build that is created in a predefined and clean environment, in this case, in the Docker container.
+By default, the docker image used is https://hub.docker.com/r/projectserum/build/tags[`project-serum/anchor`],
+configured at https://github.com/coral-xyz/anchor/blob/v0.27.0/cli/src/config.rs#L370[anchor cli] in particular docker tag.
+You can specify to use a specific image with the CLI arguments `-d, --docker-image <DOCKER_IMAGE>`.
+Or specify docker tag in `Anchor.toml` file with
+https://github.com/ochaloup/simple-admin/blob/main/Anchor.toml#LL1C1-L1C1[`anchor_version` parameter]
+(`project-serum/anchor` is the image for the tag).
 
 When you run `anchor build --verifiable`, the docker image is pulled from Docker Hub, and the build is executed inside it.
 As it's a clean environment, the build process requires the download of all dependencies and the compilation takes some time.
@@ -67,7 +72,8 @@ Use the IDL created by the verifiable build process.
    <PROGRAM_ID>
 ----
 
-Once you have uploaded the IDL, you can update the IDL account with the `upgrade` subcommand using `anchor idl upgrade ...`. Note that the IDL authority defines who has got the permission to upgrade the IDL.
+Once you have uploaded the IDL, you can update the IDL account with the `upgrade` subcommand using `anchor idl upgrade ...`.
+Note that the IDL authority defines who has got the permission to upgrade the IDL.
 
 [source,shell]
 ----
@@ -172,13 +178,13 @@ ERROR (5963): ENOENT: no such file or directory, open '/root/.config/solana/id.j
 ----
 
 To work around this issue, I used a different Docker image with a newer version of Anchor.
-The ``projectserum/build:v0.27.0`` image worked for me (use `-d` switch).
-Alternatively, you could use my Docker image based on the `projectserum/build` image from
+The `projectserum/build:v0.27.0` image worked for me (use `-d` switch or `anchor_version` attribute).
+Alternatively, you could use my own Docker image from
 https://github.com/ochaloup/projectserum-build-docker (build it first locally).
 
 [source,sh]
 ----
-anchor build --verifiable -d projectserum/build:v0.27.0
+anchor build --verifiable -d 'projectserum/build:v0.27.0'
 ----
 
 WARNING: When using a different Docker image for verification, be sure to double-check the result.
@@ -214,13 +220,12 @@ The solution could be to initialize the IDL again,
 but initialization of an already-existing account is not possible and will result in an error message (`Error processing Instruction 0: custom program error: 0x0`).
 
 What may help is Anchor version 0.27.0, which introduces the `anchor idl close` command.
-However, you need to have uploaded a program compiled with Anchor 0.27.0, which is not the case when
-by default `anchor build --verifiable` works at version `0.26.0`.
+However, you have to build the verifiable binary compiled with Anchor 0.27.0.
+Be aware that default tag for `anchor build --verifiable` is `0.26.0`.
 
-When a program is built by a older version of Anchor
-is cannot recognize the command `idl close`.
-Then an error code can be emitted: `0x66/102`
-https://docs.rs/anchor-lang/latest/anchor_lang/error/enum.ErrorCode.html#variant.InstructionDidNotDeserialize[`The program could not deserialize the given instruction`].
+A program that was build with older Anchor version does not implement the command `idl close`,
+instead  error `0x66/102`
+https://docs.rs/anchor-lang/latest/anchor_lang/error/enum.ErrorCode.html#variant.InstructionDidNotDeserialize[`The program could not deserialize the given instruction`] is emitted.
 
 == BONUS: solana-security-txt
 
@@ -231,21 +236,21 @@ Neodyme Labs has created a Rust library that defines a macro, called
 https://github.com/neodyme-labs/solana-security-txt[`solana-security-txt`]
 inspired by https://securitytxt.org[security.txt] standard.
 
-To use this library, the program creator should add the Rust dependency `solana-security-txt = "1.1.0"` to the `Cargo.toml`
+To use this library, the program creator should add the Rust dependency`solana-security-txt = "1.1.0"` to
+https://github.com/ochaloup/simple-admin/blob/main/programs/simple-admin/Cargo.toml#L20[`Cargo.toml`]
 file, and then add the metadata to the library source code using
-https://github.com/marinade-finance/solana-program-library/commit/93d808aac6a69c253edc3cddc6e15f5a2c81be24[the `security_txt!` macro definition]. A simple example can be seen below.
+https://github.com/ochaloup/simple-admin/blob/main/programs/simple-admin/src/lib.rs#L12[the `security_txt!` macro definition]. A simple example can be seen below.
 
 [source,rust]
 ----
 /// solana-security-txt for admin contract
 use solana_security_txt::security_txt;
 security_txt! {
-    name: "Simple admin contract",
+    name: "Simple admin contract for testing purposes",
     project_url: "https://github.com/ochaloup/simple-admin",
     contacts: "twitter: @_chalda",
     policy: "",
     preferred_languages: "en, cz",
-    source_code: "https://github.com/ochaloup/simple-admin",
     auditors: "None"
 }
 ----
@@ -254,9 +259,9 @@ The format, required fields, and other details are described in the library's
 https://github.com/neodyme-labs/solana-security-txt#format[README] on GitHub.
 
 One of the benefits of this standard is that it is integrated within
-https://explorer.solana.com/address/GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs?cluster=devnet[the Solana explorer],
+https://explorer.solana.com/address/sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS?cluster=devnet[the Solana explorer],
 allowing easy access to the metadata by anyone who wishes
-https://explorer.solana.com/address/GovMaiHfpVPw8BAM1mbdzgmSZYDw2tdP32J2fapoQoYs/security?cluster=devnet[to check it].
+https://explorer.solana.com/address/sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS/security?cluster=devnet[to check it].
 
 == Conclusion
 
