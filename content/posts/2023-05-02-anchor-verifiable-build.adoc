@@ -83,7 +83,18 @@ anchor idl authority --provider.cluster devnet <PROGRAM_ID>
 anchor idl set-authority --provider.cluster devnet \
   --program-id <PROGRAM_ID> \
   --new-authority <AUTHORITY_PUBKEY>
+
+# when a new authority is set --provider.wallet is for define what authority is used on idl upgrade
+anchor idl upgrade \
+  --provider.cluster devnet \
+  --provider.wallet <AUTHORITY_KEYPAIR_PATH> \
+  --filepath ./target/idl/program.json \
+  <PROGRAM_ID>
 ----
+
+NOTE: command `anchor idl upgrade` consists of two instructions which are sent to the network
+      and are defined within the anchor framework and are available as separate CLI commands as well.
+      It's `write-buffer` (idl data saved at blockchain) and `set-buffer` (the saved data loaded into program idl account).
 
 == Verifying the build
 
