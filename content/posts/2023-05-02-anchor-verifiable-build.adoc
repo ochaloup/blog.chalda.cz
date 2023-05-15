@@ -171,7 +171,7 @@ cd solana-program-library/governance/program
 anchor build --verifiable
 # deploy the program
 cd ../..
-solana -um -k ~/.config/solana/devnet.json program write-buffer ./target/verifiable/spl_governance.so
+solana -um -k ~/.config/solana/mainnet.json program write-buffer ./target/verifiable/spl_governance.so
 # later the program can be upgraded from buffer to <PROGRAM_ID>
 
 # verify the build
