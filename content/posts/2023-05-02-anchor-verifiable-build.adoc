@@ -169,10 +169,16 @@ git clone https://github.com/solana-labs/solana-program-library -b governance-v3
 cd solana-program-library/governance/program
 # do the build
 anchor build --verifiable
-# deploy the program
+# deploy the program (-k is keypair paying fee)
 cd ../..
-solana -um -k ~/.config/solana/mainnet.json program write-buffer ./target/verifiable/spl_governance.so
+solana -um -k ~/.config/solana/mainnet.json program write-buffer \
+  --buffer-authority <SOME_AUTORITY_KEYPAIR> \
+  ./target/verifiable/spl_governance.so
 # later the program can be upgraded from buffer to <PROGRAM_ID>
+solana program -um -k ~/.config/solana/mainnet.json deploy \
+  --program-id <PROGRAM_ID> \
+  --upgrade-authority <SOME_AUTORITY_KEYPAIR> \
+  --buffer <BUFFER_PUBKEY>
 
 # verify the build
 anchor --provider.cluster mainnet verify -p spl_governance <PROGRAM_ID>
