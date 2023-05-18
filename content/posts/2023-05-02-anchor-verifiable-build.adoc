@@ -188,7 +188,7 @@ anchor --provider.cluster mainnet verify -p spl_governance <PROGRAM_ID>
 
 === A docker image build error
 
-My Docker build was failing with the `anchor build --verify` command and returning the error message:
+My Docker build was failing with the `anchor build --verifiable` command and returning the error message:
 
 ----
 ERROR (5963): ENOENT: no such file or directory, open '/root/.config/solana/id.json'
