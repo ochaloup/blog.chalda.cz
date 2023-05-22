@@ -1,16 +1,16 @@
-= Decoding Solana Transaction
+= Manually decoding Solana data
 chalda <ondrej.chaloupka@proton.me>
 1.0, 2023-05-21
 
 :page-template: post
 :page-draft: true
-:page-slug: decoding-solana-transaction
+:page-slug: decoding-solana-data
 :page-category: solana
 :page-tags: Solana, Python
-:page-description: A way to manually semi-read Solana transaction data
-:page-socialImage:  /images/articles//decoding-solana-transaction/decipher-solana-transaction.jpg
+:page-description: A way to manually semi-read Solana transaction and account data
+:page-socialImage:  /images/articles/decoding-solana-data/decipher-solana-data.jpg
 
-image::articles/decipher-solana-transaction.jpg[]
+image::articles/decoding-solana-data/decipher-solana-data.jpg[]
 
 When working with Solana I often need to check what is in the transaction, or in the Solana account.
 The reading of data is usually done in some UI that one does not need to do it manually.
@@ -20,7 +20,7 @@ I will share here a way how I do it and on the way we will explore several tools
 NOTE: As disclaimer I'm not a fried of the hexadecimal format. And there for sure are other ways how to do the task
       I'll be glad to learn, feel free to share with me at link:https://twitter.com/_chalda[@_chalda].
 
-== Solana transactions and accounts data
+== Solana transaction and account data
 
 Let's talk a bit about the Solana transactions and accounts.
 We don't go into details here as there are many other resources
@@ -115,10 +115,11 @@ solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTx
 }
 ----
 
-== Converting data to u8 array
+== Converting data to uint8 array
 
-I learnt to be checking the data content in form of u8 array. Bytes are represented by unsigned integer.
-It's the same binary format as one can see when prints content of the private key.
+I learnt to be checking the data content in form of uint8 binary data array.
+Bytes are represented as unsigned integers.
+It's the same binary format as one can see when prints e.g., content of the private key file.
 
 I learnt to use a simple python scripts that converts data from and there.
 It can be seen at my gist as
