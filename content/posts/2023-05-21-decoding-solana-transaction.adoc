@@ -1,0 +1,184 @@
+= Decoding Solana Transaction
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2023-05-21
+
+:page-template: post
+:page-draft: true
+:page-slug: decoding-solana-transaction
+:page-category: solana
+:page-tags: Solana, Python
+:page-description: A way to manually semi-read Solana transaction data
+:page-socialImage:  /images/articles//decoding-solana-transaction/decipher-solana-transaction.jpg
+
+image::articles/decipher-solana-transaction.jpg[]
+
+When working with Solana I often need to check what is in the transaction, or in the Solana account.
+The reading of data is usually done in some UI that one does not need to do it manually.
+While sometimes using UI is not possible or it is not convenient, or one just wants to ensure what the data are really there.
+I will share here a way how I do it and on the way we will explore several tools that can be helpful here.
+
+NOTE: As disclaimer I'm not a fried of the hexadecimal format. And there for sure are other ways how to do the task
+      I'll be glad to learn, feel free to share with me at link:https://twitter.com/_chalda[@_chalda].
+
+== Solana transactions and accounts data
+
+Let's talk a bit about the Solana transactions and accounts.
+We don't go into details here as there are many other resources
+that go deeper in the details. For purpose of this article we want just to define
+that link:https://solanacookbook.com/core-concepts/accounts.html#account-model[a Solana account] has got some common properties (like `owner`, `lamports` etc.)
+but the stored data is an arbitrary binary data
+where is only the owner program that defines the structure.
+Similar is true for the transaction. Transaction has got
+defined link:https://medium.com/@asmiller1989/solana-transactions-in-depth-1f7f7fe06ac2[a specific format]
+of accounts that participate in the transaction, but when we consider the call data
+those are encoded in particular format only by the program.
+
+== Solana CLI to fetch data
+
+Let's print some data to investigate on them.
+
+NOTE: I use data of a simple contract program link:https://github.com/ochaloup/simple-admin[`simple-admin].
+      It provides a way to create an admin account and when created one can ask to print a message into transaction log.
+
+We use `solana account` command to fetch the data about account.
+By default the output shows data in the hexadecimal format. With `--output` we get them in `base64`.
+
+[source,sh]
+----
+# account DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ is an admin account of simple-admin contract
+solana -ud account DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ --output json
+----
+
+
+[source,json]
+.--output json
+----
+{
+  "pubkey": "DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ",
+  "account": {
+    "lamports": 1224960,
+    "data": [
+      "pZvg+dv0TqnyG8J8NTj5iMEN0Cv0IG7X57+QlCAJzwcIXnvdhqAXFQMAAAAAAAAA",
+      "base64"
+    ],
+    "owner": "sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS",
+    "executable": false,
+    "rentEpoch": 0
+  }
+}
+----
+
+In the same way we can fetch data about a transaction.
+I chose one of the transactions that works with the `simple-admin` contract.
+We use `solana confirm` command with `-v` switch to get all data from the transaction,
+without the switch only confirmation about the transaction state is displayed.
+When we use the `--output json` we get data in `base58` format(**!**).
+
+[source,sh]
+----
+solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF --output json -v
+----
+
+[source,json]
+.--output json (shortened)
+----
+{
+  "confirmationStatus": "finalized",
+  "transaction": {
+    ...
+    "message": {
+      "header": {
+        "numRequiredSignatures": 2,
+        "numReadonlySignedAccounts": 1,
+        "numReadonlyUnsignedAccounts": 1
+      },
+      "accountKeys": [
+        "CUuLjSEx7q3AB3sRGn3sMJBsSNTmULwowMGUh6NdsxQD",
+        "HJ6DPqQhAYRw8YyEuVXV8mwzzNAexxEYVC3aQutWxWn8",
+        "DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ",
+        "sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS"
+      ],
+      "recentBlockhash": "GJ8fngsibguWjKTAYWeDnqKd4P7mYntDhdEBQpUjyHM6",
+      "instructions": [
+        {
+          "programIdIndex": 3,
+          "accounts": [
+            2,
+            1
+          ],
+          "data": "7oAbCvAjeJqUZ7RpVyY51x5Sa"
+        }
+      ]
+    }
+    ...
+  },
+}
+----
+
+== Converting data to u8 array
+
+I learnt to be checking the data content in form of u8 array. Bytes are represented by unsigned integer.
+It's the same binary format as one can see when prints content of the private key.
+
+I learnt to use a simple python scripts that converts data from and there.
+It can be seen at my gist as
+link:https://gist.github.com/ochaloup/58ceee3ed436766ba7c444bf3fbc8545[tobase58.py],
+link:https://gist.github.com/ochaloup/8ecfd13ea84d4ac8603569716b1b34fb[frombase58.py],
+link: https://gist.github.com/ochaloup/e942f43e6c8a1356f422a1703596bad2[tobase64.py],
+link:https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea[frombase64.py].
+
+++++
+<table>
+  <tr>
+    <td>
+    <script src="https://gist.github.com/ochaloup/58ceee3ed436766ba7c444bf3fbc8545.js"></script>
+    </td>
+    <td>
+    <script src="https://gist.github.com/ochaloup/8ecfd13ea84d4ac8603569716b1b34fb.js"></script>
+    </td>
+    <td>
+    <script src="https://gist.github.com/ochaloup/e942f43e6c8a1356f422a1703596bad2.js"></script>
+    </td>
+    <td>
+    <script src="https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea.js"></script>
+    </td>
+  </tr>
+</table>
+++++
+
+(like generated one `solana-keyben new --output /tmp/random.keypair; cat /tmp/random.keypair`).
+
+
+[NOTE]
+====
+Instead of argument `solana ccount--output` we can use `--output-file /path/to/file`
+that makes the account data to be saved in a file in the binary form.
+One way to work with them is to use bash `od` command like this:
+
+[source,sh]
+----
+# loading data from binary format as u8 array
+decimal_array=($(od -An -t u1 < '/path/to/file'))
+# printing data
+echo "${decimal_array[@]}"
+
+# printing only last 32 bytes of the loaded data
+echo "${decimal_array[@]:(-32):32}"
+----
+
+====
+
+
+
+The data of the Solana accounts and the data part of the Solana transaction are just binary data that the particular program defines the structure of the data. It can be arbitrary.
+For Anchor program, at least, there are some basic expectations we can consider
+(like first 8 bytes are the discriminator and data is encoded by borsh).
+
+
+
+
+https://bettercallsol.dev/ -> https://blog.labeleven.dev/solana-transactions-with-better-call-sol
+https://borsh.m2.xyz/address/5CYBeckoJMrJ9pg1qXi3vcn2CxrYTgQ7KVt1nysWTMMV
+https://anchor.so/tx/inspector
+https://solana.fm/address/8szGkuLTAux9XMgZ2vtY39jVSowEcpBfFfD8hXSEqdGC/anchor-account?cluster=devnet-solana&mode=pro
+https://solana.fm/tx/55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF?cluster=devnet-solana&mode=pro
