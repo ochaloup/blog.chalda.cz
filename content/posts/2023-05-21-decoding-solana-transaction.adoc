@@ -25,13 +25,15 @@ NOTE: As disclaimer I'm not a fried of the hexadecimal format. And there for sur
 Let's talk a bit about the Solana transactions and accounts.
 We don't go into details here as there are many other resources
 that go deeper in the details. For purpose of this article we want just to define
-that link:https://solanacookbook.com/core-concepts/accounts.html#account-model[a Solana account] has got some common properties (like `owner`, `lamports` etc.)
-but the stored data is an arbitrary binary data
-where is only the owner program that defines the structure.
-Similar is true for the transaction. Transaction has got
+that Solana defines
+link:https://solanacookbook.com/core-concepts/accounts.html#account-model[an account] having
+several attributes (like `owner` or possession of `lamports`)
+and then the account content is defined as a raw binary data
+where the owning program defines the structure.
+It's similar with transactions. A transaction has got
 defined link:https://medium.com/@asmiller1989/solana-transactions-in-depth-1f7f7fe06ac2[a specific format]
-of accounts that participate in the transaction, but when we consider the call data
-those are encoded in particular format only by the program.
+of accounts that participate in the transaction, but the call data
+are encoded in format defined by the owning program.
 
 == Solana CLI to fetch data
 
@@ -117,16 +119,20 @@ solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTx
 
 == Converting data to uint8 array
 
-I learnt to be checking the data content in form of uint8 binary data array.
+I learnt to check the data content in form of `uint8` binary data array.
 Bytes are represented as unsigned integers.
-It's the same binary format as one can see when prints e.g., content of the private key file.
+It's the same format as one can see when prints content of the private key file
+(like generated one `solana-keyben new --output /tmp/random.keypair; cat /tmp/random.keypair`).
 
-I learnt to use a simple python scripts that converts data from and there.
-It can be seen at my gist as
+I use simple python scripts that converts data from here and there.
+It can be found at my gist here:
 link:https://gist.github.com/ochaloup/58ceee3ed436766ba7c444bf3fbc8545[tobase58.py],
 link:https://gist.github.com/ochaloup/8ecfd13ea84d4ac8603569716b1b34fb[frombase58.py],
 link: https://gist.github.com/ochaloup/e942f43e6c8a1356f422a1703596bad2[tobase64.py],
 link:https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea[frombase64.py].
+And scripts to do some handling of that data:
+link:https://gist.github.com/ochaloup/4d6ca93a6826a65c3f1f781d5af59d4b[arraybyindex.sh],
+link:https://gist.github.com/ochaloup/87d8745c0aa7797fe1e9dbdfdb01c931[toout.py].
 
 ++++
 <table>
@@ -144,11 +150,16 @@ link:https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea[frombase6
     <script src="https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea.js"></script>
     </td>
   </tr>
+  <tr>
+    <td>
+    <script src="https://gist.github.com/ochaloup/4d6ca93a6826a65c3f1f781d5af59d4b.js"></script>
+    </td>
+    <td>
+    <script src="https://gist.github.com/ochaloup/87d8745c0aa7797fe1e9dbdfdb01c931.js"></script>
+    </td>
+  </tr>
 </table>
 ++++
-
-(like generated one `solana-keyben new --output /tmp/random.keypair; cat /tmp/random.keypair`).
-
 
 [NOTE]
 ====
@@ -169,6 +180,104 @@ echo "${decimal_array[@]:(-32):32}"
 
 ====
 
+== Data interpretation
+
+We started with the simple Solana program contract written with https://www.anchor-lang.com[Anchor].
+When the program is written with Anchor we have a benefit that we know that data is encoded
+with https://borsh.io[borsh] and that Anchor uses `8 bytes`
+https://docs.rs/anchor-lang/latest/anchor_lang/trait.Discriminator.html[discriminator]
+(`sha256` hash of the account's Rust identifier).
+
+We have the https://github.com/ochaloup/simple-admin/[contract source code]
+at the hand.
+The data structure of the
+https://github.com/ochaloup/simple-admin/blob/blog-post/programs/simple-admin/src/state/simple_account.rs[`simple_account`]
+is declaratively defined in the code. We can see there is `Pubkey`
+that https://docs.rs/solana-program/latest/solana_program/pubkey/struct.Pubkey.html[Solana uses of length 32 bytes]
+and then a `u64` number that has got length of 8 bytes.
+
+[source,rust]
+----
+pub struct SimpleAccount {
+    pub admin: Pubkey,
+    pub print_call_count: u64,
+}
+----
+
+With call of `solana account` CLI command we've got `base64` formatted data. Let's decode it to uint array
+with the use of the scripts above.
+
+[source,sh]
+----
+solana -ud account DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ --output json
+# ... taking data base64 string ...
+
+frombase64.py pZvg+dv0TqnyG8J8NTj5iMEN0Cv0IG7X57+QlCAJzwcIXnvdhqAXFQMAAAAAAAAA
+> [165,155,224,249,219,244,78,169,242,27,194,124,53,56,249,136,193,13,208,43,244,32,110,215,231,191,144,148,32,9,207,7,8,94,123,221,134,160,23,21,3,0,0,0,0,0,0,0]
+----
+
+We can see the array consists of 48 bytes. The first 8 bytes is the descriptor of Anchor,
+the next 32 bytes is the `Pubkey` and last 8 bytes is the number
+(it's the uint and Solana uses Little Endian encoding).
+
+[source,sh]
+----
+# reading bytes at index 8 (9th byte) in length of 32 bytes
+arraybyindex.sh [165,155,224,249,219,244,78,169,242,27,194,124,53,56,249,136,193,13,208,43,244,32,110,215,231,191,144,148,32,9,207,7,8,94,123,221,134,160,23,21,3,0,0,0,0,0,0,0] 8 32
+# > [242,27,194,124,53,56,249,136,193,13,208,43,244,32,110,215,231,191,144,148,32,9,207,7,8,94,123,221,134,160,23,21]
+# printing the 32 bytes in base58 format (Pubkey)
+tobase58.py [242,27,194,124,53,56,249,136,193,13,208,43,244,32,110,215,231,191,144,148,32,9,207,7,8,94,123,221,134,160,23,21]
+HJ6DPqQhAYRw8YyEuVXV8mwzzNAexxEYVC3aQutWxWn8
+
+# reading bytes at index 40 (41st byte) in length of 8 bytes
+arraybyindex.sh [165,155,224,249,219,244,78,169,242,27,194,124,53,56,249,136,193,13,208,43,244,32,110,215,231,191,144,148,32,9,207,7,8,94,123,221,134,160,23,21,3,0,0,0,0,0,0,0] 40 8
+# > [3,0,0,0,0,0,0,0]
+# printing the 8 bytes as integer
+toout.py [3,0,0,0,0,0,0,0] int
+# > 3
+----
+
+Until now we omitted the first 8 bytes which is the Anchor discriminator (i.e., `[165,155,224,249,219,244,78,169]`).
+It's https://solana.stackexchange.com/a/5998/1386[a hash of account name] and we can consider it as internal Anchor details.
+But if we want to double-check that we work with the right account - as the Anchor uses the discriminator to ensure
+the loaded data belongs to the right account - then when having the source code we can get expanded version of the sources
+when using `expand` CLI arguments.
+
+[source,sh]
+----
+git clone https://github.com/ochaloup/simple-admin.git -b blog-post
+
+anchor expand
+# ...
+# > Expanded simple-admin into file .anchor/expanded-macros/simple-admin/simple-admin-0.1.0.rs
+
+cat .anchor/expanded-macros/simple-admin/simple-admin-0.1.0.rs | grep -i Discriminator
+# ...
+# > impl anchor_lang::Discriminator for SimpleAccount {
+# >     const DISCRIMINATOR: [u8; 8] = [165, 155, 224, 249, 219, 244, 78, 169];
+----
+
+=== Looking at non-Anchor accounts
+
+// SPL Token check
+
+The similar approach can be used when one search for a filter format to print data of program accounts (using Solana RPC HTTP call
+https://docs.solana.com/api/http#getprogramaccounts[getProgramAccounts]).
+See details in my answer about looking through
+https://solana.stackexchange.com/questions/5677/deployed-contracts-from-a-user-address/5691#5691[the Solana bpf_loader_upgradeable data structures].
+
+[NOTE]
+====
+Native Solana programs often use `bincode` library (within `serde`) to get the data coded.
+The `borsh` and `bincode` base64 data formats are not fully compatible but they could be transfered.
+Recently I started https://github.com/coral-xyz/anchor/pull/2486#issuecomment-1549469516[a discussion at Anchor project]
+where the maintainer `acheroncrypto` managed the coding
+https://github.com/coral-xyz/anchor/pull/2486/commits/b99beceb52e5b814dbc8953146b074fbe1b57b82#diff-c1f8f7498da827a634bddc8a7559198bc99b296e9d9e8b91a70b503662995b8cR2248[from bincode to borsh base64 format].
+====
+
+=== Data of transaction
+
+// TODO:
 
 
 The data of the Solana accounts and the data part of the Solana transaction are just binary data that the particular program defines the structure of the data. It can be arbitrary.
