@@ -257,23 +257,100 @@ cat .anchor/expanded-macros/simple-admin/simple-admin-0.1.0.rs | grep -i Discrim
 # >     const DISCRIMINATOR: [u8; 8] = [165, 155, 224, 249, 219, 244, 78, 169];
 ----
 
-=== Looking at non-Anchor accounts
+=== Looking at non-Anchor program accounts
 
-// SPL Token check
+As there are no prescriptions in the data format in the accounts
+it's not only the borsh one that encodes data. The other strategy that one can met for Solana accounts
+to encode the binary data is link:https://docs.rs/bincode/latest/bincode/[bincode].
+It's used often in Solana program library.
+An example could be the
+https://github.com/solana-labs/solana/blob/v1.14.17/runtime/src/inline_spl_token.rs#LL11C16-L11C30[SPL Token program].
+Let's do quick check here. We create a new mint and mint a token to ATA wallet address that we examine.
+
+[source,sh]
+----
+# creating a new mint of the token (-ud signifies we work on devnet)
+spl-token -ud create-token --decimals 0
+# > Creating token FqQXsU826gjPFXkgYXpVyuaDkgVbmvULz2MktNm1p7n6 under program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+# > Address:  FqQXsU826gjPFXkgYXpVyuaDkgVbmvULz2MktNm1p7n6
+# > Decimals:  0
+
+# creating token ATA account of the wallet (~/.config/solana/id.json)
+spl-token -ud create-account FqQXsU826gjPFXkgYXpVyuaDkgVbmvULz2MktNm1p7n6
+
+# mint 100 tokens to wallet ATA address
+spl-token -ud mint FqQXsU826gjPFXkgYXpVyuaDkgVbmvULz2MktNm1p7n6 100
+# > Minting 100 tokens
+# >   Token: FqQXsU826gjPFXkgYXpVyuaDkgVbmvULz2MktNm1p7n6
+# >   Recipient: JCX5iiNKRhkSVsqjspSgJxT5KmJ7Pqfoqr2Gt5snz8sP
+
+solana account -ud JCX5iiNKRhkSVsqjspSgJxT5KmJ7Pqfoqr2Gt5snz8sP --output json
+# > Output below:
+----
+
+[source,json]
+----
+{
+  "pubkey": "JCX5iiNKRhkSVsqjspSgJxT5KmJ7Pqfoqr2Gt5snz8sP",
+  "account": {
+    "lamports": 2039280,
+    "data": [
+      "3GoaknTR+oDWqFG297b0/v2Vu8SDp7+L82vTdUdUB6eqlmtWff4bdZUd8oayhnUR5sMO/i+gRTg93gti4R0UbmQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "base64"
+    ],
+    "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "executable": false,
+    "rentEpoch": 0
+  }
+}
+----
+
+Now we can convert data to `uint`` array and check if the data length
+(https://github.com/solana-labs/solana/blob/v1.14.17/runtime/src/inline_spl_token.rs#L24[that should be 165])
+matches.
+
+[source,sh]
+----
+ARR=`frombase64.py '3GoaknTR+oDWqFG297b0/v2Vu8SDp7+L82vTdUdUB6eqlmtWff4bdZUd8oayhnUR5sMO/i+gRTg93gti4R0UbmQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'`
+echo $ARR
+# > [220,106,26,146,116,209,250,128,214,168,81,182,247,182,244,254,253,149,187,196,131,167,191,139,243,107,211,117,71,84,7,167,170,150,107,86,125,254,27,117,149,29,242,134,178,134,117,17,230,195,14,254,47,160,69,56,61,222,11,98,225,29,20,110,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+echo "$ARR" | sed 's/[^,]//g' | wc -c
+# > 165
+----
+
+Token program does not use any discriminator for checking the account type and we can see
+that the first data belongs to public key of
+https://github.com/solana-labs/solana/blob/v1.14.17/runtime/src/inline_spl_token.rs#L11-L13[the mint and the owner of the token].
+
+[source,sh]
+----
+arraybyindex.sh $ARR 0 32
+# > [220,106,26,146,116,209,250,128,214,168,81,182,247,182,244,254,253,149,187,196,131,167,191,139,243,107,211,117,71,84,7,167]
+tobase58.py '[220,106,26,146,116,209,250,128,214,168,81,182,247,182,244,254,253,149,187,196,131,167,191,139,243,107,211,117,71,84,7,167]'
+# > FqQXsU826gjPFXkgYXpVyuaDkgVbmvULz2MktNm1p7n6
+arraybyindex.sh $ARR 32 32
+# > [170,150,107,86,125,254,27,117,149,29,242,134,178,134,117,17,230,195,14,254,47,160,69,56,61,222,11,98,225,29,20,110]
+tobase58.py '[170,150,107,86,125,254,27,117,149,29,242,134,178,134,117,17,230,195,14,254,47,160,69,56,61,222,11,98,225,29,20,110]'
+# > CUuLjSEx7q3AB3sRGn3sMJBsSNTmULwowMGUh6NdsxQ
+----
+
+=== From bincode to borsh
+
+Native Solana programs often use `bincode` library (within `serde`) to get the data coded.
+The `borsh` and `bincode` base64 data formats are not fully compatible but they could be transfered.
+Recently I started https://github.com/coral-xyz/anchor/pull/2486#issuecomment-1549469516[a discussion at Anchor project]
+where the maintainer `acheroncrypto` managed the coding
+https://github.com/coral-xyz/anchor/pull/2486/commits/b99beceb52e5b814dbc8953146b074fbe1b57b82#diff-c1f8f7498da827a634bddc8a7559198bc99b296e9d9e8b91a70b503662995b8cR2248[from bincode to borsh base64 format].
+
+===
 
 The similar approach can be used when one search for a filter format to print data of program accounts (using Solana RPC HTTP call
 https://docs.solana.com/api/http#getprogramaccounts[getProgramAccounts]).
 See details in my answer about looking through
 https://solana.stackexchange.com/questions/5677/deployed-contracts-from-a-user-address/5691#5691[the Solana bpf_loader_upgradeable data structures].
 
-[NOTE]
-====
-Native Solana programs often use `bincode` library (within `serde`) to get the data coded.
-The `borsh` and `bincode` base64 data formats are not fully compatible but they could be transfered.
-Recently I started https://github.com/coral-xyz/anchor/pull/2486#issuecomment-1549469516[a discussion at Anchor project]
-where the maintainer `acheroncrypto` managed the coding
-https://github.com/coral-xyz/anchor/pull/2486/commits/b99beceb52e5b814dbc8953146b074fbe1b57b82#diff-c1f8f7498da827a634bddc8a7559198bc99b296e9d9e8b91a70b503662995b8cR2248[from bincode to borsh base64 format].
-====
+
 
 === Data of transaction
 
