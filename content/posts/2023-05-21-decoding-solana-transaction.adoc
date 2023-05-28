@@ -41,6 +41,7 @@ Let's print some data to investigate on them.
 
 NOTE: I use data of a simple contract program link:https://github.com/ochaloup/simple-admin[`simple-admin].
       It provides a way to create an admin account and when created one can ask to print a message into transaction log.
+      The program is deployed at devnet address `sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS`.
 
 We use `solana account` command to fetch the data about account.
 By default the output shows data in the hexadecimal format. With `--output` we get them in `base64`.
@@ -196,6 +197,7 @@ is declaratively defined in the code. We can see there is `Pubkey`
 that https://docs.rs/solana-program/latest/solana_program/pubkey/struct.Pubkey.html[Solana uses of length 32 bytes]
 and then a `u64` number that has got length of 8 bytes.
 
+<<simple-account>>
 [source,rust]
 ----
 pub struct SimpleAccount {
@@ -343,7 +345,55 @@ Recently I started https://github.com/coral-xyz/anchor/pull/2486#issuecomment-15
 where the maintainer `acheroncrypto` managed the coding
 https://github.com/coral-xyz/anchor/pull/2486/commits/b99beceb52e5b814dbc8953146b074fbe1b57b82#diff-c1f8f7498da827a634bddc8a7559198bc99b296e9d9e8b91a70b503662995b8cR2248[from bincode to borsh base64 format].
 
-===
+=== RPC call getProgramAccounts
+
+Using the RPC call https://docs.solana.com/api/http#getprogramaccounts[`getProgramAccounts] provide a way to find out
+all accounts managed by a program while filtering that based on parameters. The call has got a pretty generic "API"
+where one has to define data offset and lenght that will be matched. We provide the parameters as `base64` format.
+
+In case of our test `SimpleAdmin` program we for example ask to get all admin accounts (`SimpleAccount`) that
+were executed tree times (i.e., parameter `print_call_count` is `3`).
+We are going to call https://solana.com/rpc[devnet RPC server] as we created our account instances there,
+the simple admin program id is `sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS`,
+for the purpose of this example we decide to find out only number of such accounts
+(acccount that having `print_call_count` equal to `3`) and we don't need to download the program
+data, thus we set `dataSize` to `0`.
+As of the https://docs.solana.com/api/http#filter-criteria[filter criteria]
+we know link:simple-account[the SimpleAccount] data consists of 8 bytes of discriminator,
+32 bytes of pubkey and then 8 bytes of the counter we want to match.
+Offset is `40` and we pass `base58` format of the data `[3,0,0,0,0,0,0,0]` that is `W723RTUpoZ`.
+
+[source,sh]
+----
+tobase58.py '[3,0,0,0,0,0,0,0]'
+# > W723RTUpoZ
+
+curl https://api.devnet.solana.com -X POST -H "Content-Type: application/json" -d '
+  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "getProgramAccounts",
+    "params": [
+      "sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS",
+      {
+        "filters": [
+          {
+            "dataSize": 0
+          },
+          {
+            "memcmp": {
+              "offset": 39,
+              "bytes": "W723RTUpoZ",
+              "encoding": "base58"
+            }
+          }
+        ]
+      }
+    ]
+  }
+'
+----
+
 
 The similar approach can be used when one search for a filter format to print data of program accounts (using Solana RPC HTTP call
 https://docs.solana.com/api/http#getprogramaccounts[getProgramAccounts]).
