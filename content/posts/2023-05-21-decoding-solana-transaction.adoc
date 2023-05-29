@@ -31,9 +31,9 @@ several attributes (like `owner` or possession of `lamports`)
 and then the account content is defined as a raw binary data
 where the owning program defines the structure.
 It's similar with transactions. A transaction has got
-defined link:https://medium.com/@asmiller1989/solana-transactions-in-depth-1f7f7fe06ac2[a specific format]
+defined link:https://solanacookbook.com/core-concepts/transactions.html#facts[a specific format]
 of accounts that participate in the transaction, but the call data
-are encoded in format defined by the owning program.
+are encoded specifically by the owning program.
 
 == Solana CLI to fetch data
 
@@ -96,7 +96,7 @@ solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTx
         "numReadonlyUnsignedAccounts": 1
       },
       "accountKeys": [
-        "CUuLjSEx7q3AB3sRGn3sMJBsSNTmULwowMGUh6NdsxQD",
+        "CUuLjSEx7q3AB3sRGn3sMJBsSNTmULwowMGUh6NdsxQD"
         "HJ6DPqQhAYRw8YyEuVXV8mwzzNAexxEYVC3aQutWxWn8",
         "DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ",
         "sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS"
@@ -164,7 +164,7 @@ link:https://gist.github.com/ochaloup/87d8745c0aa7797fe1e9dbdfdb01c931[toout.py]
 
 [NOTE]
 ====
-Instead of argument `solana ccount--output` we can use `--output-file /path/to/file`
+Instead of argument `solana account--output` we can use `--output-file /path/to/file`
 that makes the account data to be saved in a file in the binary form.
 One way to work with them is to use bash `od` command like this:
 
@@ -245,6 +245,7 @@ But if we want to double-check that we work with the right account - as the Anch
 the loaded data belongs to the right account - then when having the source code we can get expanded version of the sources
 when using `expand` CLI arguments.
 
+[[anchor expand discriminator]]
 [source,sh]
 ----
 git clone https://github.com/ochaloup/simple-admin.git -b blog-post
@@ -259,7 +260,143 @@ cat .anchor/expanded-macros/simple-admin/simple-admin-0.1.0.rs | grep -i Discrim
 # >     const DISCRIMINATOR: [u8; 8] = [165, 155, 224, 249, 219, 244, 78, 169];
 ----
 
-=== Looking at non-Anchor program accounts
+=== Transaction data structure
+
+For the transaction output of the `solana confirm` command we can read quite a good context
+from the `logMessages` that often shows the `Instruction name` and informs what happens.
+But let's take a look only on the base info and the call data here.
+We can see there is used one instruction and we can check more about accounts as well.
+
+NOTE: to learn about the transaction format
+      I recommend deep dive article link:https://medium.com/@asmiller1989/solana-transactions-in-depth-1f7f7fe06ac2[Solana transactions in depth]
+
+[source,sh]
+----
+solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF --output json -v
+
+# > ...
+# >      "accountKeys": [
+# >        "CUuLjSEx7q3AB3sRGn3sMJBsSNTmULwowMGUh6NdsxQD"
+# >        "HJ6DPqQhAYRw8YyEuVXV8mwzzNAexxEYVC3aQutWxWn8",
+# >        "DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ",
+# >        "sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS"
+# >      ],
+# >      "instructions": [
+# >        {
+# >          "programIdIndex": 3,
+# >          "accounts": [
+# >            2,
+# >            1
+# >          ],
+# >          "data": "7oAbCvAjeJqUZ7RpVyY51x5Sa"
+# >        }
+# >      ]
+# > ...
+----
+
+We can find examine the data in the same way as we did for accounts
+
+[source,sh]
+----
+frombase58.py 7oAbCvAjeJqUZ7RpVyY51x5Sa
+# > [163,217,65,81,53,230,29,28,6,0,0,0,104,101,108,108,111,51]
+----
+
+[[anchor transaction discriminator]]
+We know this is the Anchor program that means the `8 byte` discriminator
+for the operation type: `[163,217,65,81,53,230,29,28]`.
+Solana has use single entrypoint for its program (in difference to Ethereum for example)
+and the program itself has to decide what operation/function will be executed.
+That's where the discriminator is used and these 8 bytes defines the function to be executed.
+The Anchor discriminator is a hash is calculated from
+https://solana.stackexchange.com/a/4996/1386[name of the operation]
+https://solana.stackexchange.com/a/3185/1386[/function].
+
+As we have the source code of the program we can use again
+the <<anchor expand discriminator, `anchor expand`>> to find out that the operation
+that will be executed.
+
+[source,rust]
+----
+impl anchor_lang::Discriminator for PrintAdmin {
+    const DISCRIMINATOR: [u8; 8] = [163, 217, 65, 81, 53, 230, 29, 28];
+}
+----
+
+Now we can take a look at the accounts that are passed in. From the `solana confirm` call
+we can see there is used account at index `3`  as program address and then
+the instruction gets accounts at index `2` and `1` as input in that order.
+We can examine the  `accountKeys` then. Indexes goes from `0`. We know that the pubkey at the `0` index
+is used as the fee payer for the transaction.
+From there then we can find out that is `sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS` for program id,
+and two accounts are passed in in order `DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ, HJ6DPqQhAYRw8YyEuVXV8mwzzNAexxEYVC3aQutWxWn8`.
+
+With the code at hand we can find the `PrintAdmin` instruction
+https://github.com/ochaloup/simple-admin/blob/blog-post/programs/simple-admin/src/instructions/print_admin.rs#L7[the source code].
+
+[source,rust]
+----
+pub struct PrintAdmin<'info> {
+    pub simple_admin_account: Account<'info, SimpleAccount>,
+    pub admin: Signer<'info>,
+}
+
+pub fn process(&mut self, PrintAdminParams { message }: PrintAdminParams) -> Result<()> {
+}
+----
+
+From the code we can read that the first account address `DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ` is used as the address
+of the account where data is stored (`pub simple_admin_account: Account<'info, SimpleAccount>`) The second account address
+`HJ6DPqQhAYRw8YyEuVXV8mwzzNAexxEYVC3aQutWxWn8`
+is admin that has to sign the transaction and only then the processing is sucessful (` pub admin: Signer<'info>`).
+
+Now what about the `call data`? The first 8 bytes is <<anchor transaction discriminator,the discriminator of the operation>>.
+The rest is
+https://github.com/ochaloup/simple-admin/blob/blog-post/programs/simple-admin/src/instructions/print_admin.rs#L16[the `message`]
+which is a `string`. We know it will be the UTF-8 string. In assistance of the python scripts we can get
+the `message` in a readable form.
+
+[source,sh]
+----
+# transaction call data coming from solana confirm
+frombase58.py 7oAbCvAjeJqUZ7RpVyY51x5Sa
+# > [163,217,65,81,53,230,29,28,6,0,0,0,104,101,108,108,111,51]
+
+# getting all data from index 8 to the end of the list
+arraybyindex.sh [163,217,65,81,53,230,29,28,6,0,0,0,104,101,108,108,111,51] 8
+# > [6,0,0,0,104,101,108,108,111,51]
+
+toout.py [6,0,0,0,104,101,108,108,111,51] string
+# > hello3
+----
+
+And we can see that the transaction should print to transaction log (i.e., `msg!(...)` Solana Rust macro)
+message `hellow3` that can be confirmed in listing
+
+[source,sh]
+----
+# get info about the examined transaction
+solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF --output json -v
+
+# > ...
+# > "logMessages": [
+# >   "Program sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS invoke [1]",
+# >   "Program log: Instruction: PrintAdmin",
+# >   "Program log: hello3",
+# >   "Program data: 4nBLdtV6DJ/yG8J8NTj5iMEN0Cv0IG7X57+QlCAJzwcIXnvdhqAXFQYAAABoZWxsbzM=",
+# >   "Program sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS consumed 4266 of 200000 compute units",
+# >   "Program sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS success"
+# > ],
+# > ...
+----
+
+NOTE: We talked about the fact we know where is the source code.
+      That's why is a good practice to publish https://github.com/neodyme-labs/solana-security-txt[`security-txt`]
+      metadata within your program when https://blog.chalda.cz/posts/solana-anchor-verifiable-builds#_bonus_solana_security_txt[it's published].
+      One can then use https://explorer.solana.com/address/sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS/security?cluster=devnet[https://explorer.solana.com]
+      to easily find it.
+
+== Data interpretation: Looking at non-Anchor program accounts
 
 As there are no prescriptions in the data format in the accounts
 it's not only the borsh one that encodes data. The other strategy that one can met for Solana accounts
@@ -376,13 +513,15 @@ curl https://api.devnet.solana.com -X POST -H "Content-Type: application/json" -
     "params": [
       "sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS",
       {
+        "encoding": "base64",
+        "dataSlice": {
+          "offset": 0,
+          "length": 0
+        },
         "filters": [
           {
-            "dataSize": 0
-          },
-          {
             "memcmp": {
-              "offset": 39,
+              "offset": 40,
               "bytes": "W723RTUpoZ",
               "encoding": "base58"
             }
@@ -392,30 +531,44 @@ curl https://api.devnet.solana.com -X POST -H "Content-Type: application/json" -
     ]
   }
 '
+# > {"jsonrpc":"2.0","result":[{"account":{"data":["","base64"],"executable":false,"lamports":1224960,"owner":"sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS","rentEpoch":0},"pubkey":"DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ"}],"id":1}
 ----
 
+You can check another example of setting up the filters of the
+the Solana RPC HTTP call https://docs.solana.com/api/http#getprogramaccounts[getProgramAccounts]
+at my response at the Solana Stack Exchange
+https://solana.stackexchange.com/questions/5677/deployed-contracts-from-a-user-address/5691#5691[about bpf_loader_upgradeable data structures].
 
-The similar approach can be used when one search for a filter format to print data of program accounts (using Solana RPC HTTP call
-https://docs.solana.com/api/http#getprogramaccounts[getProgramAccounts]).
-See details in my answer about looking through
-https://solana.stackexchange.com/questions/5677/deployed-contracts-from-a-user-address/5691#5691[the Solana bpf_loader_upgradeable data structures].
+== Tooling
+
+=== Borsh account decoding
+
+We talked about a potential way how to examine manually binary data structure of the Solana accounts and transactions call data.
+Despite it's handy to check the account this way in general it's tedious and unproductive.
+Toolings around Solana makes this just easy.
+
+When we talk about the `borsh` formatted accounts (which are mostly those written in Anchor)
+there is in help site https://borsh.m2.xyz .
+It's a tooling that helps to decode the account when we know the structure.
+Similar as we did above manually with `python/bash` scripts we can just click through
+at web. Here is example for examined
+https://borsh.m2.xyz[DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ] account.
+We fill-in the field types and size and offset is calculated for us.
+
+image::articles/decoding-solana-data/borsh-solana-decoder.png[]
+
+=== UI for transactions
+
+An UI tool to construct transactions is https://bettercallsol.dev/.
+You can create the transaction by clicking through all parameters easily in UI,
+that transaction can be run, simulated or passed to systems that are integrated within.
+More details   -> https://blog.labeleven.dev/solana-transactions-with-better-call-sol
 
 
+=== Anchor IDL
 
-=== Data of transaction
+https://github.com/ochaloup/simple-admin/blob/main/packages/simple-admin-sdk/generated/simple_admin.ts
 
-// TODO:
-
-
-The data of the Solana accounts and the data part of the Solana transaction are just binary data that the particular program defines the structure of the data. It can be arbitrary.
-For Anchor program, at least, there are some basic expectations we can consider
-(like first 8 bytes are the discriminator and data is encoded by borsh).
-
-
-
-
-https://bettercallsol.dev/ -> https://blog.labeleven.dev/solana-transactions-with-better-call-sol
-https://borsh.m2.xyz/address/5CYBeckoJMrJ9pg1qXi3vcn2CxrYTgQ7KVt1nysWTMMV
 https://anchor.so/tx/inspector
 https://solana.fm/address/8szGkuLTAux9XMgZ2vtY39jVSowEcpBfFfD8hXSEqdGC/anchor-account?cluster=devnet-solana&mode=pro
 https://solana.fm/tx/55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF?cluster=devnet-solana&mode=pro
