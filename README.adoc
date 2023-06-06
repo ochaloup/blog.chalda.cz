@@ -3,6 +3,8 @@
 This blog is Gatsby built based on https://github.com/alxshelepenok/gatsby-starter-lumen
 It was adjusted to work with Gatsby adoc documents (plugin https://www.gatsbyjs.com/plugins/gatsby-transformer-asciidoc/[gatsby-transformer-asciidoc]).
 
+More on the Asciidoctor setup can be found at https://blog.chalda.cz/posts/gatsby-and-asciidoc
+
 == DNS setup
 
 Working with custom DNS domain http://blog.chalda.cz.

@@ -1,9 +1,9 @@
-= Manually decoding Solana data
+= Decoding Solana data accounts
 chalda <ondrej.chaloupka@proton.me>
 1.0, 2023-05-21
 
 :page-template: post
-:page-draft: true
+:page-draft: false
 :page-slug: decoding-solana-data
 :page-category: solana
 :page-tags: Solana, Python
@@ -12,39 +12,31 @@ chalda <ondrej.chaloupka@proton.me>
 
 image::articles/decoding-solana-data/decipher-solana-data.jpg[]
 
-When working with Solana I often need to check what is in the transaction, or in the Solana account.
-The reading of data is usually done in some UI that one does not need to do it manually.
-While sometimes using UI is not possible or it is not convenient, or one just wants to ensure what the data are really there.
-I will share here a way how I do it and on the way we will explore several tools that can be helpful here.
 
-NOTE: As disclaimer I'm not a fried of the hexadecimal format. And there for sure are other ways how to do the task
-      I'll be glad to learn, feel free to share with me at link:https://twitter.com/_chalda[@_chalda].
+When working with Solana, I often need to check the contents of a transaction or an account.
+Usually, data reading is done through a user interface, eliminating the need for manual intervention.
+However, there are situations where using the UI is not possible or convenient, or when one simply wants to verify the presence of certain data manually.
+In this article, I will share a method I use for this purpose, and along the way, we will explore some tools that can be helpful.
 
-== Solana transaction and account data
+NOTE: As a disclaimer, there are certainly other ways to accomplish this task. I would be glad to learn more,
+      so feel free to share with me on Twitter at https://twitter.com/_chalda[_chalda].
 
-Let's talk a bit about the Solana transactions and accounts.
-We don't go into details here as there are many other resources
-that go deeper in the details. For purpose of this article we want just to define
-that Solana defines
-link:https://solanacookbook.com/core-concepts/accounts.html#account-model[an account] having
-several attributes (like `owner` or possession of `lamports`)
-and then the account content is defined as a raw binary data
-where the owning program defines the structure.
-It's similar with transactions. A transaction has got
-defined link:https://solanacookbook.com/core-concepts/transactions.html#facts[a specific format]
-of accounts that participate in the transaction, but the call data
-are encoded specifically by the owning program.
+== Solana Transaction and Account Data
+
+A brieaf touch on Solana transactions and accounts first (no details, there are many other resources for that).
+For the purpose of this article, we say that Solana has an https://solanacookbook.com/core-concepts/accounts.html#account-model[account] with various attributes (such as `owner` and possession of `lamports`), and the account's content is represented as raw binary data, with the structure defined by the owning program. Similarly, transactions have a https://solanacookbook.com/core-concepts/transactions.html#facts[specific format] that dictates the accounts involved in the transaction, while the call data is encoded solely according to the owning program's requirements.
 
 == Solana CLI to fetch data
 
-Let's print some data to investigate on them.
+To investigate, let's get some data from blockchain.
 
-NOTE: I use data of a simple contract program link:https://github.com/ochaloup/simple-admin[`simple-admin].
-      It provides a way to create an admin account and when created one can ask to print a message into transaction log.
-      The program is deployed at devnet address `sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS`.
+Through of this article I use an example contract program called https://github.com/ochaloup/simple-admin[simple-admin].
+This program allows creating an admin account and, once created, one can request to print a message that's included in the transaction's log.
+The program is deployed at the devnet address `sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS`.
 
-We use `solana account` command to fetch the data about account.
-By default the output shows data in the hexadecimal format. With `--output` we get them in `base64`.
+We are gonna use `solana account` command to fetch data about an account created by the `simple-admin` program.
+By default, the solana command displays the data in hexadecimal format.
+However, by using the `--output` option, we can retrieve the data in `base64` format, that we want to use.
 
 [source,sh]
 ----
@@ -71,11 +63,12 @@ solana -ud account DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ --output json
 }
 ----
 
-In the same way we can fetch data about a transaction.
-I chose one of the transactions that works with the `simple-admin` contract.
-We use `solana confirm` command with `-v` switch to get all data from the transaction,
-without the switch only confirmation about the transaction state is displayed.
-When we use the `--output json` we get data in `base58` format(**!**).
+Similarly, we can fetch data about a transaction.
+
+For this example, I have selected one of the transactions that interacts with the `simple-admin` program.
+By using the `solana confirm` command with the `-v` switch, we obtain all the data from the transaction.
+Without the switch, only the transaction state confirmation is displayed.
+Additionally, when we include the `--output json` option, the data is provided in `base58` format.
 
 [source,sh]
 ----
@@ -118,55 +111,64 @@ solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTx
 }
 ----
 
-== Converting data to uint8 array
+= Converting Data to a Uint8 Array
 
-I learnt to check the data content in form of `uint8` binary data array.
-Bytes are represented as unsigned integers.
-It's the same format as one can see when prints content of the private key file
-(like generated one `solana-keyben new --output /tmp/random.keypair; cat /tmp/random.keypair`).
+When working with data, I often find it helpful to examine its content in the form of a `uint8` binary data array.
+In this format, bytes are represented as unsigned integers. You may recognize this format if you've ever printed
+the content of a private key file, such as one generated using the command
+`solana-keyben new --output /tmp/random.keypair; cat /tmp/random.keypair`.
 
-I use simple python scripts that converts data from here and there.
-It can be found at my gist here:
-link:https://gist.github.com/ochaloup/58ceee3ed436766ba7c444bf3fbc8545[tobase58.py],
-link:https://gist.github.com/ochaloup/8ecfd13ea84d4ac8603569716b1b34fb[frombase58.py],
-link: https://gist.github.com/ochaloup/e942f43e6c8a1356f422a1703596bad2[tobase64.py],
-link:https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea[frombase64.py].
-And scripts to do some handling of that data:
-link:https://gist.github.com/ochaloup/4d6ca93a6826a65c3f1f781d5af59d4b[arraybyindex.sh],
-link:https://gist.github.com/ochaloup/87d8745c0aa7797fe1e9dbdfdb01c931[toout.py].
+To simplify the process of converting data, I've created some handy Python scripts.
+These scripts allow you to easily transfer data from one source to another.
+You can find the scripts in my gist here:
+
+====
+* link:https://gist.github.com/ochaloup/58ceee3ed436766ba7c444bf3fbc8545[tobase58.py]
+* link:https://gist.github.com/ochaloup/8ecfd13ea84d4ac8603569716b1b34fb[frombase58.py]
+* link:https://gist.github.com/ochaloup/e942f43e6c8a1356f422a1703596bad2[tobase64.py]
+* link:https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea[frombase64.py]
+* link:https://gist.github.com/ochaloup/4d6ca93a6826a65c3f1f781d5af59d4b[arraybyindex.sh]
+* link:https://gist.github.com/ochaloup/87d8745c0aa7797fe1e9dbdfdb01c931[toout.py]
+====
+
+These scripts are designed to streamline the conversion process and make it more convenient for you.
+Feel free to explore and utilize them for your own data conversion needs.
 
 ++++
-<table>
-  <tr>
-    <td>
-    <script src="https://gist.github.com/ochaloup/58ceee3ed436766ba7c444bf3fbc8545.js"></script>
-    </td>
-    <td>
-    <script src="https://gist.github.com/ochaloup/8ecfd13ea84d4ac8603569716b1b34fb.js"></script>
-    </td>
-    <td>
-    <script src="https://gist.github.com/ochaloup/e942f43e6c8a1356f422a1703596bad2.js"></script>
-    </td>
-    <td>
-    <script src="https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea.js"></script>
-    </td>
-  </tr>
-  <tr>
-    <td>
-    <script src="https://gist.github.com/ochaloup/4d6ca93a6826a65c3f1f781d5af59d4b.js"></script>
-    </td>
-    <td>
-    <script src="https://gist.github.com/ochaloup/87d8745c0aa7797fe1e9dbdfdb01c931.js"></script>
-    </td>
-  </tr>
-</table>
+<div id="tableWrapper" style="font-size: 14px; min-width: 100%; overflow-x: scroll; table-layout: fixed;">
+  <table>
+    <tr>
+      <td>
+      <script src="https://gist.github.com/ochaloup/58ceee3ed436766ba7c444bf3fbc8545.js"></script>
+      </td>
+      <td>
+      <script src="https://gist.github.com/ochaloup/8ecfd13ea84d4ac8603569716b1b34fb.js"></script>
+      </td>
+      <td>
+      <script src="https://gist.github.com/ochaloup/e942f43e6c8a1356f422a1703596bad2.js"></script>
+      </td>
+      <td>
+      <script src="https://gist.github.com/ochaloup/b3c2c2410f63782b75abcda96d261fea.js"></script>
+      </td>
+      <td>
+      <script src="https://gist.github.com/ochaloup/4d6ca93a6826a65c3f1f781d5af59d4b.js"></script>
+      </td>
+      <td>
+      <script src="https://gist.github.com/ochaloup/87d8745c0aa7797fe1e9dbdfdb01c931.js"></script>
+      </td>
+    </tr>
+  </table>
+</div>
 ++++
 
 [NOTE]
 ====
-Instead of argument `solana account--output` we can use `--output-file /path/to/file`
-that makes the account data to be saved in a file in the binary form.
-One way to work with them is to use bash `od` command like this:
+When working with account data, instead of using the `solana account --output` argument,
+you have the option to use `--output-file /path/to/file`.
+This allows you to save the account data directly into a file in binary form.
+
+One way to work with this binary data is by utilizing the `od` command in Bash.
+Here's an example of how you can use it:
 
 [source,sh]
 ----
@@ -180,6 +182,25 @@ echo "${decimal_array[@]:(-32):32}"
 ----
 
 ====
+
+
+// TODO: continue here
+== Data Interpretation
+
+When the program is written with Anchor, we have the benefit of knowing that the data is encoded
+with https://borsh.io[borsh], and we know that Anchor uses `8 bytes` as the byte data length
+for the https://docs.rs/anchor-lang/latest/anchor_lang/trait.Discriminator.html[discriminator]
+(sha256 hash of the account's Rust identifier).
+
+We have the https://github.com/ochaloup/simple-admin/[contract source code] at hand.
+The data structure of the 
+https://github.com/ochaloup/simple-admin/blob/blog-post/programs/simple-admin/src/state/simple_account.rs[`simple_account`]
+is declaratively defined in the code. We can see that it includes
+https://docs.rs/solana-program/latest/solana_program/pubkey/struct.Pubkey.html[a `Pubkey` field],
+which has a length of 32 bytes,
+and a `u64` number with a length of 8 bytes.
+
+By examining this code, we can gain insights into the structure of the data and understand the specific lengths of the fields used in our Solana program contract.
 
 == Data interpretation
 
@@ -196,6 +217,8 @@ https://github.com/ochaloup/simple-admin/blob/blog-post/programs/simple-admin/sr
 is declaratively defined in the code. We can see there is `Pubkey`
 that https://docs.rs/solana-program/latest/solana_program/pubkey/struct.Pubkey.html[Solana uses of length 32 bytes]
 and then a `u64` number that has got length of 8 bytes.
+
+
 
 <<simple-account>>
 [source,rust]
@@ -602,3 +625,9 @@ image::articles/decoding-solana-data/explorer-solana-account.png
 
 Other Solana blockchain inspectors knows to interpret IDL data in the similar way.
 You can see the simlar at https://solana.fm/address/DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ/anchor-account?cluster=devnet-solana[Solana.fm] for example.
+
+== Conclusion
+
+We discussed one way how to manually examine the Solana data structures in binary format.
+For that purpose we used Python and Bash scripts.
+We also discussed the tooling that can help us.
