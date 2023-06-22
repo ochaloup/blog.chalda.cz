@@ -40,7 +40,14 @@ Or specify docker tag in `Anchor.toml` file with
 https://github.com/ochaloup/simple-admin/blob/main/Anchor.toml#LL1C1-L1C1[`anchor_version` parameter]
 (`project-serum/anchor` is the image for the tag).
 
-When you run `anchor build --verifiable`, the docker image is pulled from Docker Hub, and the build is executed inside it.
+When you run the `anchor build --verifiable` command, the build process is executed inside the docker container.
+
+[source,shell]
+----
+anchor build --verifiable
+----
+
+The docker image is pulled from Docker Hub, and the build is executed inside it.
 As it's a clean environment, the build process requires the download of all dependencies and the compilation takes some time.
 The result of the build is a standard `.so` binary file, which is stored at directory `./target/verifiable/`.
 The build also generates the IDLs, which are stored at `./target/idl/` and `./target/types`.
