@@ -25,7 +25,8 @@ the Solana Program Library and thus it's developed by people from https://solana
 
 This is simple as go to https://app.realms.today/ (when testing the setup at devnet add https://app.realms.today/?cluster=devnet[?cluster=devnet]),
 click at blue button `Create DAO` and choose the `Multi-Signature Wallet`. The wizard goes with you through few steps
-where one defines what wallet keys will be part of the multisig management (members of the multisig may be still added or removed later)
+where one defines what wallet keys will be part of the multisig management (members of the multisig may be still
+https://docs.realms.today/DAO-Management/DAO-add-members[added or removed later])
 and then the multisig DAO is created.
 
 NOTE: For the purpose of the showcase in this blogpost I have created a DAO
@@ -50,4 +51,33 @@ For anybody can create a `Proposal` with whatever transaction content there is I
 At `Governance` we defines the multisig signature key that the transaction will be signed with
 and the `Instruction` field has tobe filled with `Base64` serialized Solana instruction.
 
+image::articles/spl-custom-transaction/custom-transaction-proposal.png[]
+
 Ok, but where to take it?
+
+Basically, it's can be whaetever transaction that's encoded to `base64` of borsh serialized data
+that contains `program id`, `account keys` and `call data`
+
+[source,typescript]
+----
+[
+  InstructionData,
+  {
+    kind: 'struct',
+    fields: [
+      ['programId', 'pubkey'],
+      ['accounts', [AccountMetaData]],
+      ['data', ['u8']],
+    ],
+  }
+]
+----
+
+The https://github.com/solana-labs/oyster[Oyster] SPL Governance SDK provides a function
+https://github.com/solana-labs/oyster/blob/040b7c89f757846f64c2436dbb58ecc4db8c5837/packages/governance-sdk/src/governance/serialisation.ts#L229[`serializeInstructionToBase64`]
+that takes an instruction and provides the encoded form.
+
+== Contract example with admin authority
+
+To show the whole context let's take an example of a simple contract. It's named https://github.com/ochaloup/simple-admin[`Simple admin`]
+and it requires to declare admin authority where only that one has got permission to process an action.

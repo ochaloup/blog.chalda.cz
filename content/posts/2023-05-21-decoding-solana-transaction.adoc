@@ -3,7 +3,7 @@ chalda <ondrej.chaloupka@proton.me>
 1.0, 2023-05-21
 
 :page-template: post
-:page-draft: false
+:page-draft: true
 :page-slug: decoding-solana-data
 :page-category: solana
 :page-tags: Solana, Python
@@ -111,7 +111,7 @@ solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTx
 }
 ----
 
-= Converting Data to a Uint8 Array
+== Converting Data to a Uint8 Array
 
 When working with data, I often find it helpful to examine its content in the form of a `uint8` binary data array.
 In this format, bytes are represented as unsigned integers. You may recognize this format if you've ever printed
@@ -193,7 +193,7 @@ for the https://docs.rs/anchor-lang/latest/anchor_lang/trait.Discriminator.html[
 (sha256 hash of the account's Rust identifier).
 
 We have the https://github.com/ochaloup/simple-admin/[contract source code] at hand.
-The data structure of the 
+The data structure of the
 https://github.com/ochaloup/simple-admin/blob/blog-post/programs/simple-admin/src/state/simple_account.rs[`simple_account`]
 is declaratively defined in the code. We can see that it includes
 https://docs.rs/solana-program/latest/solana_program/pubkey/struct.Pubkey.html[a `Pubkey` field],
