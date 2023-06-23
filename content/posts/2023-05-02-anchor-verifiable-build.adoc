@@ -59,7 +59,7 @@ Instead, you can use the `solana` CLI tools.
 ----
 solana program deploy -v -u devnet --keypair ~/.config/solana/devnet.json \
   --program-id <PROGRAM_ID> \
-  --program-authority <PATH_TO_KEYPAIR> \
+  --upgrade-authority <PATH_TO_KEYPAIR> \
   ./target/verifiable/program.so
 ----
 
