@@ -15,3 +15,12 @@ https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pag
 == Building and deploying
 
 Using Github actions, see link:./.github/workflows/gatsby.yml[].
+
+
+== To develop
+
+[source,sh]
+----
+yarn start
+chrome http://localhost:8000/
+----

@@ -1,6 +1,6 @@
 = Story of one SPL Governance transaction
 chalda <ondrej.chaloupka@proton.me>
-1.0, 2023-05-21-06-06
+1.0, 2023-07-15
 
 :page-template: post
 :page-draft: true
@@ -49,7 +49,7 @@ NOTE: the SPL Governance Proposal workflow is first to create a `Proposal` with 
 
 For anybody can create a `Proposal` with whatever transaction content there is Instruction type `Execute custom Instruction`.
 At `Governance` we defines the multisig signature key that the transaction will be signed with
-and the `Instruction` field has tobe filled with `Base64` serialized Solana instruction.
+and the `Instruction` field has to be filled with `Base64` serialized Solana instruction.
 
 image::articles/spl-custom-transaction/custom-transaction-proposal.png[]
 
