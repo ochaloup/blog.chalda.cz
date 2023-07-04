@@ -206,7 +206,7 @@ which we could know having the length of 32 bytes, and a `u64` number with a len
 
 By examining this code, we can gain insights into the structure of the data and understand the specific lengths.
 
-<<simple-account>>
+[#simple-account]
 [source,rust]
 ----
 pub struct SimpleAccount {
@@ -252,7 +252,7 @@ Up until this point, we have overlooked the initial `8` bytes, which serve as th
 This value, a hash of the account name, can be regarded as internal Anchor details. However, if we wish to verify that we are operating with the correct account, as Anchor utilizes the discriminator to confirm the integrity of the loaded data, we can obtain an expanded version of the sources by utilizing the `anchor expand` CLI command
 when we have access to the source code.
 
-[[anchor expand discriminator]]
+[#anchor-expand-discriminator]
 [source,sh]
 ----
 git clone https://github.com/ochaloup/simple-admin.git -b v1
@@ -283,7 +283,7 @@ We can observe that a single instruction was utilized, and we can delve deeper i
 NOTE: to learn about the transaction format
       I recommend deep dive article link:https://medium.com/@asmiller1989/solana-transactions-in-depth-1f7f7fe06ac2[Solana transactions in depth^]
 
-[[PrintAdmin instruction output]]
+[#print-admin-instruction-output]
 [source,sh]
 ----
 solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF --output json -v
@@ -308,6 +308,7 @@ solana confirm -ud 55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTx
 # > ...
 ----
 
+[#anchor-transaction-discriminator]
 Let's examine the data in the same format of `uint8` array as we did for an account above.
 
 [source,sh]
@@ -316,7 +317,6 @@ frombase58.py 7oAbCvAjeJqUZ7RpVyY51x5Sa
 # > [163,217,65,81,53,230,29,28,6,0,0,0,104,101,108,108,111,51]
 ----
 
-[[anchor transaction discriminator]]
 We are aware that the Anchor program employs the first `8 bytes` as a discriminator,
 indicated here as `[163, 217, 65, 81, 53, 230, 29, 28]`.
 Unlike Ethereum, Solana follows a single entrypoint approach for programs. In this paradigm, the program itself assumes the responsibility of determining which operation or function should be executed.
@@ -327,7 +327,7 @@ https://solana.stackexchange.com/a/4996/1386[name of the operation^]
 https://solana.stackexchange.com/a/3185/1386[/function^].
 
 As we have the source code of the program we can use again
-the <<anchor expand discriminator, `anchor expand`>> command to find out that the operation
+the <<anchor-expand-discriminator, `anchor expand`>> command to find out that the operation
 that will be executed.
 
 [source,rust]
@@ -340,7 +340,7 @@ impl anchor_lang::Discriminator for PrintAdmin {
 }
 ----
 
-Now, let's examine the accounts that are involved. From the output of the <<PrintAdmin instruction output, `solana confirm`>> call it appears that the account at index `3` is used as the program address,
+Now, let's examine the accounts that are involved. From the output of the <<print-admin-instruction-output, `solana confirm`>> call it appears that the account at index `3` is used as the program address,
 while accounts at indexes `2` and `1`, in that particular order, are considered as instruction input accounts.
 From inspecting the `accountKeys` the keys are indexed starting from `0`.
 It's worth noting that the public key at index `0` is responsible for paying the transaction fee, i.e., it's the `feePayer`.
@@ -368,7 +368,7 @@ We can read that the first account address passed in the instruction, the `DabBr
 is the `admin` wallet address and we recognize that this key has to sign the transaction.
 Only when the transaction is signed by this key the processing is allowed (` pub admin: Signer<'info>`).
 
-Now what about the `call data`? We already know that the first `8` bytes is <<anchor transaction discriminator,the discriminator of the operation>>.
+Now what about the `call data`? We already know that the first `8` bytes is <<anchor-transaction-discriminator,the discriminator of the operation>>.
 The rest is a message
 https://github.com/ochaloup/simple-admin/blob/v1/programs/simple-admin/src/instructions/print_admin.rs#L15[`PrintAdminParams#message`^].
 The message is a `string`. As it's Solana Rust We know it will be the UTF-8 string.
