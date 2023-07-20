@@ -593,7 +593,7 @@ For the benefit of Anchor IDL data interpretation, the program
 https://blog.chalda.cz/posts/solana-anchor-verifiable-builds#_uploading_anchor_idl[has to be published with IDL on chain^].
 When one does it it can be seen in https://explorer.solana.com/ down in the box `Anchor Program IDL`.
 
-image::articles/decoding-solana-data/explorer-solana-idl-box-only.png
+image::articles/decoding-solana-data/explorer-solana-idl-box-only.png[alt=Solana Explorer IDL tab,width=500]
 
 For our examined `Simple Admin` contract the IDL
 can be seen https://explorer.solana.com/address/sa3HiPEaDZk5JyU1CCmmRbcWnBc9U4TzHq42RWVUNQS/anchor-program?cluster=devnet[in the Explorer^] and the Typescript format is published next to the contract
@@ -603,9 +603,9 @@ The Explorer makes it easy to access transaction details in a human-readable for
 For example, you can observe the transaction with the id https://explorer.solana.com/tx/55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF?cluster=devnet[55E5mPX87Ms55chvKdGUg2XCGrJ1Qp4Pw7ER4z4fCgSqtXQ3JhZGXP7mpohTxPEm8S87Q5PNW7x7MSqx9GDATMiF^] or the
 https://explorer.solana.com/address/DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ/anchor-account?cluster=devnet[`SimpleAccount` DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ^].
 
-image::articles/decoding-solana-data/explorer-solana-tx.png
+image::articles/decoding-solana-data/explorer-solana-tx.png[alt=Solana Explorer Transaction tab,width=500]
 
-image::articles/decoding-solana-data/explorer-solana-account.png
+image::articles/decoding-solana-data/explorer-solana-account.png[alt=Solana Explorer Account tab,width=500]
 
 Other Solana blockchain inspectors knows to interpret IDL data in the similar way.
 You can see the similar at https://solana.fm/address/DabBrrPf3JcNgKqcYNhn3tVcfPwDpsQ6HdAifNWi1ebJ/anchor-account?cluster=devnet-solana[Solana.fm^] for example.
