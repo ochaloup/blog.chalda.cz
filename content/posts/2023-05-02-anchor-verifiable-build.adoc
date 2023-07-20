@@ -102,6 +102,7 @@ anchor idl upgrade \
 NOTE: command `anchor idl upgrade` consists of two instructions which are sent to the network
       and are defined within the anchor framework and are available as separate CLI commands as well.
       It's `write-buffer` (idl data saved at blockchain) and `set-buffer` (the saved data loaded into program idl account).
+      To combine `write-buffer` with `set-buffer` to manage IDL authority being multisig see https://gist.github.com/ochaloup/e013a7912858818ad2855e13754edf36
 
 == Verifying the build
 
