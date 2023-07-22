@@ -58,12 +58,12 @@ Instead, you can use the `solana` CLI tools.
 [source,shell]
 ----
 solana program deploy -v -u devnet --keypair ~/.config/solana/devnet.json \
-  --program-id <PROGRAM_ID> \
+  --program-id <PROGRAM_ID_KEYPAIR> \
   --upgrade-authority <PATH_TO_KEYPAIR> \
   ./target/verifiable/program.so
 ----
 
-NOTE: usually `<PROGRAM_ID>` is defined at https://github.com/marinade-finance/liquid-staking-program/blob/447f9607a8c755cac7ad63223febf047142c6c8f/Anchor.toml#L9[`Anchor.toml`]
+NOTE: usually `<PROGRAM_ID>` is defined at https://github.com/marinade-finance/liquid-staking-program/blob/447f9607a8c755cac7ad63223febf047142c6c8f/Anchor.toml#L9[`Anchor.toml`] and for initial deployment we need to provide the keypair as the new account needs to be initialized
 
 == Uploading Anchor IDL
 
