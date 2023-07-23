@@ -127,8 +127,11 @@ The created admin account https://explorer.solana.com/address/3oZa6pjVpC5m1gaKYn
 the multisig governance wallet https://app.realms.today/dao/2EogxMvrtTr8ccA4oQcAGfS8vKbDhYTANA12LW3fqUy3/treasury/v2?cluster=devnet[`GjYBMcRv4JzkgqCfeUKQMs7KygkFvgLpGzFbQ7SihGJ8`].
 
 With that the `PrintMessage` instruction has to be signed with SPL governance `Proposal` acknowledged by members of the multisig.
-There is not such a `Proposal` type in the Governance UI and we need to provide the base64 encoded transaction.
-The `simple-admin` contract provides a CLI command for that purpose.
+Obviously the Governance UI does list the `simple-admin` instructions in the listing
+and we need to provide the base64 encoded transaction by ourselves.
+The `simple-admin` contract provides a CLI command for that purpose. It can generate the base64 format of the `PrintMessage` transaction.
+
+First, let's re-check what's setup within the contract.
 
 [source,sh]
 ----
@@ -155,19 +158,71 @@ pnpm cli -ud show -a 3oZa6pjVpC5m1gaKYnXWoxahrBQt2dCsapBSiDAMBWoh
 }
 ----
 
+The content of the `simple-account` says that only signature of the governance wallet
+`GjYBMcRv4JzkgqCfeUKQMs7KygkFvgLpGzFbQ7SihGJ8` permits to execute the operation.
+When we try to execute the transaction signed by the default wallet (`~/.config/solana/id.json`)
+an error is emitted.
 
 [source,sh]
 ----
 # trying to execute the print-message with default solana wallet
 pnpm cli -ud print-message  --message 'gm gm' 3oZa6pjVpC5m1gaKYnXWoxahrBQt2dCsapBSiDAMBWoh
 > [...] ERROR (377647): Admin CUuLjSEx7q3AB3sRGn3sMJBsSNTmULwowMGUh6NdsxQD is not an admin of simple account 3oZa6pjVpC5m1gaKYnXWoxahrBQt2dCsapBSiDAMBWoh > (admin is GjYBMcRv4JzkgqCfeUKQMs7KygkFvgLpGzFbQ7SihGJ8)
+----
 
+That's not what we want and thus we follow the the original plan to use the governance wallet signature.
+
+[source,sh]
+----
 # get base64 transaction data to be used as custom transaction
 pnpm cli -ud print-message --print-only --rent-payer GjYBMcRv4JzkgqCfeUKQMs7KygkFvgLpGzFbQ7SihGJ8 --admin GjYBMcRv4JzkgqCfeUKQMs7KygkFvgLpGzFbQ7SihGJ8 --message 'gm gm' 3oZa6pjVpC5m1gaKYnXWoxahrBQt2dCsapBSiDAMBWoh
 > Instructions:
 >   DPRtGY504O6TnBjrarIUv9xLcAC17A/DMHqwT2cgX78FAAAAKaTrO1Ty3tvwfW/rnwokf8rtF+EgRM3z1Nxd+oTUD5gAAenE85m/zh0eB1j8UHbJDkYK+b+mqI9psHckuV6lrgRtAQCYBSVJmeyBwE67H9wKHeiNwzR47QJ0XgYHJjS6rEJoJQAB6cTzmb/OHR4HWPxQdskORgr5v6aoj2mwdyS5XqWuBG0BAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARAAAARg8IXY5SF1kFAAAAZ20gZ20=
 > [...] INFO (377533): Message 'gm gm' successfully printed for account 3oZa6pjVpC5m1gaKYnXWoxahrBQt2dCsapBSiDAMBWoh
 ----
+
+Let's elaborate on this action a little bit.
+
+We used the `--print-only` argument that instead of execution of the transaction to cluster
+uses the Oyster function to print the transaction in base64 format.
+// TODO: add link to code here
+
+An important thing to notice is that we provided the `--rent-payer` argument.
+The `PrintMessage` instruction creates a new account where a message is saved into.
+The account has to be created with deposit of the rent excempt that has to be payed by somebody.
+For that we need the CLI provides a way to pass a pubkey here.
+We generated base64 transaction data which is not signed, neither there is a blockhash encoded.
+The signatures are added at time of the execution. The SPL Governance UI uses the wallet signature
+provided by the user that clicks button `Execute` in browser. The browser wallet is used to pay the transaction fee.
+That's an obligatory part. This signature can be used for any other purposes as well, for example for rent payment.
+If we create the base64 transaction with rent payer pubkey of a wallet
+then only that particular wallet is then able to execute transactions from the acknowledged `Proposal`.
+As rent payer we used again the address of the governance wallet. We pre-funded the governance wallet
+with some SOLs beforehand. As the SPL Governance system provides the transaction execution
+always with the signature of the governance wallet the pre-funded SOLs can be used for example
+as payment for the rent.
+
+With instruction prepared in base64 format we can create a `Proposal` of custom transaction of this content.
+
+image::articles/spl-custom-transaction/multisig-proposal-creation.png[]
+
+Before we create the `Proposal` with the transaction we can check the if transaction
+content is correct and can be run. With using `Preview Transaction` button the transaction will be simulated.
+
+image::articles/spl-custom-transaction/multisig-proposal-creation-simulation.png[]
+
+The `Inspect` button redirects us to Solana Explorer
+where we can review the transaction from there.
+
+// TODO: talk about Solana TX tool
+
+
+When we finish with having the `Proposal` created, the `Proposal` is acknowledged by multisig members
+(the more that threshold of voters voted `Yes` on the `Proposal`) and 
+the `Proposal` transaction was executed, then a print-account is created
+with content of a message.
+The `simple-admin` CLI allows us to list all print-accounts belonging
+to a particular simple-admin account.
 
 [source,sh]
 ----
@@ -187,3 +242,10 @@ pnpm cli -ud show --address 3oZa6pjVpC5m1gaKYnXWoxahrBQt2dCsapBSiDAMBWoh --print
   ]
 }
 ----
+
+== Summary
+
+With that we went through the SPL Governance Multisig signature management,
+we talked about `Proposal` creation and risk connected with Proposal's transaction
+using signatures different to a wallet (fee-payer) and we introduced
+a tool to list SPL Gov 
