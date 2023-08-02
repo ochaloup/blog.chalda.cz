@@ -577,9 +577,11 @@ vim ./mnde-mint.json
 
 solana-test-validator --reset --ledger /tmp/test-ledger --account MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey ./mnde-mint.json
 
-# test to mint (in different bash console)
+# test to mint (in different console)
 spl-token -ul create-account  MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey
 > Creating account HDBG6v77dUiNS9yjPKRaRJhDRLzhpL54aBK5PZFUAhXj
+spl-token -ul mint --mint-authority ./mnde-mint-authority.keypair  MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey 1000 HDBG6v77dUiNS9yjPKRaRJhDRLzhpL54aBK5PZFUAhXj
+Minting 1000 tokens
 ----
 
 === RPC call getProgramAccounts
