@@ -1,0 +1,21 @@
+= On Solana error handling
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2023-08-01
+
+:page-template: post
+:page-draft: true
+:page-slug: error-handling
+:page-category: solana
+:page-tags: Solana, Typescript
+:page-description: About Solana error handling from TypeScript client.
+:page-socialImage:  /images/articles/solana-errors-title.jpg
+
+image::articles/solana-errors-title.jpg[]
+
+Handling errors in Solana is not easy to grasp. At least from client perspective.
+The aim of this article is to summarize some facts that one get to used
+when calling the Solana blockchain program form Typescript client.
+
+
+
+https://github.com/solana-labs/solana-program-library/blob/token-v4.0.0/token/program/src/error.rs

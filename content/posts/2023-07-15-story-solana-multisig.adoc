@@ -189,7 +189,7 @@ uses the Oyster function to print the transaction in base64 format.
 
 An important thing to notice is that we provided the `--rent-payer` argument.
 The `PrintMessage` instruction creates a new account where a message is saved into.
-The account has to be created with deposit of the rent excempt that has to be payed by somebody.
+The account has to be created with deposit of the rent exempt that has to be payed by somebody.
 For that we need the CLI provides a way to pass a pubkey here.
 We generated base64 transaction data which is not signed, neither there is a blockhash encoded.
 The signatures are added at time of the execution. The SPL Governance UI uses the wallet signature

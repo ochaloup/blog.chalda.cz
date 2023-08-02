@@ -503,6 +503,84 @@ NOTE: Native Solana programs often use `bincode` library (within `serde`) to get
       where the maintainer https://twitter.com/acheroncrypto[acheroncrypto^] managed the coding
       https://github.com/coral-xyz/anchor/pull/2486/commits/b99beceb52e5b814dbc8953146b074fbe1b57b82#diff-c1f8f7498da827a634bddc8a7559198bc99b296e9d9e8b91a70b503662995b8cR2248[from bincode to borsh base64 format^].
 
+=== Changing accounts for tests
+
+One of the purposes to change the account data could be loading accounts for tests. One may want to start the solana test validator at localhost
+and process actions that are not possible at mainnet for testing purposes.
+Let's say we want to mint a https://explorer.solana.com/address/MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey[MNDE token]
+that was minted with max amount and there is no more mint authority.
+We can load the account from the mainnet, change the data interpretation
+and then pass the changed account at the test validator start-up.
+
+[source,sh]
+----
+# loading account data from mainnet
+solana account -um MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey --output json --output-file ./mnde-mint.json
+{
+  "pubkey": "MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey",
+  "account": {
+    "lamports": 1991461600,
+    "data": [
+      "AAAAAAU7Cq81B+5iPAIrQjwKE7gsOycDnU85ZkE/v2q2Xh0rrPJWkUi24A0JAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+      "base64"
+    ],
+    "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "executable": false,
+    "rentEpoch": 361,
+    "space": 82
+  }
+}
+Wrote account to ./mnde-mint.json
+----
+
+NOTE: We can do the process in opposite way. Generate a different mint account with parameters we need and then only change the `pubkey`
+      as we need. This is a showcase of changing an authority field that can be used for arbitrary program.
+      Some accounts have difficult ways to simulate current state than just in case of mint one.
+
+We are interested in data of that account. The interpretation of the data can be read from
+https://github.com/solana-labs/solana-program-library/blob/token-v4.0.0/token/program/src/state.rs#L16[the source code]
+or this Sec3 article
+https://www.sec3.dev/blog/solana-programs-part-1-understanding-spl-token-mint[Understanding SPL Token Mint].
+
+[source,sh]
+----
+frombase64.py 'AAAAAAU7Cq81B+5iPAIrQjwKE7gsOycDnU85ZkE/v2q2Xh0rrPJWkUi24A0JAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=='
+[0,0,0,0,5,59,10,175,53,7,238,98,60,2,43,66,60,10,19,184,44,59,39,3,157,79,57,102,65,63,191,106,182,94,29,43,172,242,86,145,72,182,224,13,9,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+----
+
+We can see the account first bytes belongs to the mint authority `mint_authority: COption<Pubkey>`
+which is the part we want to change. The `COption` is
+https://github.com/solana-labs/solana-program-library/blob/token-v4.0.0/token/program/src/state.rs#L261[coded as 4 bytes]
+where `[1,0,0,0]` means to be setup and then following 32 bytes of Publickey.
+So let's get it all together and load the solana-test-validator.
+
+[source,sh]
+----
+solana-keygen new --no-bip39-passphrase -o ./mnde-mint-authority.keypair
+solana-keygen pubkey ./mnde-mint-authority.keypair
+> 9q3UhZFX5jAFZfn16Z3bsy8PedHwJVGHhd33CatVkcsN
+
+frombase58.py 9q3UhZFX5jAFZfn16Z3bsy8PedHwJVGHhd33CatVkcsN
+> [131,44,44,247,56,178,214,183,144,210,96,63,240,40,135,179,251,160,128,101,14,63,1,5,151,61,4,190,76,95,32,109]
+
+# we know we want 4 bytes + 32 bytes to get off
+arraybyindex.sh [0,0,0,0,5,59,10,175,53,7,238,98,60,2,43,66,60,10,19,184,44,59,39,3,157,79,57,102,65,63,191,106,182,94,29,43,172,242,86,145,72,182,224,13,9,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] 36
+> [172,242,86,145,72,182,224,13,9,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+# merging all together [1,0,0,0] + [mint pubkey] + [rest]
+tobase64.py tobase64.py [1,0,0,0,131,44,44,247,56,178,214,183,144,210,96,63,240,40,135,179,251,160,128,101,14,63,1,5,151,61,4,190,76,95,32,109,172,242,86,145,72,182,224,13,9,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+> AQAAAIMsLPc4sta3kNJgP/Aoh7P7oIBlDj8BBZc9BL5MXyBtrPJWkUi24A0JAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+
+# change ./mnde-mint.json "data" field
+vim ./mnde-mint.json
+> ...
+
+solana-test-validator --reset --ledger /tmp/test-ledger --account MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey ./mnde-mint.json
+
+# test to mint (in different bash console)
+spl-token -ul create-account  MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey
+> Creating account HDBG6v77dUiNS9yjPKRaRJhDRLzhpL54aBK5PZFUAhXj
+----
 
 === RPC call getProgramAccounts
 
