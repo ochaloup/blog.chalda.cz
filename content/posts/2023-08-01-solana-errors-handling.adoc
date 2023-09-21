@@ -12,10 +12,103 @@ chalda <ondrej.chaloupka@proton.me>
 
 image::articles/solana-errors-title.jpg[]
 
-Handling errors in Solana is not easy to grasp. At least from client perspective.
-The aim of this article is to summarize some facts that one get to used
-when calling the Solana blockchain program form Typescript client.
+Understanding the error types in Solana is not easy to grasp.
+At least it's my experience when working on a client application.
+The aim of this article is to summarize facts that one get to used
+when calling the Solana blockchain programs.
+Here we will be using a Typescript client with a focus on Anchor program and client.
 
+== How client sends
+
+For the baseline of the understanding we need to shortly summarize
+what is a default processing when one sends 
+https://docs.solana.com/integrations/retrying-transactions[a transaction from a client to blockchain].
+
+[source,typescript]
+----
+await connection.getLatestBlockhash()
+const ix = SystemProgram.transfer({
+    fromPubkey: fromKeypair.publicKey,
+    toPubkey: wallet.publicKey,
+    lamports: anchor.web3.LAMPORTS_PER_SOL,
+})
+const messageV0 = new web3.TransactionMessage({
+  payerKey: payer.publicKey,
+  recentBlockhash: blockhash,
+  instructions,
+}).compileToV0Message();
+const txBuf = Transaction({
+        ...latestBlockhash,
+        feePayer: wallet.publicKey,
+    })
+    .add(ix)
+    .serialize()
+try {
+    await provider.connection.sendRawTransaction(txBuf, {
+    skipPreflight: false, // simulated == YES
+    preflightCommitment: "processed",
+    })
+----
+
+In the above code the client creates a transaction, the transaction is signed, serialized
+and send to a RPC node.
+
+https://github.com/solana-labs/solana-web3.js/blob/v1.78.4/packages/library-legacy/src/connection.ts#L238
+
+[source,typescript]
+----
+/**
+ * Options for sending transactions
+ */
+type SendOptions = {
+    /** disable transaction verification step */
+    skipPreflight?: boolean;
+    /** preflight commitment level */
+    preflightCommitment?: Commitment;
+    /** Maximum number of times for the RPC node to retry sending the transaction to the leader. */
+    maxRetries?: number;
+    /** The minimum slot that the request can be evaluated at */
+    minContextSlot?: number;
+};
+/**
+ * Options for confirming transactions
+ */
+type ConfirmOptions = {
+    /** disable transaction verification step */
+    skipPreflight?: boolean;
+    /** desired commitment level */
+    commitment?: Commitment;
+    /** preflight commitment level */
+    preflightCommitment?: Commitment;
+    /** Maximum number of times for the RPC node to retry sending the transaction to the leader. */
+    maxRetries?: number;
+    /** The minimum slot that the request can be evaluated at */
+    minContextSlot?: number;
+};
+----
+
+https://stackoverflow.com/a/68751515/187035
+Some of those terms are old, but here's roughly how they would translate:
+processed = recent
+confirmed = singleGossip = single
+finalized = root = max
+if you choose "finalized" it means that you're running your transaction against a finalized block, and if you choose "processed", you're running your transaction against the most recent block
+
+https://docs.solana.com/api/http#configuring-state-commitment
+For preflight checks and transaction processing, Solana nodes choose which bank state to query based on a commitment requirement set by the client. 
+
+[source,typescript]
+----
+/**
+ * The level of commitment desired when querying state
+ * <pre>
+ *   'processed': Query the most recent block which has reached 1 confirmation by the connected node
+ *   'confirmed': Query the most recent block which has reached 1 confirmation by the cluster
+ *   'finalized': Query the most recent block which has been finalized by the cluster
+ * </pre>
+ */
+type Commitment = 'processed' | 'confirmed' | 'finalized' | 'recent' | 'single' | 'singleGossip' | 'root' | 'max';
+----
 
 
 https://github.com/solana-labs/solana-program-library/blob/token-v4.0.0/token/program/src/error.rs

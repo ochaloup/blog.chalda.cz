@@ -178,7 +178,7 @@ Here's an example of how you can use it:
 [source,sh]
 ----
 # loading data from binary format as u8 array
-decimal_array=($(od -An -t u1 < '/path/to/file'))
+decimal_array=($(od -v -An -t u1 < '/path/to/file'))
 # printing data
 echo "${decimal_array[@]}"
 
