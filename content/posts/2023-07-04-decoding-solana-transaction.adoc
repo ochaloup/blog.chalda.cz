@@ -182,6 +182,8 @@ decimal_array=($(od -v -An -t u1 < '/path/to/file'))
 # printing data
 echo "${decimal_array[@]}"
 
+# show first 8 bytes
+echo "${decimal_array[@]:0:8}"
 # printing only last 32 bytes of the loaded data
 echo "${decimal_array[@]:(-32):32}"
 ----
