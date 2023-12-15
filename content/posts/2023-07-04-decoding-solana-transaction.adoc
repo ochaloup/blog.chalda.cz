@@ -186,6 +186,10 @@ echo "${decimal_array[@]}"
 echo "${decimal_array[@]:0:8}"
 # printing only last 32 bytes of the loaded data
 echo "${decimal_array[@]:(-32):32}"
+
+# convert solana account data to hex
+solana account -um <address> -o /tmp/acc
+cat /tmp/acc | od -An -v -tx1 | tr -d ' \n'
 ----
 
 ====
