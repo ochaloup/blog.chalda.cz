@@ -1,0 +1,138 @@
+= Solana Hardware Wallets Typescript client
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2024-10-08
+
+:page-template: post
+:page-draft: true
+:page-slug: solana-hardware-wallets
+:page-category: solana
+:page-tags: Solana, Typescript, Hardware.Wallets
+:page-description: How to code Node.js TypeScript client to work with hardware wallets on Solana
+:page-socialImage:  /images/articles/hardware-wallet-article.png
+
+image::articles/hardware-wallet-article.png[]
+
+Using hardware wallets for securely signing blockchain transaction is a defacto standard.
+On Solana when one creates a web application there are multiple solution of wallet connection tools
+and Solana tooling provides good link:https://solana.com/developers/cookbook/wallets/connect-wallet-react[integration to React^] and link:https://solana.com/developers/guides/wallets/add-solana-wallet-adapter-to-nextjs[Nextjs base apps^].
+But such a library for Node.js command line tools is not, to my knowledge, available.
+A good news is that every vendor provides a javascript library that can be used
+to work with the device. But then one needs to put all moving parts together to make it working.
+This article is about this.
+
+== BIP-32, BIP-39 and BIP-44
+
+Let's start with hardware wallet address schema. Before I started to play with the Typescript
+signature tooling I fought to understand the meaning. This brief description is not aimed
+to provide link:https://vault12.com/learn/crypto-security-basics/what-is-bip39/[an in-detail explanation of the topic]
+naiter more link:https://www.abiraja.com/blog/from-seed-phrase-to-solana-address[in-depth explanation].
+But rather to describe the context needed to work with the wallet in the code.
+
+The term link:https://github.com/bitcoin/bips/tree/master[BIP stands for "bitcoin improvement proposal"^]
+and all these three are "linked" to topic of how addresses used within the hardware wallets.
+
+When usual user takes a hardware wallet he is asked to to remember a generated set of words
+(most commonly 12 or 24). This is a seed phrase - a mnemonic sentence - is then converted by wallets
+to the private and public keys used to sign transactions.
+The link:https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#user-content-Motivation[BIP-39^]
+defines the set of the words
+that can be used in the phrase. This set of seed words is defined within various languages,
+but the english is the mostly used variant. This base word set is chosen in way
+the words would be as different as possible to be difficult to interchange one for another.
+
+So the BIP-39 describes how to construct the seed phrase.
+Then the link:https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#master-key-generation[BIP-32^]
+defines a method to derive set of private/public keys from the single seed phrase.
+That way one can control multiple accounts
+withing the single seed phrase. The derived public keys have got a nice
+property that they cannot be tracked within each other. From the perspective
+of the outside spectator the public keys derived from one seed have nothing in common.
+
+The last link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#abstract[BIP-44^]
+hierarchical schema used to deterministically generate the private keys (BIP-39) from the seed phrase (BIP-32).
+This hierarchy is expressed as link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#path-levels[a path]
+like
+
+[source]
+----
+m / purpose' / coin_type' / account' / change / address_index
+----
+
+The first level `purpose` is encoded within the
+link:https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki#user-content-Motivation[BIP-43^]
+where purpose of generating the keys from the seed phrase as defined by BIP-44
+has got purpose `44'`.
+
+Then we have the `coin_type` that is defined for Solana being `501`
+(see link:https://github.com/satoshilabs/slips/blob/master/slip-0044.md[SLIP-44]).
+
+For Solana the base derivation path is link:https://docs.rs/solana-sdk/latest/solana_sdk/derivation_path/index.html[`m/44'/501'`^].
+
+The `account'` is considered as an independent user identity and can be understood
+as a substitution for a bank account of the user.
+
+The `change` has the specific meaning or constant `0` is used for external chain
+and constant `1` for internal chain (also known as change addresses).
+For Solana, I believe, we consider only external chain constant of value `0`
+(the constant `0` for the external chain can be used to receive payments).
+
+
+== Account discovery
+
+As mentioned above the BIP-44 derived keys have got no way to be derived from each other.
+The only way how to find keys managed by the wallet
+is to take the seed phrase and start generating the keys
+within the hierarchy until reached the desired account (desired matching public key)
+and then the particular all-important private encryption key can be used to sign a transaction.
+
+The hardware wallet starts at `account'` and `change` being value `0'`.
+For our Solana purpose the first key to be used with a new seed phrase is at path:
+
+[source]
+----
+m/44'/501'/0'/0
+----
+
+When the wallet wants to discover if addresses "managed" by seed phrase of the hardware wallet
+own some funds it scans the hierarchy by defined
+With that the link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account-discovery[account discovery procedure in BIP-44^]
+and checks if the derived address has got some funds (for Solana account based approach)
+or has got some transaction history (for Bitcoin UTXO based approach).
+The BIP-44 defines the wallet should scan the accounts until reaching
+the link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#address-gap-limit[address gap limit^]
+which is until `20` scanned addresses without any funds being found.
+
+While Bitcoin discovery process seems to be defined in way of using
+link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples[`address_index`^]
+to search for the addresses the Solana uses an "account discovery approach" where
+the derivation path link:https://docs.solanalabs.com/cli/wallets/hardware/#specify-a-keypair-url[works with `account/change`^]
+part of the BIP-44 path. And the hardware wallet then uses the `account` part to be the "changing" part for discovery.
+With that the wallet will search at second for an existing funds at addressed derived from path `m/44'/501'/1'/0'`.
+
+== Solana CLI utils
+
+If you are used to work with link:https://docs.solanalabs.com/cli/[Solana CLI]
+you can use the CLI to work with link:https://www.ledger.com/coin/wallet/solana[Ledger]
+and to get Solana public key addresses at particular derived path.
+When you connect your Ledger device use `solana-keygen pubkey`.
+The Solana CLI Ledger schema is `usb://<MANUFACTURER>[/<WALLET_ID>][?key=<DERIVATION_PATH>]`.
+
+[source,sh]
+----
+# printing wallet id of the connected device
+solana-keygen pubkey usb://ledger
+
+# printing pubkey at the path m/44'/501'/0'/0 of the connected device
+solana-keygen pubkey usb://ledger?key=0/0
+
+# searches for devices with defined wallet id for pubkey at the particular path
+solana-keygen pubkey usb://ledger/<wallet-id>?key=0
+----
+
+[NOTE]
+====
+* `Error: no device found` can be got when no connected ledger device
+  is of this wallet id
+* `Error: protocol error: Unknown error` when received then check
+  if your Ledger wallet is connected to your computer and it is unlocked (opened)
+====

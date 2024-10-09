@@ -1,6 +1,6 @@
 = On Solana error handling
 chalda <ondrej.chaloupka@proton.me>
-1.0, 2024-09-10
+1.0, 2030-01-01
 
 :page-template: post
 :page-draft: true
