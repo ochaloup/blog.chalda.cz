@@ -1,0 +1,99 @@
+= Solana Programs Fuzz Testing
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2024-10-20
+
+:page-template: post
+:page-draft: true
+:page-slug: solana-fuzz-testing
+:page-category: solana, testing
+:page-tags: Solana, Rust, Testing
+:page-description: Notes on using Ackee Blockchain Trident tooling for fuzz testing Solana on-chain program
+:page-socialImage:  /images/articles/trident-fuzz-testing.jpg
+
+image::articles/trident-fuzz-testing.jpg[]
+
+Testing programs is a cornerstone of good software engineering practices. One type of testing is fuzz testing, which involves automatically injecting randomized, unexpected, and potentially malformed inputs into a program. Fuzz testing software then observes the system's responses to these inputs and evaluates for vulnerabilities or system instabilities.
+
+The link:https://ackee.xyz/trident/[Ackee Blockchain^]
+created a link:https://github.com/Ackee-Blockchain/trident[Trident^]
+framework for the purpose of fuzz testing of Solana on-chain program
+written in link:https://github.com/coral-xyz/anchor[Solana Anchor^].
+Under the belt the Trident uses
+the link:https://github.com/rust-fuzz/honggfuzz-rs[Honggfuzz^]
+fuzzer developed by Google for fuzzing Rust programs.
+
+== Start with fuzzing with Trident
+
+As I can say beside pretty quickly checking the
+well-written
+link:https://ackee.xyz/trident/docs/0.7.0/fuzzing/first-steps/writing-fuzz-test/[documentation^]
+I quickly skipped to the Trident's
+link:https://github.com/Ackee-Blockchain/trident/tree/master/examples/fuzz-tests[examples at github^]
+and started to copy&paste structure and data into my contract.
+
+I need to say that was not a good start and eventually I returned back
+to work with documentation resources. And I would recommend
+
+[loweralpha]
+. Use pre-defined directory structure and do not try to bend it anyhow.
+  Use the defaults as it just work.
+. Use link:https://ackee.xyz/trident/docs/latest/fuzzing/first-steps/fuzz-test-initialization[`trident-cli`^]
+  to generate the Trident's fuzz testing project structure for you.
+  It generates a lot of boiler plate needed particularly for your project.
+. Check out video tutorial for Trident by Ackee at Solana Auditors Bootcamp,
+  plus the github resources available for the same
+** link:https://www.youtube.com/watch?v=5JRVnxGW8kc[Solana Anchor Program Fuzzing with Trident I^]
+** link:https://www.youtube.com/watch?v=gMk6hm0x44M[Solana Anchor Program Fuzzing with Trident II^]
+** link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp[GitHub Bootcamp resources^]
+  
+=== Initializing with dependency errors
+
+I develop the fuzz tests for link:https://marinade.finance/[Marinade^]'s
+link:https://github.com/marinade-finance/validator-bonds[Validator Bonds program^].
+This was written with Solana `1.17.x` and Anchor `0.29.0` dependencies and
+here multiple dependency incompatibility issues occurred.
+Running the command
+
+[source,sh]
+----
+trident init fuzz
+----
+
+Failed with errors like
+
+----
+error[E0635]: unknown feature `stdsimd`
+  --> .cargo/registry/src/index.crates.io-6f17d22bba15001f/ahash-0.7.6/src/lib.rs:33:42
+    |
+33 | #![cfg_attr(feature = "stdsimd", feature(stdsimd))]
+    | 
+----
+
+The incompatibility of Rust and Solana version with Trident framework
+caused a bit of headache here.
+The solution for me was to switch to Rust in version `1.76.0`
+and move the Solana dependency from `1.17.x` to `1.18.x`
+and then get running the `trident init fuzz`.
+
+The good thing was that this way I make the `init` working and later
+I can change the dependencies back to the original version
+as the boiler is generated and `trident fuzz run` seems 
+does not require the problematic `ahash/stdsimd` dependency.
+
+=== Project structure and writing fuzz tests
+
+The link:https://ackee.xyz/trident/docs/latest/fuzzing/first-steps/fuzz-test-initialization/[documentation^]
+is really informative in this manner and thus I would just mention few notes
+
+* Fuzz tests are stored at `trident-tests/fuzz_tests/fuzz_0`.
+  Trident generates the boilderplate for every instruction
+  within the Anchor program. To align the setup it's good
+  to check the
+  link:https://youtu.be/5JRVnxGW8kc?t=1856[video tutorial^]
+  where all is nicely explained step-by-step.
+* When more programs than those available in `solana-test-validator`
+  is needed for testing then the `.so` files have to be stored into
+  folder named `trident-genesis` in the same directore as the `Anchor.toml` file is stored.
+* When fuzz testing with trident is run with `trident fuzz run`
+  then built data is stored at `trident-tests/fuzz_tests/fuzzing`
+* Trident updates `.gitignore` to ignore `trident-tests/fuzz_tests/fuzzing/hfuzz_target/` directory where built program tests are stored

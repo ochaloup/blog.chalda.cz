@@ -1,6 +1,6 @@
 = Solana Hardware Wallets Typescript client
 chalda <ondrej.chaloupka@proton.me>
-1.0, 2024-10-08
+1.0, 2024-10-20
 
 :page-template: post
 :page-draft: true
