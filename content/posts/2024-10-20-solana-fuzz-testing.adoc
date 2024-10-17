@@ -136,7 +136,7 @@ fuzz_instructions.rs:: Here is where fuzz tests are written. The structure of th
 
 === A bit more on fuzz_instructions.rs
 
-The hongfuzz generate random bytes
+The honggfuzz generate random bytes
 link:https://www.youtube.com/watch?v=5JRVnxGW8kc&list=PLzUrW5H8-hDdU-pzHjZrgupi5Wis6zWNJ&index=3[where Trident "corrects" it to structures suitable for Solana programming model^].
 The keypoint of the `fuzz_instructions.rs` is definition of 
 link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L84[a storage of the accounts^].
@@ -167,15 +167,111 @@ On top of this core structure it's more than needed to check enhanced techniques
   link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp/blob/76e61fef431de5059a3aca790729b70298d0c147/Lesson-4/trident-lesson-part-ii/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L86-L114[in specific state or data]
   for tests (e.g., an account has be initialized in particular way before instruction is called)
 
-== Trident.toml configuration
+== Running tests
 
+When the test is written the fuzz testing is executed with `trident-cli`
 
-=== Points for test runs
+[source,sh]
+----
+# trident fuzz run <fuzz_scenario>
+trident fuzz run fuzz_0
+----
 
-```
-This crashfile didn't trigger any panics...
-Are you sure that you selected the correct crashfile and that your program's behavior is entirely deterministic and only dependent on the fuzzing input?
-```
+By default the fuzzing does not care about the results and it just generates
+data until is stopped manually by `CTRL^C` or by specific condition in the configuration.
+That's where the
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml[`Trident.toml`^]
+comes to play.
+
+The fuzz tests may get stopped either on number of
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L9 [`iterations`],
+after some
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L7[`timeout`]
+or 
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L32[number of bytes]
+to be processed until stopped.
+
+Then the execution may be stopped when a
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L17[crash occurs].
+Otherwise the test is fuzzing until other condition is held
+and the crashes can be evaluated all together.
+
+At the `[fuzz]` section is good to enable `fuzzing_with_stats`
+that provides a summary of the instructions that were run.
+
+=== Trident.toml configuration for debugging
+
+A good thing for debugging purposes is to setup the
+lintk:https://www.youtube.com/watch?v=gMk6hm0x44M&t=1276s[following parameters^]:
+
+[source,toml]
+----
+[honggfuzz]
+# lower number of interations to be comprehensible
+iterations = 10  
+# do not execute in parallel to be easier to check the results
+threads = 1
+# print to console
+keep_output = true
+verbose = true
+----
+
+This setup makes the fuzzing to print all the Solana program log
+information to console.
+
+== Evaluation crashes
+
+For evaluation of errors one need to check the crashfiles that are generated into
+`trident-tests/fuzz_tests/fuzzing/hfuzz_workspace/fuzz_0/*.fuzz`.
+For that it's needed to run cli command
+
+[source,sh]
+----
+cargo fuzz run-debug fuzz_0 <path-to-fuzz-file>
+----
+
+With that one is booted into `lldb` console (write `q<ENTER>` to quit).
+After execution we can usually end up in the end of printing where
+a long lldb stacktrace can be seen.
+We need to scroll up to the part where information about Solana program
+processing is shown. The we can see title
+
+----
+Instructions sequence:
+....
+------ End of Instructions sequence ------ 
+Currently processing: ConfigureConfig(ConfigureConfig {
+  ...
+----
+
+That informs what parameters where used on instruction invocation
+and usually the program log can shed light on reasons of the failure.
+
+image::articles/fuzz-testing/console-log.png[]
+
+=== Several troubleshooting points
+
+* On running `trident fuzz run-debug` failure `ModuleNotFoundError: No module named 'lldb.embedded_interpreter'`
+  has been observed. I was able to fix it as explained at
+  link:https://github.com/llvm/llvm-project/issues/55575#issuecomment-1247426995[github issue #55575^]
+
+* For Ubuntu to install newer versions of LVM toolchain see https://apt.llvm.org/[^]
+  It could be like
+  [source,sh]
+  ----
+  sudo echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main
+  deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy main' > /etc/apt/sources.list.d/llvm-toolchain.list
+  sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+  ----
+
+* On `run-debug` for a crash file is printed `This crashfile didn't trigger any panics...` and
+  the exit code `2` is returned then it could be the particular crashfile was not the cause
+  of the panic.
+  This seems to be a case when Solana program exists with an `Error` and not with `panic!`.
+  It seems to be all ok otherwise and one should check the Solana program logs what happened.
+
+* `warning: This version of LLDB has no plugin for the language "rust". Inspection of frame variables will be limited.`.
+  Not sure on tackle this. It seems `rust-lldb` could hep but installation is not straight forward.
 
 == Summary
 
