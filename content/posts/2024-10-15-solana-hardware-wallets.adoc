@@ -136,3 +136,7 @@ solana-keygen pubkey usb://ledger/<wallet-id>?key=0
 * `Error: protocol error: Unknown error` when received then check
   if your Ledger wallet is connected to your computer and it is unlocked (opened)
 ====
+
+
+NOTES: https://medium.com/hryer-dev/how-wallet-works-on-evm-709fd5c5eace
+       https://www.abiraja.com/blog/from-seed-phrase-to-solana-address

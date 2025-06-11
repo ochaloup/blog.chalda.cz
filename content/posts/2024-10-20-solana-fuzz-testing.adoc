@@ -14,7 +14,7 @@ image::articles/trident-fuzz-testing.jpg[]
 
 Testing programs is a cornerstone of good software engineering practices. One type of testing is fuzz testing, which involves automatically injecting randomized, unexpected, and potentially malformed inputs into a program. Fuzz testing software then observes the system's responses to these inputs and evaluates for vulnerabilities or system instabilities.
 
-The link:https://ackee.xyz/trident/[Ackee Blockchain^]
+The link:https://ackee.xyz/trident/docs/[Ackee Blockchain^]
 created a link:https://github.com/Ackee-Blockchain/trident[Trident^]
 framework for the purpose of fuzz testing of Solana on-chain program
 written in link:https://github.com/coral-xyz/anchor[Solana Anchor^].
@@ -176,6 +176,9 @@ When the test is written the fuzz testing is executed with `trident-cli`
 # trident fuzz run <fuzz_scenario>
 trident fuzz run fuzz_0
 ----
+
+NOTE: when `Anchor.toml` is at different place from where the Trident tests are stored
+      then one can use option `trident fuzz --root <anchor-project-root>`.
 
 By default the fuzzing does not care about the results and it just generates
 data until is stopped manually by `CTRL^C` or by specific condition in the configuration.
