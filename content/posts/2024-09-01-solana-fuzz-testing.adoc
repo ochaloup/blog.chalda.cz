@@ -1,0 +1,282 @@
+= Solana Programs Fuzz Testing
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2024-09-01
+
+:page-template: post
+:page-draft: false
+:page-slug: solana-fuzz-testing
+:page-category: solana, testing
+:page-tags: Solana, Rust, Testing
+:page-description: Notes on using Ackee Blockchain Trident tooling for fuzz testing Solana on-chain programs
+:page-socialImage:  /images/articles/trident-fuzz-testing.jpg
+
+image::articles/trident-fuzz-testing.jpg[]
+
+Testing programs is a cornerstone of good software engineering practices. One type of testing is fuzz testing, which involves automatically injecting randomized, unexpected, and potentially malformed inputs into a program. Fuzz testing software then observes the system's responses to these inputs and evaluates for vulnerabilities or system instabilities.
+
+The link:https://ackee.xyz/trident/docs/[Ackee Blockchain^]
+created a link:https://github.com/Ackee-Blockchain/trident[Trident^]
+framework for the purpose of fuzz testing of Solana on-chain programs
+written in link:https://github.com/coral-xyz/anchor[Solana Anchor^].
+Under the hood, Trident uses
+the link:https://github.com/rust-fuzz/honggfuzz-rs[Honggfuzz^]
+fuzzer developed by Google for fuzzing Rust programs.
+
+== Start with fuzzing with Trident
+
+I can say that besides pretty quickly checking the
+well-written
+link:https://ackee.xyz/trident/docs/0.7.0/fuzzing/first-steps/writing-fuzz-test/[documentation^],
+I quickly skipped to Trident's
+link:https://github.com/Ackee-Blockchain/trident/tree/master/examples/fuzz-tests[examples at GitHub^]
+and started to copy & paste structure and data into my contract.
+
+I need to say that was not a good way to start with coding and eventually I returned back
+to work with documentation resources and to start with `trident-cli`.
+
+[[trident-resources]]
+[loweralpha]
+. Use link:https://ackee.xyz/trident/docs/latest/fuzzing/first-steps/fuzz-test-initialization[`trident-cli`^]
+  to generate Trident's fuzz testing project structure for you.
+  It generates a lot of boilerplate needed particularly for your project.
+. Check out video tutorials for Trident by Ackee at Solana Auditors Bootcamp,
+  plus the GitHub resources available for the same
+** link:https://www.youtube.com/watch?v=5JRVnxGW8kc[Solana Anchor Program Fuzzing with Trident I^]
+** link:https://www.youtube.com/watch?v=gMk6hm0x44M[Solana Anchor Program Fuzzing with Trident II^]
+** link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp[GitHub Bootcamp resources^]
+** link:https://github.com/Ackee-Blockchain/trident/tree/master/examples/fuzz-tests[Trident repository test examples^]
+
+NOTE: I was using Trident in link:https://github.com/Ackee-Blockchain/trident/releases/tag/0.7.0[version 0.7.0^] while writing this article.
+  
+=== Initializing with dependency errors
+
+I developed the fuzz tests for link:https://marinade.finance/[Marinade^]'s
+link:https://github.com/marinade-finance/validator-bonds[Validator Bonds program^].
+This was written with Solana `1.17.x` and Anchor `0.29.0` dependencies and
+here multiple dependency incompatibility issues occurred.
+Running the command
+
+[source,sh]
+----
+trident init fuzz
+----
+
+failed with errors like
+
+----
+error[E0635]: unknown feature `stdsimd`
+  --> .cargo/registry/src/index.crates.io-6f17d22bba15001f/ahash-0.7.6/src/lib.rs:33:42
+    |
+33 | #![cfg_attr(feature = "stdsimd", feature(stdsimd))]
+    | 
+----
+
+The incompatibility of Rust and Solana version with the Trident framework
+caused a bit of a headache here.
+The solution for me was to switch to Rust link:https://github.com/tkaitchuck/aHash/issues/200#issuecomment-1928956777[in version `1.76.0`^]
+and move the Solana dependency from `1.17.x` to `1.18.x`
+and only then did running `trident init fuzz` start to work.
+
+The "good thing" was that I could get the `init` CLI command working and later
+I could change the dependencies back to the original version
+and the `trident fuzz run` command seems not to require the problematic `ahash/stdsimd` dependency.
+
+== Project structure and fuzz tests
+
+I believe
+link:https://ackee.xyz/trident/docs/latest/fuzzing/first-steps/fuzz-test-initialization/[Trident's documentation^]
+is pretty elaborate and I would only recommend to check it out and to watch
+the link:https://youtu.be/5JRVnxGW8kc?t=1856[video tutorial^] by link:https://ackee.xyz/[Ackee].
+
+First I would recommend using the directory structure prescribed by the Trident `init` command
+and not trying to bend it anyhow. Just use the defaults as it just works.
+
+Trident knows how to work with integration tests besides the fuzz tests.
+Those are generated with `trident init poc`
+but were not of interest to me as I'm used to using `Anchor` and link:https://github.com/kevinheavey/solana-bankrun/[`bankrun`] for this purpose.
+
+=== What is Trident's directory structure
+
+* `Trident.toml` configures processing of the fuzzing with configuration parameters that
+  are transferred to honggfuzz and some that serve for configuration of Trident.
+  The `Trident.toml` should be placed alongside `Anchor.toml`.
+* `trident-tests/fuzz_tests` directory containing particular fuzzing scenarios.
+  One of those is by default `fuzz_0` at `trident-tests/fuzz_tests/fuzz_0`
+  configured at `trident-tests/fuzz_tests/Cargo.toml` that can be executed
+  as `trident run fuzz fuzz_0`.
+* `trident-genesis` at the same directory as the `trident-tests` and it contains
+  program binaries that are used in CPI calls from the main fuzzed Anchor program.
+  It could be a binary downloaded from mainnet like
+  [source,sh]
+  ----
+  solana program dump -um TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA trident-genesis/token-program.so
+  ----
+  Then usage of such "third-party programs" is configured
+  link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/cpi-metaplex-7/trident-tests/fuzz_tests/fuzz_0/test_fuzz.rs#L38-L46[in `test_fuzz.rs`^].
+* The resulting binaries, reports and crashfiles of the fuzz testing are stored at
+  `trident-tests/fuzz_tests/fuzzing/` where binaries for each scenario are stored under the subfolder `hfuzz_target`
+  and the reports and crash files are stored under the subfolder `hfuzz_workspace`.
+  One can find the report for the `fuzz_0` scenario under `trident-tests/fuzz_tests/fuzzing/hfuzz_workspace/fuzz_0/`.
+* Trident updates `.gitignore` to ignore the `trident-tests/fuzz_tests/fuzzing/hfuzz_target/` directory.
+
+== Start writing tests
+
+Again I would recommend <<trident-resources,watching the video series>> but basically there are
+three files generated by the `trident init fuzz` command under a scenario folder like `trident-tests/fuzz_tests/fuzz_0`.
+
+accounts_snapshot.rs:: Auto-generated boilerplate code covering Anchor's contract instructions.
+                       Not necessary to be touched.
+                       It can be replaced
+                       link:https://youtu.be/gMk6hm0x44M?t=1221[by derived macros possibly in the future^].
+test_fuzz.rs:: Entry point main function of the program. It defines the fuzz loop
+               and configures the programs that are part of the fuzzing session.
+fuzz_instructions.rs:: This is where fuzz tests are written. The structure of the tests is pre-generated by the `init` command
+                       and then has to be enhanced manually based on the contract's logic.
+
+=== A bit more on fuzz_instructions.rs
+
+Honggfuzz generates random bytes
+link:https://www.youtube.com/watch?v=5JRVnxGW8kc&list=PLzUrW5H8-hDdU-pzHjZrgupi5Wis6zWNJ&index=3[where Trident "corrects" them to structures suitable for the Solana programming model^].
+The key point of `fuzz_instructions.rs` is the definition of 
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L84[a storage of accounts^].
+The storage works with a random "index" in the form
+of link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/crates/fuzz/src/lib.rs[`AccountId`^]
+and every account type may define one or multiple storages used within test functions.
+
+Then every instruction is defined within
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L7[the enumeration]
+that defines the instruction's data and accounts 
+that are gathered and used as defined within the
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L25[implementation of `IxOps`] methods.
+
+On top of this core structure, it's more than necessary to check the enhanced techniques presented in examples of Ackee Bootcamp
+
+* Definition of instruction order and limitation of what instructions to be called
+  link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp/blob/master/Lesson-4/trident-lesson-part-ii/trident-tests/fuzz_tests/fuzz_0/test_fuzz.rs#L18[with `FuzzDataBuilder`]
+* Using
+  link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/cpi-metaplex-7/trident-tests/fuzz_tests/fuzz_0/test_fuzz.rs#L38-L46[additional Solana programs^]
+  within CPI calls
+* link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp/blob/master/Lesson-4/trident-lesson-part-ii/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L47[Limiting the input data]
+  generated by the randomizer into some boundaries
+* Adding custom
+  link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp/blob/master/Lesson-4/trident-lesson-part-ii/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L201[invariant checks]
+* Adding custom handlers of
+  link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp/blob/master/Lesson-4/trident-lesson-part-ii/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L221[error codes]
+* Creating accounts
+  link:https://github.com/Ackee-Blockchain/Solana-Auditors-Bootcamp/blob/76e61fef431de5059a3aca790729b70298d0c147/Lesson-4/trident-lesson-part-ii/trident-tests/fuzz_tests/fuzz_0/fuzz_instructions.rs#L86-L114[in specific state or with specific data]
+  for tests (e.g., an account has to be initialized in a particular way before the instruction is called)
+
+== Running tests
+
+When the test is written, the fuzz testing is executed with `trident-cli`
+
+[source,sh]
+----
+# trident fuzz run <fuzz_scenario>
+trident fuzz run fuzz_0
+----
+
+NOTE: When `Anchor.toml` is at a different place from where the Trident tests are stored,
+      then one can use the option `trident fuzz --root <anchor-project-root>`.
+
+By default, fuzzing doesn't care about the results and it just generates
+data until it is stopped manually by `CTRL+C` or by a specific condition in the configuration.
+That's where the
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml[`Trident.toml`^]
+comes into play.
+
+The fuzz tests may get stopped either on the number of
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L9[`iterations`],
+after some
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L7[`timeout`]
+or 
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L32[number of bytes]
+to be processed until stopped.
+
+Then the execution may be stopped when a
+link:https://github.com/Ackee-Blockchain/trident/blob/0.7.0/examples/fuzz-tests/hello_world/Trident.toml#L17[crash occurs].
+Otherwise the test keeps fuzzing until another condition is met
+and the crashes can be evaluated all together.
+
+At the `[fuzz]` section it's good to enable `fuzzing_with_stats`
+that provides a summary of the instructions that were run.
+
+=== Trident.toml configuration for debugging
+
+A good thing for debugging purposes is to set up the
+link:https://www.youtube.com/watch?v=gMk6hm0x44M&t=1276s[following parameters^]:
+
+[source,toml]
+----
+[honggfuzz]
+# lower number of iterations to be comprehensible
+iterations = 10  
+# do not execute in parallel to be easier to check the results
+threads = 1
+# print to console
+keep_output = true
+verbose = true
+----
+
+This setup makes the fuzzing print all the Solana program log
+information to the console.
+
+== Evaluating crashes
+
+For evaluation of errors, one needs to check the crashfiles that are generated into
+`trident-tests/fuzz_tests/fuzzing/hfuzz_workspace/fuzz_0/*.fuzz`.
+For that it's needed to run the CLI command
+
+[source,sh]
+----
+cargo fuzz run-debug fuzz_0 <path-to-fuzz-file>
+----
+
+With that one is booted into the `lldb` console (write `q<ENTER>` to quit).
+After execution we can usually end up at the end of printing where
+a long lldb stacktrace can be seen.
+We need to scroll up to the part where information about Solana program
+processing is shown. There we can see the title
+
+----
+Instructions sequence:
+....
+------ End of Instructions sequence ------ 
+Currently processing: ConfigureConfig(ConfigureConfig {
+  ...
+----
+
+That informs what parameters were used on instruction invocation
+and usually the program log can shed light on the reasons for the failure.
+
+image::articles/fuzz-testing/console-log.png[]
+
+=== Several troubleshooting points
+
+* On running `trident fuzz run-debug`, the failure `ModuleNotFoundError: No module named 'lldb.embedded_interpreter'`
+  has been observed. I was able to fix it as explained at
+  link:https://github.com/llvm/llvm-project/issues/55575#issuecomment-1247426995[GitHub issue #55575^]
+
+* For Ubuntu to install newer versions of the LLVM toolchain see https://apt.llvm.org/[^]
+  It could be like
+  [source,sh]
+  ----
+  sudo echo 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main
+  deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy main' > /etc/apt/sources.list.d/llvm-toolchain.list
+  sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+  ----
+
+* On `run-debug` for a crash file, if `This crashfile didn't trigger any panics...` is printed and
+  the exit code `2` is returned, then it could be that the particular crashfile was not the cause
+  of the panic.
+  This seems to be the case when the Solana program exits with an `Error` and not with `panic!`.
+  It seems to be all ok otherwise and one should check the Solana program logs to see what happened.
+
+* `warning: This version of LLDB has no plugin for the language "rust". Inspection of frame variables will be limited.`.
+  Not sure how to tackle this. It seems `rust-lldb` could help but installation is not straightforward.
+
+== Summary
+
+The key takeaways include: starting with the `trident-cli` initialization rather than copying examples, understanding the project structure that Trident generates, writing effective fuzz tests in `fuzz_instructions.rs`, configuring `Trident.toml` for both production runs and debugging, and evaluating crashes through the generated crashfiles. The article also addresses common dependency issues and provides troubleshooting tips for working with LLVM and lldb tools.
+
+For developers working with Solana programs, fuzz testing with Trident offers an automated way to discover vulnerabilities and edge cases by generating randomized inputs. Despite the version changes since this was written, the fundamental approach and best practices outlined here provide a solid foundation for anyone looking to add fuzz testing to their Solana development workflow.
