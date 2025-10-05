@@ -1,0 +1,15 @@
+= Anchor IDL and managing older versions
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2025-10-10
+
+:page-template: post
+:page-draft: true
+:page-slug: anchor-idl
+:page-category: solana
+:page-tags: Solana, Typescript, Rust, Anchor, IDL
+:page-description: Working with Anchor IDL from older versions of Anchor framework.
+:page-socialImage:  /images/articles/anchor-idl.png
+
+image::articles/anchor-idl.png[]
+
+ble, ble
