@@ -12,4 +12,101 @@ chalda <ondrej.chaloupka@proton.me>
 
 image::articles/anchor-idl.png[]
 
-ble, ble
+What if a Solana Anchor program is created with an older version of the Anchor
+and you want to interact with it using a newer version of the Anchor framework?
+Or what the on-chain program does not provide a source code, but only the IDL?
+With all of this may help this article.
+
+== Anchor IDL
+
+Anchor IDL (Interface Definition Language) is a JSON file that describes the
+interface of an Anchor program. It includes information about the program's
+instructions, accounts, types, and events. The IDL is used by the Anchor
+framework to generate client code that can interact with the program.
+
+The IDL is generated automatically when you build an Anchor program using the
+Anchor CLI. The IDL file is typically located in the `target/idl` directory of
+your Anchor project.
+Any good Anchor program should have the IDL file available on-chain, so you can
+fetch it using the program's public key. One way is to check the [Solana Explorer](https://explorer.solana.com/).
+See for example the [IDL of Marinade Liquid Staking program](https://explorer.solana.com/address/MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD/idl).
+
+Other way to fetch the IDL is to use the Anchor CLI:
+
+```bash
+anchor idl fetch <PROGRAM_ID> -o <OUTPUT_FILE>
+```
+
+E.g., for Marinade Liquid Staking program:
+
+```bash
+anchor idl fetch MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD | head -n 10
+{
+  "version": "0.1.0",
+  "name": "marinade_finance",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "state",
+          "isMut": true,
+
+```
+
+Besides the IDL file the Anchor program provides a binding for TypeScript client code.
+When Anchor program is built the TypeScript bindings are generated in the `target/types` directory.
+It is not available directly on-chain.
+
+== Older versions of Anchor
+
+Let's take a look at [Marinade Liquid Staking program](https://github.com/marinade-finance/liquid-staking-program).
+It is a program that was written pretty some time ago, and it uses an older version of
+the [Anchor in version 0.27.0](https://github.com/solana-foundation/anchor/releases/tag/v0.27.0).
+That's a version released in March 2023 and it is dependent on Solana client v1.14.x.
+The source code of the Liquid Staking program is available on-chain, but just building is a bit problematic
+as the older versions of Solana client cannot be easily installed with the `curl` toolchain command.
+
+This one just does not work
+
+```bash
+sh -c "$(curl -sSfL https://release.anza.xyz/v1.14.29/install)"
+
+> curl: (22) The requested URL returned error: 404
+```
+
+The chance is few manual steps as the older versions of Solana client are still available on GitHub.
+
+1. Download the Solana v1.14.29 tarball from the [Solana releases page](https://github.com/solana-labs/solana/releases/tag/v1.14.29).
+   In my case, I downloaded the `solana-release-x86_64-unknown-linux-gnu.tar.bz2` file.
+2. Extract the tarball to `$HOME/.local/share/solana/install/releases/<version>` directory.
+   ```bash
+   VERSION=1.14.29
+   mkdir -p $HOME/.local/share/solana/install/releases/$VERSION
+   # creating the releases directory: $HOME/.local/share/solana/install/releases/$VERSION/solana-release/
+   tar xvjf solana-release-x86_64-unknown-linux-gnu.tar.bz2 -C $HOME/.local/share/solana/install/releases/$VERSION
+   ```
+3. Symlink the newly extracted directory
+    ```bash
+    rm -f $HOME/.local/share/solana/install/active_release
+    ln -s $HOME/.local/share/solana/install/releases/$VERSION/solana-release $HOME/.local/share/solana/install/active_release
+    ```
+4. Install the Anchor version
+    ```bash
+    # expected the avm tool is already installed
+    avm install 0.27.0
+    avm use 0.27.0
+    ```
+5. Now you can build the Anchor program
+    ```bash
+    git clone https://github.com/marinade-finance/liquid-staking-program.git
+    cd liquid-staking-program/
+    anchor build
+
+    ls target/idl/
+    > marinade_finance.json
+    ls target/types/
+    > marinade_finance.ts
+    ```
+
+== Different version of Anchor IDL
