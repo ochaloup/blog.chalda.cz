@@ -109,4 +109,109 @@ The chance is few manual steps as the older versions of Solana client are still 
     > marinade_finance.ts
     ```
 
-== Different version of Anchor IDL
+== Different version of Anchor and IDL
+
+Using programs created in Anchor framework in prior versions
+in programs or client applications of the current versions of Anchor
+brings a significant challenges. The Anchor library is (hopefully we can say was)
+deeply coupled with particular versions of Solana toolchain.
+So working with program coded in Anchor in version 0.27.0 where Solana in version 1.17.x was required
+was problematic when integrating CPI calls or client linking with Anchor 0.29.0.
+
+Anchor developers strives to [address this issue](https://github.com/solana-foundation/anchor/pull/3819)
+by making Anchor more independent
+on Solana tooling but these difficulties still occurs especially when working with programs
+coded in older Anchor versions.
+
+Additionally, from the past to nowadays there were one substantial change of IDL format
+that was [introduced in version 0.30.0](https://github.com/solana-foundation/anchor/pull/2824)
+and made required in Anchor 0.30.1.
+This is an issue especially to Anchor TypeScript SDK client that uses the IDL to understand
+the on-chain program structure and to serialize and deserialize the instructions calls to the program.
+
+As as on can download the IDL from chain but when it was generated in the version prior to 0.30.1
+and we want to use Anchor TS SDK of the current Anchor version 0.32.0 there is a trouble of incompatibility.
+
+== Program Rust dependencies
+
+The way how to overcome the issue with version incompatibilities there are two options,
+for a long time it was the third party crate [`anchor-gen`](https://github.com/saber-hq/anchor-gen) that makes possible to work
+with programs of the older Anchor.
+From Anchor 0.30.0 there is option to use macro [`declare_program!`](https://github.com/solana-foundation/anchor/pull/2824)
+doing similar.
+
+> **WARNING** be aware that anchor-gen code has not been audited
+
+=== declare_program! macro
+
+When using [the Anchor 0.30.1+](https://github.com/solana-foundation/anchor/pull/2997)
+then `declare_program` is probably way to go for CPI calls within the program.``
+The example usage of the macro can be found
+[in the Anchor sources](https://github.com/solana-foundation/anchor/blob/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/programs/declare-program/src/lib.rs).
+
+The idea is to having the [idls](https://github.com/solana-foundation/anchor/tree/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/idls)
+alongside the program using the macro. The `declare_program!` then generates the required Rust structures
+[that can be used for interacting](https://github.com/solana-foundation/anchor/blob/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/programs/declare-program/src/lib.rs#L5-L6)
+with the program defined in the IDL.
+
+Similarly for client calls you download the idl into specific [idls directory](https://github.com/ochaloup/test-anchor-gen/tree/59c5d072d015d4423f1b433d2d04e9f88c4c449a/declare-program-rust/idls)
+and then use the macro `declare_program!` with the name of the `idl.json` file.
+The [`use` directive then declares](https://github.com/ochaloup/test-anchor-gen/blob/main/declare-program-rust/src/main.rs)
+what instructions and accounts are imported to the client code.
+
+You can find the details in the Anchor documentation at chapter [Dependency Free Composability](https://www.anchor-lang.com/docs/features/declare-program).
+
+=== anchor-gen crate
+
+When using the prior version of Anchor then you have to either upgrade (possibly recommended)
+or to use the `anchor-gen` library. That works in similar manner where a macro generates for you a Rust code
+based on IDL and that can be used within your project. As difference there is created a separate "CPI crate"
+for the program you want to interact with.
+You can see the example of declaration of
+[Marinade Liquid Staking crate](https://github.com/saber-hq/anchor-gen/tree/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi)
+inside of the `anchor-gen/examples`. 
+// TODO: what about this sentence?
+The anchor-gen crate links to the Marinade program sources and based on that it generates the linking.
+
+Then this newly declared crate is linked to your project and used. Here is example of the usage
+[in Anchor Client calls](https://github.com/ochaloup/test-anchor-gen/blob/ffb9474d605ff05d09e87a94b46ffd4647162ea6/anchor-gen-rust/src/main.rs).
+
+There could be good [to align the versions of anchor-gen](https://github.com/saber-hq/anchor-gen/blame/85658b83bdb1eca0707a336b2cd41a61ddc4805f/crates/anchor-gen/README.md#L7)
+that works with particular Anchor version to make it working with your project.
+
+=== Troubleshooting
+
+The `declare_program!` macro is developed to be capable to work with IDLs generated
+[in the older versions of Anchor](https://github.com/solana-foundation/anchor/pull/2997/files).
+But there are some pitfalls that you may encounter.
+
+One is that when the IDL does not contain the `metadata.address` field.
+When Anchor was generating the IDL in the older versions the metadata address field
+was not added until the IDL was uploaded to the chain.
+For manual IDL deployment it meant that the address field was not present in the IDL.
+you may see an error like this:
+
+```
+error: Program id missing in `idl.metadata.address` field
+  --> src/main.rs:10:18
+   |
+10 | declare_program!(marinade);
+
+```
+
+In older versions of the Anchor the IDL was not created with the `address` field by default.
+The address was added to the IDL for example only at time the IDL was uploaded to the chain.
+But for cases when the IDL 
+Especially when the program 
+
+
+```
+error[E0428]: the name `__cpi_client_accounts_common` is defined multiple times
+  --> src/main.rs:10:1
+   |
+10 | declare_program!(marinade);
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^ `__cpi_client_accounts_common` redefined here
+   |
+   = note: `__cpi_client_accounts_common` must be defined only once in the type namespace of this module
+   = note: this error originates in the macro `declare_program` (in Nightly builds, run with -Z macro-backtrace for more info)
+```
