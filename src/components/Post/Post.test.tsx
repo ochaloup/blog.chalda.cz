@@ -18,7 +18,10 @@ describe("Post", () => {
   });
 
   it("renders correctly", () => {
-    const props = { post: mocks.asciidoc, tags: mocks.asciidoc.pageAttributes.tags.split(",").map(i => i.trim()) };
+    const props = {
+      post: mocks.asciidoc,
+      tags: mocks.asciidoc.pageAttributes.tags.split(",").map((i) => i.trim()),
+    };
     const tree = renderer.create(<Post {...props} />).toJSON();
     expect(tree).toMatchSnapshot();
   });

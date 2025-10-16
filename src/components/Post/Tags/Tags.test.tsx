@@ -7,7 +7,7 @@ import * as mocks from "@/mocks";
 describe("Tags", () => {
   it("renders correctly", () => {
     const props = {
-      tags: mocks.asciidoc.pageAttributes.tags.split(",").map(t => t.trim()),
+      tags: mocks.asciidoc.pageAttributes.tags.split(",").map((t) => t.trim()),
       tagSlugs: mocks.asciidoc.fields.tagsSlugs,
     };
 

@@ -48,7 +48,10 @@ const createPages: GatsbyNode["createPages"] = async ({ graphql, actions }) => {
         component: constants.templates.pageTemplate,
         context: { slug: node.fields.slug },
       });
-    } else if (node?.pageAttributes?.template === "post" && node?.fields?.slug) {
+    } else if (
+      node?.pageAttributes?.template === "post" &&
+      node?.fields?.slug
+    ) {
       createPage({
         path: node.fields.slug,
         component: constants.templates.postTemplate,

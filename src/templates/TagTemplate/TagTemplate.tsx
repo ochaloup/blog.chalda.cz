@@ -27,10 +27,13 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
   const { edges } = data.allAsciidoc;
 
   // Filter posts by tag (tags are comma-separated strings in AsciiDoc)
-  const filteredEdges = edges.filter(e => {
+  const filteredEdges = edges.filter((e) => {
     const tags = e.node.pageAttributes.tags || "";
     // Split by comma and trim whitespace, then check if tag matches
-    return tags.split(",").map(t => t.trim()).includes(group || "");
+    return tags
+      .split(",")
+      .map((t) => t.trim())
+      .includes(group || "");
   });
 
   // Apply manual pagination since GraphQL can't filter comma-separated tags
@@ -67,10 +70,7 @@ export const query = graphql`
     }
     allAsciidoc(
       filter: {
-        pageAttributes: {
-          template: { eq: "post" }
-          draft: { ne: "true" }
-        }
+        pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } }
       }
       sort: { revision: { date: DESC } }
     ) {

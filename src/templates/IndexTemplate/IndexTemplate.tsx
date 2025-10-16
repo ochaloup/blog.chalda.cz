@@ -50,7 +50,9 @@ export const query = graphql`
       limit: $limit
       skip: $offset
       sort: { revision: { date: DESC } }
-      filter: { pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } } }
+      filter: {
+        pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } }
+      }
     ) {
       edges {
         node {

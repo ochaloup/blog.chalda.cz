@@ -19,7 +19,8 @@ const PostTemplate: React.FC<Props> = ({ data }: Props) => {
   const { description = "", socialimage } = pageAttributes;
   const { title } = document;
   const metaDescription = description || siteSubtitle;
-  const tags = data.asciidoc.pageAttributes?.tags?.split(",").map(t => t.trim()) || [];
+  const tags =
+    data.asciidoc.pageAttributes?.tags?.split(",").map((t) => t.trim()) || [];
 
   return (
     <Layout

@@ -4,11 +4,10 @@ import { groupTag } from "@/utils";
 
 import * as types from "../types";
 
-
 interface TagsQueryResult {
   allAsciidoc: {
     edges?: Array<types.Edge>;
-  }
+  };
 }
 
 const useTagsList = () => {

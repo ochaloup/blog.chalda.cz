@@ -4,7 +4,7 @@ import { Link } from "gatsby";
 
 import type { Node } from "@/types";
 
-import highlightCode from "../../utils/highlightCode"
+import highlightCode from "../../utils/highlightCode";
 import { Author } from "./Author";
 import { Comments } from "./Comments";
 import { Content } from "./Content";
@@ -21,12 +21,12 @@ interface Props {
 const Post: React.FC<Props> = ({ post, tags }: Props) => {
   const { html } = post;
   const { tagSlugs, slug } = post.fields;
-  const { title} = post.document;
+  const { title } = post.document;
   const { date } = post.revision;
 
   useEffect(() => {
-    highlightCode()
-  })
+    highlightCode();
+  });
 
   return (
     <div className={styles.post}>

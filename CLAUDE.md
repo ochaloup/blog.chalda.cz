@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Gatsby-based static blog site that uses **AsciiDoc** (`.adoc` files) instead of Markdown for content authoring. The site is built on the [gatsby-starter-lumen](https://github.com/alxshelepenok/gatsby-starter-lumen) template and has been customized to work with the `gatsby-transformer-asciidoc` plugin.
 
 Key characteristics:
+
 - TypeScript-based Gatsby site
 - React components with SCSS styling
 - AsciiDoc for blog posts and pages
@@ -16,22 +17,27 @@ Key characteristics:
 ## Development Commands
 
 ### Starting Development Server
+
 ```bash
 npm start
 # or
 yarn start
 ```
+
 This cleans the cache and starts the Gatsby development server in verbose mode at http://localhost:8000/
 
 ### Building for Production
+
 ```bash
 npm run build
 # or
 yarn build
 ```
+
 Cleans the cache and builds the static site to the `public/` directory.
 
 ### Testing
+
 ```bash
 # Run all tests
 npm test
@@ -42,9 +48,11 @@ npm run test:watch
 # Run tests with coverage
 npm run test:coverage
 ```
+
 Tests are configured with Jest using SWC for transformation. Test configuration is in `internal/testing/jest-config.ts`.
 
 ### Linting and Formatting
+
 ```bash
 # Check linting (TypeScript + SCSS)
 npm run lint
@@ -60,9 +68,11 @@ npm run format:scss  # Format SCSS files
 ```
 
 ### Serving Production Build
+
 ```bash
 npm run serve
 ```
+
 Serves the production build locally for testing.
 
 ## Architecture
@@ -70,12 +80,15 @@ Serves the production build locally for testing.
 ### Content System
 
 Content is stored in the `content/` directory:
+
 - **Posts**: `content/posts/*.adoc` - Blog articles with frontmatter metadata
 - **Pages**: `content/pages/**/*.adoc` - Static pages (e.g., Links page)
 - **Config**: `content/config.json` - Site metadata, author info, menu structure
 
 #### AsciiDoc Frontmatter Format
+
 Posts and pages use AsciiDoc document attributes for metadata:
+
 ```asciidoc
 = Title of the Article
 chalda <ondrej.chaloupka@proton.me>
@@ -91,6 +104,7 @@ chalda <ondrej.chaloupka@proton.me>
 ```
 
 Key attributes:
+
 - `:page-template:` - Either `post` or `page`
 - `:page-draft:` - Set to `true` to exclude from builds
 - `:page-slug:` - Custom URL slug (optional)
@@ -103,6 +117,7 @@ Key attributes:
 The Gatsby configuration is split across multiple files:
 
 **gatsby-config.ts**: Plugin configuration including:
+
 - `gatsby-transformer-asciidoc` for processing `.adoc` files
 - Image optimization (sharp)
 - RSS feed generation
@@ -111,6 +126,7 @@ The Gatsby configuration is split across multiple files:
 - PWA/offline support
 
 **gatsby-node.ts**: Exports three core functions:
+
 - `createPages` (from `internal/gatsby/create-pages.ts`) - Generates pages and pagination
 - `onCreateNode` (from `internal/gatsby/on-create-node.ts`) - Processes Asciidoc nodes, creates slug fields
 - `onCreateWebpackConfig` - Webpack customization
@@ -140,6 +156,7 @@ internal/
 ### Path Aliases
 
 TypeScript path aliases are configured in `tsconfig.json`:
+
 - `@/components` → `src/components`
 - `@/hooks` → `src/hooks`
 - `@/utils` → `src/utils`
@@ -166,6 +183,7 @@ Pagination limit is configured via `postsLimit` in `content/config.json` (curren
 ### Slug Generation
 
 In `internal/gatsby/on-create-node.ts`:
+
 - If `:page-slug:` is specified in frontmatter, uses that as the slug
 - Otherwise, generates slug from file path
 - Category slugs: `/category/{kebab-case-name}/`
@@ -174,6 +192,7 @@ In `internal/gatsby/on-create-node.ts`:
 ### Component Structure
 
 Components follow a consistent pattern:
+
 - Each component in its own directory with `index.ts` barrel export
 - Styles in co-located `.module.scss` files
 - Tests in `.test.tsx` files next to the component
@@ -182,6 +201,7 @@ Components follow a consistent pattern:
 ### Testing Infrastructure
 
 Tests use:
+
 - **Jest** with **@swc/jest** for fast TypeScript transformation
 - **react-test-renderer** for component testing
 - **jsdom** environment
@@ -192,6 +212,7 @@ Mock utilities include: `site-metadata`, `edges`, `page-context`, `author`, `gat
 ## Deployment
 
 The site deploys automatically to GitHub Pages via `.github/workflows/gatsby.yml`:
+
 - Triggers on pushes to the `gatsby` branch
 - Uses Node 20 and yarn/npm auto-detection
 - Caches `public/` and `.cache/` directories for faster builds

@@ -6,7 +6,7 @@ import groupTag from "../utils/group-tags";
 interface TagsQueryResult {
   allAsciidoc: {
     edges?: Array<types.Edge>;
-  }
+  };
 }
 
 const tagsQuery = async (graphql: CreatePagesArgs["graphql"]) => {

@@ -30,7 +30,7 @@ const onCreateNode: GatsbyNode["onCreateNode"] = ({
     }
 
     if (tags) {
-      const splitTags = tags.split(",").map(t => t.trim());
+      const splitTags = tags.split(",").map((t) => t.trim());
       const value = splitTags.map((tag) =>
         utils.concat(
           constants.routes.tagRoute,
