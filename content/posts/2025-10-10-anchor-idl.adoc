@@ -1,9 +1,9 @@
 = Anchor IDL and managing older versions
 chalda <ondrej.chaloupka@proton.me>
-1.0, 2025-10-10
+1.0, 2025-10-16
 
 :page-template: post
-:page-draft: true
+:page-draft: false
 :page-slug: anchor-idl
 :page-category: solana
 :page-tags: Solana, Typescript, Rust, Anchor, IDL
