@@ -1,4 +1,5 @@
 import { graphql, useStaticQuery } from "gatsby";
+
 import { groupTag } from "@/utils";
 
 import * as types from "../types";

@@ -21,8 +21,10 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
   const { title: siteTitle, subtitle: siteSubtitle } = useSiteMetadata();
 
   const { group, pagination } = pageContext;
-  // TODO: here we should manually handle limit and offset on the filteredEdges
-  // then the hasPrevPage and hasNextPage could be handled as well better
+  /*
+   * TODO: here we should manually handle limit and offset on the filteredEdges
+   * then the hasPrevPage and hasNextPage could be handled as well better
+   */
   const { currentPage, prevPagePath, nextPagePath, hasPrevPage, hasNextPage } =
     pagination;
 

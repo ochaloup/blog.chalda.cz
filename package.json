@@ -1,6 +1,6 @@
 {
   "name": "gatsby-starter-lumen",
-  "version": "1.1.436",
+  "version": "2.0.60",
   "description": "A constantly evolving and thoughtful architecture for creating static blogs with Gatsby",
   "keywords": [
     "gatsby",
@@ -40,7 +40,7 @@
     ]
   },
   "lint-staged": {
-    "*.{tsx?}": [
+    "*.{ts,tsx,tsx?}": [
       "npm run format:ts"
     ],
     "*.{(sc|sa|c)ss}": [
@@ -58,7 +58,7 @@
     "gatsby-plugin-google-gtag": "^5.15.0",
     "gatsby-plugin-image": "^3.15.0",
     "gatsby-plugin-manifest": "^5.15.0",
-    "gatsby-plugin-offline": "^6.15.0",
+    "gatsby-plugin-remove-serviceworker": "^1.0.0",
     "gatsby-plugin-optimize-svgs": "^1.0.5",
     "gatsby-plugin-react-helmet": "^6.15.0",
     "gatsby-plugin-sass": "^6.15.0",

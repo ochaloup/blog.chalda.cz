@@ -152,32 +152,7 @@ export default {
         start_url: "/",
       },
     },
-    {
-      resolve: "gatsby-plugin-offline",
-      options: {
-        workboxConfig: {
-          runtimeCaching: [
-            {
-              urlPattern: /(\.js$|\.css$|[^:]static\/)/,
-              handler: "CacheFirst",
-            },
-            {
-              urlPattern: /^https?:.*\/page-data\/.*\.json/,
-              handler: "StaleWhileRevalidate",
-            },
-            {
-              urlPattern:
-                /^https?:.*\.(png|jpg|jpeg|webp|svg|gif|tiff|js|woff|woff2|json|css)$/,
-              handler: "StaleWhileRevalidate",
-            },
-            {
-              urlPattern: /^https?:\/\/fonts\.googleapis\.com\/css/,
-              handler: "StaleWhileRevalidate",
-            },
-          ],
-        },
-      },
-    },
+    "gatsby-plugin-remove-serviceworker",
     {
       resolve: "@sentry/gatsby",
       options: {

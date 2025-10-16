@@ -4,6 +4,7 @@ import { Link } from "gatsby";
 
 import type { Node } from "@/types";
 
+import highlightCode from "../../utils/highlightCode"
 import { Author } from "./Author";
 import { Comments } from "./Comments";
 import { Content } from "./Content";
@@ -11,7 +12,6 @@ import { Meta } from "./Meta";
 import { Tags } from "./Tags";
 
 import * as styles from "./Post.module.scss";
-import highlightCode from '../../utils/highlightCode'
 
 interface Props {
   post: Node;

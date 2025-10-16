@@ -5,7 +5,6 @@ import { Link } from "gatsby";
 import { Edge } from "@/types";
 
 // import { StaticImage } from "gatsby-plugin-image"
-
 import * as styles from "./Feed.module.scss";
 
 type Props = {
@@ -20,19 +19,19 @@ type FeedImageProps = {
 
 export class FeedImage extends Component<FeedImageProps> {
   static defaultProps = {
-    src: '',
-    slug: ''
+    src: "",
+    slug: "",
   }
 
   render() {
-    if (this.props.src != undefined && this.props.src && this.props.src.trim()) {
+    if (this.props.src !== undefined && this.props.src && this.props.src.trim()) {
       return (
         <Link to={this.props.slug}>
           <img loading="lazy" src={this.props.src} className="feedimage" />
         </Link>
       )
     } else {
-      return
+      return null
     }
   }
 }

@@ -8,8 +8,7 @@ interface TagPageAttributes {
   tags?: string;
 }
 
-const groupTag = (edges: TagEdge[]): Array<{fieldValue: string; totalCount: number }> => {
-  return edges?.flatMap(
+const groupTag = (edges: TagEdge[]): Array<{fieldValue: string; totalCount: number }> => edges?.flatMap(
     (e: TagEdge) => e.node.pageAttributes?.tags?.split(",").map(t => t.trim())
   ).reduce((returnedArray, value) => {
     if (returnedArray === undefined || value === undefined) return returnedArray;
@@ -20,7 +19,6 @@ const groupTag = (edges: TagEdge[]): Array<{fieldValue: string; totalCount: numb
       returnedArray.push({fieldValue: value, totalCount: 1});
     }
     return returnedArray;
-  }, new Array<{fieldValue: string; totalCount: number }>()) || [];
-}
+  }, new Array<{fieldValue: string; totalCount: number }>()) || []
 
 export default groupTag;
