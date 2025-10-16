@@ -33,13 +33,15 @@ See for example the https://explorer.solana.com/address/MarBmsSgKXdrN1egZf5sqe1T
 
 Another way to fetch the IDL is to use the Anchor CLI:
 
-```bash
+[source,bash]
+----
 anchor idl fetch <PROGRAM_ID> -o <OUTPUT_FILE>
-```
+----
 
 E.g., for Marinade Liquid Staking program:
 
-```bash
+[source,bash+json]
+----
 anchor idl fetch MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD | head -n 10
 {
   "version": "0.1.0",
@@ -52,7 +54,7 @@ anchor idl fetch MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD | head -n 10
           "name": "state",
           "isMut": true,
 
-```
+----
 
 Besides the IDL file, the Anchor program provides a binding for TypeScript client code.
 When an Anchor program is built, the TypeScript bindings are generated in the `target/types` directory.
@@ -69,45 +71,54 @@ as the older versions of Solana client cannot be easily installed with the `curl
 
 This one just does not work:
 
-```bash
+[source,bash]
+----
 sh -c "$(curl -sSfL https://release.anza.xyz/v1.14.29/install)"
 
 > curl: (22) The requested URL returned error: 404
-```
+----
 
 The solution requires a few manual steps as the older versions of Solana client are still available on GitHub.
 
-1. Download the Solana v1.14.29 tarball from the https://github.com/solana-labs/solana/releases/tag/v1.14.29[Solana releases page].
+. Download the Solana v1.14.29 tarball from the https://github.com/solana-labs/solana/releases/tag/v1.14.29[Solana releases page].
    In my case, I downloaded the `solana-release-x86_64-unknown-linux-gnu.tar.bz2` file.
-2. Extract the tarball to `$HOME/.local/share/solana/install/releases/<version>` directory.
-   ```bash
-   VERSION=1.14.29
-   mkdir -p $HOME/.local/share/solana/install/releases/$VERSION
-   # creating the releases directory: $HOME/.local/share/solana/install/releases/$VERSION/solana-release/
-   tar xvjf solana-release-x86_64-unknown-linux-gnu.tar.bz2 -C $HOME/.local/share/solana/install/releases/$VERSION
-   ```
-3. Symlink the newly extracted directory
-    ```bash
-    rm -f $HOME/.local/share/solana/install/active_release
-    ln -s $HOME/.local/share/solana/install/releases/$VERSION/solana-release $HOME/.local/share/solana/install/active_release
-    ```
-4. Install the Anchor version
-    ```bash
-    # expected that the avm tool is already installed
-    avm install 0.27.0
-    avm use 0.27.0
-    ```
-5. Now you can build the Anchor program
-    ```bash
-    git clone https://github.com/marinade-finance/liquid-staking-program.git
-    cd liquid-staking-program/
-    anchor build
+. Extract the tarball to `$HOME/.local/share/solana/install/releases/<version>` directory.
++
+[source,bash]
+----
+VERSION=1.14.29
+mkdir -p $HOME/.local/share/solana/install/releases/$VERSION
+# creating the releases directory: $HOME/.local/share/solana/install/releases/$VERSION/solana-release/
+tar xvjf solana-release-x86_64-unknown-linux-gnu.tar.bz2 -C $HOME/.local/share/solana/install/releases/$VERSION
+----
+. Symlink the newly extracted directory
++
+[source,bash]
+----
+rm -f $HOME/.local/share/solana/install/active_release
+ln -s $HOME/.local/share/solana/install/releases/$VERSION/solana-release $HOME/.local/share/solana/install/active_release
+----
+. Install the Anchor version
++
+[source,bash]
+----
+# expected that the avm tool is already installed
+avm install 0.27.0
+avm use 0.27.0
+----
+. Now you can build the Anchor program
++
+[source,bash]
+----
+git clone https://github.com/marinade-finance/liquid-staking-program.git
+cd liquid-staking-program/
+anchor build
 
-    ls target/idl/
-    > marinade_finance.json
-    ls target/types/
-    > marinade_finance.ts
-    ```
+ls target/idl/
+> marinade_finance.json
+ls target/types/
+> marinade_finance.ts
+----
 
 == Different version of Anchor and IDL
 
@@ -141,7 +152,8 @@ Running it simply with an input file does not work in case the IDL format does n
 the `metadata.address` field. This field is required in the newer IDL format
 and it has to be provided manually when converting the IDL.
 
-```bash
+[source,bash]
+----
 # downloading the IDL from the chain of older version
 anchor --provider.cluster mainnet idl fetch \
   MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD > /tmp/marinade_finance.json
@@ -150,7 +162,7 @@ anchor --provider.cluster mainnet idl fetch \
 anchor idl convert /tmp/marinade_finance.json \
   --program-id MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD \
   -o /tmp/marinade_finance_v0.30.0.json
-```
+----
 
 == Program Rust dependencies
 
@@ -213,20 +225,22 @@ Having types for the TypeScript client is nice to have as it provides type safet
 When not having access to Anchor program source code you can generate the types from the IDL
 using my utility https://github.com/ochaloup/anchor-idl-to-ts[anchor-idl-to-ts].
 
-```bash
+[source,bash]
+----
 anchor --provider.cluster mainnet idl fetch \
   MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD > /tmp/marinade_finance.json
 
 cargo install anchor-idl-to-ts
 anchor-idl-to-ts /tmp/marinade_finance.json -o /tmp/marinade_finance.ts
-```
+----
 
 With IDL and types you can use both in your TypeScript client code.
 The code that creates the Anchor program client looks similar.
 The most notable difference is that for older versions you need to manually provide the program address
 as it is not present in the IDL.
 
-```typescript
+[source,typescript]
+----
 import { PublicKey } from '@solana/web3.js'
 import { IDL as MarinadeIDL, MarinadeFinance } from './types/marinade'
 import { AnchorProvider, IdlAccounts, Program, Wallet } from '@coral-xyz/anchor'
@@ -247,7 +261,7 @@ const provider = new AnchorProvider(
 )
 const program = new Program<MarinadeFinance>(MarinadeIDL, MARINADE_LIQUID_STAKE_PROGRAM_ID, provider)
 const marinadeState = await program.account.state.fetch(MARINADE_LIQUID_STAKE_STATE)
-```
+----
 
 You can see the example code for:
 
