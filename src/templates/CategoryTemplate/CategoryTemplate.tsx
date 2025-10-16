@@ -58,7 +58,7 @@ export const query = graphql`
           draft: { ne: "true" }
         }
       }
-      sort: { order: DESC, fields: [revision___date] }
+      sort: { revision: { date: DESC } }
     ) {
       edges {
         node {

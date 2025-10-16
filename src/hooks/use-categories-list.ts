@@ -18,7 +18,7 @@ const useCategoriesList = () => {
             pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } }
           }
         ) {
-          group(field: pageAttributes___category) {
+          group(field: { pageAttributes: { category: SELECT } }) {
             fieldValue
             totalCount
           }

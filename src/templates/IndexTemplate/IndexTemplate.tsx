@@ -49,7 +49,7 @@ export const query = graphql`
     allAsciidoc(
       limit: $limit
       skip: $offset
-      sort: { order: DESC, fields: [revision___date] }
+      sort: { revision: { date: DESC } }
       filter: { pageAttributes: { template: { eq: "post" }, draft: { ne: "true" } } }
     ) {
       edges {
