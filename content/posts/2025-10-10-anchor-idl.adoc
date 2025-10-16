@@ -132,10 +132,30 @@ the on-chain program structure and to serialize and deserialize the instructions
 As as on can download the IDL from chain but when it was generated in the version prior to 0.30.1
 and we want to use Anchor TS SDK of the current Anchor version 0.32.0 there is a trouble of incompatibility.
 
+=== Converting IDL to the newer format
+
+Anchor CLI from version 0.30.1 provides an utility that is capable to convert the IDL
+from the older format to the newer one. The command is `anchor idl convert`.
+
+Running it simply with input file does not work in case the IDL format does not contain
+the `metadata.address` field. This field is required in newer IDL format
+and it has to be provided manually when converting the IDL.
+
+```bash
+# downloading the IDL from the chain of older version
+anchor --provider.cluster mainnet idl fetch \
+  MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD > /tmp/marinade_finance.json
+
+# converting the IDL to the newer format
+anchor idl convert /tmp/marinade_finance.json \
+  --program-id MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD \
+  -o /tmp/marinade_finance_v0.30.0.json
+```
+
 == Program Rust dependencies
 
-The way how to overcome the issue with version incompatibilities there are two options,
-for a long time it was the third party crate [`anchor-gen`](https://github.com/saber-hq/anchor-gen) that makes possible to work
+The way how to overcome the issue with Anchor version incompatibilities there are two options in Rust.
+Either using the third party crate [`anchor-gen`](https://github.com/saber-hq/anchor-gen) that makes possible to work
 with programs of the older Anchor.
 From Anchor 0.30.0 there is option to use macro [`declare_program!`](https://github.com/solana-foundation/anchor/pull/2824)
 doing similar.
@@ -170,16 +190,74 @@ for the program you want to interact with.
 You can see the example of declaration of
 [Marinade Liquid Staking crate](https://github.com/saber-hq/anchor-gen/tree/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi)
 inside of the `anchor-gen/examples`. 
-// TODO: what about this sentence?
-The anchor-gen crate links to the Marinade program sources and based on that it generates the linking.
 
-Then this newly declared crate is linked to your project and used. Here is example of the usage
+You can see that you create [the anchor-gen project](https://github.com/saber-hq/anchor-gen/blob/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi/Cargo.toml)
+and places the IDL definition into [`idl.json`](https://github.com/saber-hq/anchor-gen/blob/master/examples/marinade-cpi/idl.json)
+and from here the [`anchor_gen::generate_cpi_crate`](https://github.com/saber-hq/anchor-gen/blob/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi/src/lib.rs)
+macro builds the Rust structures and functions that can be called from your project.
+
+This crate is linked to your project and used. Here is example of the usage
 [in Anchor Client calls](https://github.com/ochaloup/test-anchor-gen/blob/ffb9474d605ff05d09e87a94b46ffd4647162ea6/anchor-gen-rust/src/main.rs).
 
 There could be good [to align the versions of anchor-gen](https://github.com/saber-hq/anchor-gen/blame/85658b83bdb1eca0707a336b2cd41a61ddc4805f/crates/anchor-gen/README.md#L7)
 that works with particular Anchor version to make it working with your project.
 
+== TypeScript client
+
+When you have the IDL file you can use it in your TypeScript client code. As mentioned before it is important
+to have the IDL in format aligned with the Anchor client version you are using.
+
+On building the Anchor program the TypeScript bindings are generated in the `target/types` directory
+while the IDL is in the `target/idl` directory. The on-chain program provides the IDL only.
+Having types for the TypeScript client is a nice to have as it provides type safety.
+When not having access to Anchor program source code you can generate the types from the IDL
+using my utility [anchor-idl-to-ts](https://github.com/ochaloup/anchor-idl-to-ts).
+
+```bash
+anchor --provider.cluster mainnet idl fetch \
+  MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD > /tmp/marinade_finance.json
+
+cargo install anchor-idl-to-ts
+anchor-idl-to-ts /tmp/marinade_finance.json -o /tmp/marinade_finance.ts
+```
+
+With IDL and types you can use both in your TypeScript client code.
+The code that creates the Anchor program client looks similar.
+The most notable difference is that for older you need to manually provide the program address
+as it is not present in the IDL.
+
+```typescript
+import { PublicKey } from '@solana/web3.js'
+import { IDL as MarinadeIDL, MarinadeFinance } from './types/marinade'
+import { AnchorProvider, IdlAccounts, Program, Wallet } from '@coral-xyz/anchor'
+
+const MARINADE_LIQUID_STAKE_PROGRAM_ID = new PublicKey("MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD")
+const MARINADE_LIQUID_STAKE_STATE = new PublicKey("8szGkuLTAux9XMgZ2vtY39jVSowEcpBfFfD8hXSEqdGC")
+
+export type MarinadeProgram = Program<MarinadeFinance>
+export type MarinadeState = IdlAccounts<MarinadeFinance>['state']
+
+...
+
+const wallet = new Wallet(keypair);
+const provider = new AnchorProvider(
+   connection,
+   wallet,
+   AnchorProvider.defaultOptions(),
+)
+const program = new Program<MarinadeFinance>(MarinadeIDL, MARINADE_LIQUID_STAKE_PROGRAM_ID, provider)
+const marinadeState = await program.account.state.fetch(MARINADE_LIQUID_STAKE_STATE)
+```
+
+You can see the example code for:
+
+* [Anchor client version 0.27.0](https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/anchor-0.27/src/main.ts)
+* [Anchor client version 0.31.0](https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/anchor-0.31/src/main.ts)
+we use 
+
 === Troubleshooting
+
+=== missing in `idl.metadata.address` field
 
 The `declare_program!` macro is developed to be capable to work with IDLs generated
 [in the older versions of Anchor](https://github.com/solana-foundation/anchor/pull/2997/files).
@@ -204,6 +282,11 @@ The address was added to the IDL for example only at time the IDL was uploaded t
 But for cases when the IDL 
 Especially when the program 
 
+=== name collision
+
+When working with an older IDL it may happen thet the names of accounts or instructions
+collides. They were not separated that strictly as nowadays. For example, in the Marinade Liquid Staking program
+there is an named set of accounts used for an instruction in the same way as `common` that generates the name collision.
 
 ```
 error[E0428]: the name `__cpi_client_accounts_common` is defined multiple times
@@ -215,3 +298,8 @@ error[E0428]: the name `__cpi_client_accounts_common` is defined multiple times
    = note: `__cpi_client_accounts_common` must be defined only once in the type namespace of this module
    = note: this error originates in the macro `declare_program` (in Nightly builds, run with -Z macro-backtrace for more info)
 ```
+
+My resolution was to manually edit the IDL and rename the `common` instruction account set to
+[`common_<suffix>`](https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/declare-program-rust/idls/marinade.json#L845).
+
+== Summary
