@@ -60,7 +60,7 @@ Besides the IDL file, the Anchor program provides a binding for TypeScript clien
 When an Anchor program is built, the TypeScript bindings are generated in the `target/types` directory.
 It is not available directly on-chain.
 
-== Older versions of Anchor
+== Issues of installing older Solana client
 
 Let's take a look at https://github.com/marinade-finance/liquid-staking-program[Marinade Liquid Staking program^].
 It is a program that was written quite some time ago, and it uses an older version of
@@ -122,12 +122,10 @@ ls target/types/
 
 == Different version of Anchor and IDL
 
-Using programs created in the Anchor framework in prior versions
-in programs or client applications of the current versions of Anchor
-brings significant challenges. The Anchor library is (hopefully we can say was)
+The Anchor library is (hopefully we can say was)
 deeply coupled with particular versions of the Solana toolchain.
 So working with a program coded in Anchor version 0.27.0 where Solana version 1.17.x was required
-was problematic when integrating CPI calls or client linking with Anchor 0.29.0.
+was problematic when integrating CPI calls or client linking with newer versions (e.g. Anchor 0.29.0).
 
 Anchor developers strive to https://github.com/solana-foundation/anchor/pull/3819[address this issue^]
 by making Anchor more independent
@@ -139,9 +137,6 @@ that was https://github.com/solana-foundation/anchor/pull/2824[introduced in ver
 and made required in Anchor 0.30.1.
 This is an issue especially for Anchor TypeScript SDK client that uses the IDL to understand
 the on-chain program structure and to serialize and deserialize the instruction calls to the program.
-
-As one can download the IDL from chain but when it was generated in the version prior to 0.30.1
-and we want to use Anchor TS SDK of the current Anchor version 0.32.0 there is a trouble of incompatibility.
 
 === Converting IDL to the newer format
 
@@ -188,10 +183,12 @@ with the program defined in the IDL.
 
 Similarly for client calls you download the idl into a specific https://github.com/ochaloup/test-anchor-gen/tree/59c5d072d015d4423f1b433d2d04e9f88c4c449a/declare-program-rust/idls[idls directory^]
 and then use the macro `declare_program!` with the name of the `idl.json` file.
-The https://github.com/ochaloup/test-anchor-gen/blob/main/declare-program-rust/src/main.rs[`use` directive then declares^]
-what instructions and accounts are imported to the client code.
+The `use` directive then declares what instructions and accounts are imported to the client code.
+Here is an example of the usage
+https://github.com/ochaloup/test-anchor-gen/blob/main/declare-program-rust/src/main.rs[[in Anchor client calls^].
 
-You can find the details in the Anchor documentation at chapter https://www.anchor-lang.com/docs/features/declare-program[Dependency Free Composability^].
+Anchor documents this approach at the chapter
+https://www.anchor-lang.com/docs/features/declare-program[Dependency free composability^].
 
 === anchor-gen crate
 
@@ -209,7 +206,7 @@ and from here the https://github.com/saber-hq/anchor-gen/blob/85658b83bdb1eca070
 macro builds the Rust structures and functions that can be called from your project.
 
 This crate is linked to your project and used. Here is an example of the usage
-https://github.com/ochaloup/test-anchor-gen/blob/ffb9474d605ff05d09e87a94b46ffd4647162ea6/anchor-gen-rust/src/main.rs[in Anchor Client calls^].
+https://github.com/ochaloup/test-anchor-gen/blob/ffb9474d605ff05d09e87a94b46ffd4647162ea6/anchor-gen-rust/src/main.rs[in Anchor client calls^].
 
 It could be good https://github.com/saber-hq/anchor-gen/blame/85658b83bdb1eca0707a336b2cd41a61ddc4805f/crates/anchor-gen/README.md#L7[to align the versions of anchor-gen^]
 that work with particular Anchor versions to make it work with your project.
@@ -222,7 +219,7 @@ to have the IDL in a format aligned with the Anchor client version you are using
 On building the Anchor program the TypeScript bindings are generated in the `target/types` directory
 while the IDL is in the `target/idl` directory. The on-chain program provides the IDL only.
 Having types for the TypeScript client is nice to have as it provides type safety.
-When not having access to Anchor program source code you can generate the types from the IDL
+When not having access to Anchor program source code you can generate the TypeScript types from the IDL
 using my utility https://github.com/ochaloup/anchor-idl-to-ts[anchor-idl-to-ts^].
 
 [source,bash]
