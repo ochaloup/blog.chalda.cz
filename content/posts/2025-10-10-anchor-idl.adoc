@@ -29,7 +29,7 @@ Anchor CLI. The IDL file is typically located in the `target/idl` directory of
 your Anchor project.
 Any good Anchor program should have the IDL file available on-chain, so you can
 fetch it using the program's public key. One way is to check the https://explorer.solana.com/[Solana Explorer].
-See for example the https://explorer.solana.com/address/MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD/idl[IDL of Marinade Liquid Staking program].
+See for example the https://explorer.solana.com/address/MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD/idl[IDL of Marinade Liquid Staking program^].
 
 Another way to fetch the IDL is to use the Anchor CLI:
 
@@ -62,9 +62,9 @@ It is not available directly on-chain.
 
 == Older versions of Anchor
 
-Let's take a look at https://github.com/marinade-finance/liquid-staking-program[Marinade Liquid Staking program].
+Let's take a look at https://github.com/marinade-finance/liquid-staking-program[Marinade Liquid Staking program^].
 It is a program that was written quite some time ago, and it uses an older version of
-https://github.com/solana-foundation/anchor/releases/tag/v0.27.0[Anchor in version 0.27.0].
+https://github.com/solana-foundation/anchor/releases/tag/v0.27.0[Anchor in version 0.27.0^].
 That's a version released in March 2023 and it is dependent on Solana client v1.14.x.
 The source code of the Liquid Staking program is available on GitHub, but just building it is a bit problematic
 as the older versions of Solana client cannot be easily installed with the `curl` toolchain command.
@@ -80,7 +80,7 @@ sh -c "$(curl -sSfL https://release.anza.xyz/v1.14.29/install)"
 
 The solution requires a few manual steps as the older versions of Solana client are still available on GitHub.
 
-. Download the Solana v1.14.29 tarball from the https://github.com/solana-labs/solana/releases/tag/v1.14.29[Solana releases page].
+. Download the Solana v1.14.29 tarball from the https://github.com/solana-labs/solana/releases/tag/v1.14.29[Solana releases page^].
    In my case, I downloaded the `solana-release-x86_64-unknown-linux-gnu.tar.bz2` file.
 . Extract the tarball to `$HOME/.local/share/solana/install/releases/<version>` directory.
 +
@@ -129,13 +129,13 @@ deeply coupled with particular versions of the Solana toolchain.
 So working with a program coded in Anchor version 0.27.0 where Solana version 1.17.x was required
 was problematic when integrating CPI calls or client linking with Anchor 0.29.0.
 
-Anchor developers strive to https://github.com/solana-foundation/anchor/pull/3819[address this issue]
+Anchor developers strive to https://github.com/solana-foundation/anchor/pull/3819[address this issue^]
 by making Anchor more independent
 of Solana tooling but these difficulties still occur especially when working with programs
 coded in older Anchor versions.
 
 Additionally, from the past to nowadays there was one substantial change of IDL format
-that was https://github.com/solana-foundation/anchor/pull/2824[introduced in version 0.30.0]
+that was https://github.com/solana-foundation/anchor/pull/2824[introduced in version 0.30.0^]
 and made required in Anchor 0.30.1.
 This is an issue especially for Anchor TypeScript SDK client that uses the IDL to understand
 the on-chain program structure and to serialize and deserialize the instruction calls to the program.
@@ -167,31 +167,31 @@ anchor idl convert /tmp/marinade_finance.json \
 == Program Rust dependencies
 
 The way to overcome the issue with Anchor version incompatibilities, there are two options in Rust.
-Either using the third party crate https://github.com/saber-hq/anchor-gen[`anchor-gen`] that makes it possible to work
+Either using the third party crate https://github.com/saber-hq/anchor-gen[`anchor-gen`^] that makes it possible to work
 with programs of the older Anchor.
-From Anchor 0.30.0 there is an option to use macro https://github.com/solana-foundation/anchor/pull/2824[`declare_program!`]
+From Anchor 0.30.0 there is an option to use macro https://github.com/solana-foundation/anchor/pull/2824[`declare_program!`^]
 doing similar.
 
 > **WARNING** be aware that anchor-gen code has not been audited
 
 === declare_program! macro
 
-When using https://github.com/solana-foundation/anchor/pull/2997[the Anchor 0.30.1+]
+When using https://github.com/solana-foundation/anchor/pull/2997[the Anchor 0.30.1+^]
 then `declare_program` is probably the way to go for CPI calls within the program.
 The example usage of the macro can be found
-https://github.com/solana-foundation/anchor/blob/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/programs/declare-program/src/lib.rs[in the Anchor sources].
+https://github.com/solana-foundation/anchor/blob/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/programs/declare-program/src/lib.rs[in the Anchor sources^].
 
-The idea is to have the https://github.com/solana-foundation/anchor/tree/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/idls[idls]
+The idea is to have the https://github.com/solana-foundation/anchor/tree/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/idls[idls^]
 alongside the program using the macro. The `declare_program!` then generates the required Rust structures
-https://github.com/solana-foundation/anchor/blob/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/programs/declare-program/src/lib.rs#L5-L6[that can be used for interacting]
+https://github.com/solana-foundation/anchor/blob/d4502a6ad4e59cd29369ec7c0974a854f99164c0/tests/declare-program/programs/declare-program/src/lib.rs#L5-L6[that can be used for interacting^]
 with the program defined in the IDL.
 
-Similarly for client calls you download the idl into a specific https://github.com/ochaloup/test-anchor-gen/tree/59c5d072d015d4423f1b433d2d04e9f88c4c449a/declare-program-rust/idls[idls directory]
+Similarly for client calls you download the idl into a specific https://github.com/ochaloup/test-anchor-gen/tree/59c5d072d015d4423f1b433d2d04e9f88c4c449a/declare-program-rust/idls[idls directory^]
 and then use the macro `declare_program!` with the name of the `idl.json` file.
-The https://github.com/ochaloup/test-anchor-gen/blob/main/declare-program-rust/src/main.rs[`use` directive then declares]
+The https://github.com/ochaloup/test-anchor-gen/blob/main/declare-program-rust/src/main.rs[`use` directive then declares^]
 what instructions and accounts are imported to the client code.
 
-You can find the details in the Anchor documentation at chapter https://www.anchor-lang.com/docs/features/declare-program[Dependency Free Composability].
+You can find the details in the Anchor documentation at chapter https://www.anchor-lang.com/docs/features/declare-program[Dependency Free Composability^].
 
 === anchor-gen crate
 
@@ -200,18 +200,18 @@ or use the `anchor-gen` library. That works in a similar manner where a macro ge
 based on IDL and that can be used within your project. As a difference there is created a separate "CPI crate"
 for the program you want to interact with.
 You can see the example of declaration of
-https://github.com/saber-hq/anchor-gen/tree/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi[Marinade Liquid Staking crate]
+https://github.com/saber-hq/anchor-gen/tree/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi[Marinade Liquid Staking crate^]
 inside of the `anchor-gen/examples`.
 
-You can see that you create https://github.com/saber-hq/anchor-gen/blob/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi/Cargo.toml[the anchor-gen project]
-and place the IDL definition into https://github.com/saber-hq/anchor-gen/blob/master/examples/marinade-cpi/idl.json[`idl.json`]
-and from here the https://github.com/saber-hq/anchor-gen/blob/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi/src/lib.rs[`anchor_gen::generate_cpi_crate`]
+You can see that you create https://github.com/saber-hq/anchor-gen/blob/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi/Cargo.toml[the anchor-gen project^]
+and place the IDL definition into https://github.com/saber-hq/anchor-gen/blob/master/examples/marinade-cpi/idl.json[`idl.json`^]
+and from here the https://github.com/saber-hq/anchor-gen/blob/85658b83bdb1eca0707a336b2cd41a61ddc4805f/examples/marinade-cpi/src/lib.rs[`anchor_gen::generate_cpi_crate`^]
 macro builds the Rust structures and functions that can be called from your project.
 
 This crate is linked to your project and used. Here is an example of the usage
-https://github.com/ochaloup/test-anchor-gen/blob/ffb9474d605ff05d09e87a94b46ffd4647162ea6/anchor-gen-rust/src/main.rs[in Anchor Client calls].
+https://github.com/ochaloup/test-anchor-gen/blob/ffb9474d605ff05d09e87a94b46ffd4647162ea6/anchor-gen-rust/src/main.rs[in Anchor Client calls^].
 
-It could be good https://github.com/saber-hq/anchor-gen/blame/85658b83bdb1eca0707a336b2cd41a61ddc4805f/crates/anchor-gen/README.md#L7[to align the versions of anchor-gen]
+It could be good https://github.com/saber-hq/anchor-gen/blame/85658b83bdb1eca0707a336b2cd41a61ddc4805f/crates/anchor-gen/README.md#L7[to align the versions of anchor-gen^]
 that work with particular Anchor versions to make it work with your project.
 
 == TypeScript client
@@ -223,7 +223,7 @@ On building the Anchor program the TypeScript bindings are generated in the `tar
 while the IDL is in the `target/idl` directory. The on-chain program provides the IDL only.
 Having types for the TypeScript client is nice to have as it provides type safety.
 When not having access to Anchor program source code you can generate the types from the IDL
-using my utility https://github.com/ochaloup/anchor-idl-to-ts[anchor-idl-to-ts].
+using my utility https://github.com/ochaloup/anchor-idl-to-ts[anchor-idl-to-ts^].
 
 [source,bash]
 ----
@@ -265,15 +265,15 @@ const marinadeState = await program.account.state.fetch(MARINADE_LIQUID_STAKE_ST
 
 You can see the example code for:
 
-* https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/anchor-0.27/src/main.ts[Anchor client version 0.27.0]
-* https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/anchor-0.31/src/main.ts[Anchor client version 0.31.0]
+* https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/anchor-0.27/src/main.ts[Anchor client version 0.27.0^]
+* https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/anchor-0.31/src/main.ts[Anchor client version 0.31.0^]
 
 === Troubleshooting
 
 ==== Missing `idl.metadata.address` field
 
 The `declare_program!` macro is developed to be capable of working with IDLs generated
-https://github.com/solana-foundation/anchor/pull/2997/files[in the older versions of Anchor].
+https://github.com/solana-foundation/anchor/pull/2997/files[in the older versions of Anchor^].
 But there are some pitfalls that you may encounter.
 
 One is when the IDL does not contain the `metadata.address` field.
@@ -300,7 +300,7 @@ collide. They were not separated as strictly as nowadays. For example, in the Ma
 there is a named set of accounts used for an instruction in the same way as `common` that generates the name collision.
 
 ```
-error[E0428]: the name `__cpi_client_accounts_common` is defined multiple times
+error[E0428^]: the name `__cpi_client_accounts_common` is defined multiple times
   --> src/main.rs:10:1
    |
 10 | declare_program!(marinade);
@@ -311,7 +311,7 @@ error[E0428]: the name `__cpi_client_accounts_common` is defined multiple times
 ```
 
 My resolution was to manually edit the IDL and rename the `common` instruction account set to
-https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/declare-program-rust/idls/marinade.json#L845[`common_<suffix>`].
+https://github.com/ochaloup/test-anchor-gen/blob/529bdf72cf336d3f6746b6ac86ecd92b1058cb9b/declare-program-rust/idls/marinade.json#L845[`common_<suffix>`^].
 
 == Summary
 
