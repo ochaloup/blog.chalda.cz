@@ -20,20 +20,22 @@ interface Props {
 const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
   const { title: siteTitle, subtitle: siteSubtitle } = useSiteMetadata();
 
-  const { group, pagination } = pageContext;
-  /*
-   * TODO: here we should manually handle limit and offset on the filteredEdges
-   * then the hasPrevPage and hasNextPage could be handled as well better
-   */
+  const { group, pagination, limit, offset } = pageContext;
   const { currentPage, prevPagePath, nextPagePath, hasPrevPage, hasNextPage } =
     pagination;
 
   const { edges } = data.allAsciidoc;
-  console.log(`>>> ${group}`)
+
+  // Filter posts by tag (tags are comma-separated strings in AsciiDoc)
   const filteredEdges = edges.filter(e => {
-    console.log(`${e.node.pageAttributes.tags}`)
-    return e.node.pageAttributes.tags?.includes(group || "")
+    const tags = e.node.pageAttributes.tags || "";
+    // Split by comma and trim whitespace, then check if tag matches
+    return tags.split(",").map(t => t.trim()).includes(group || "");
   });
+
+  // Apply manual pagination since GraphQL can't filter comma-separated tags
+  const paginatedEdges = filteredEdges.slice(offset, offset + limit);
+
   const pageTitle =
     currentPage > 0
       ? `${group} - Page ${currentPage} - ${siteTitle}`
@@ -43,13 +45,13 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
     <Layout title={pageTitle} description={siteSubtitle}>
       <Sidebar />
       <Page title={group}>
-        <Feed edges={filteredEdges} />
-        {/* <Pagination
+        <Feed edges={paginatedEdges} />
+        <Pagination
           prevPagePath={prevPagePath}
           nextPagePath={nextPagePath}
           hasPrevPage={hasPrevPage}
           hasNextPage={hasNextPage}
-        /> */}
+        />
       </Page>
     </Layout>
   );
