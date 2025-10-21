@@ -231,6 +231,11 @@ cargo install anchor-idl-to-ts
 anchor-idl-to-ts /tmp/marinade_finance.json -o /tmp/marinade_finance.ts
 ----
 
+**UPDATE:** The other option (probably better) is to use `anchor idl type` command
+             provided in Anchor CLI from version 0.31.1 that generates TypeScript types.
+
+*See* https://github.com/solana-foundation/anchor/discussions/3484
+
 With IDL and types you can use both in your TypeScript client code.
 The code that creates the Anchor program client looks similar.
 The most notable difference is that for older versions you need to manually provide the program address
