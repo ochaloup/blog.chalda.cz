@@ -43,7 +43,7 @@
     "*.{ts,tsx,tsx?}": [
       "npm run format:ts"
     ],
-    "*.{(sc|sa|c)ss}": [
+    "*.{scss,sass,css}": [
       "npm run format:scss"
     ]
   },

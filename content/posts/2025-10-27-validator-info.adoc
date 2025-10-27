@@ -1,0 +1,160 @@
+= Solana Validators and Their On-Chain Profiles
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2025-10-27
+
+:page-template: post
+:page-draft: false
+:page-slug: validator-info
+:page-category: solana
+:page-tags: Solana, Validator
+:page-description: Understanding how validators publish their information on-chain and how explorers display validator icons.
+:page-socialImage: /images/articles/validator-info.png
+
+image::articles/validator-info.png[]
+
+In this short write-up, let's discuss how validators publish their information on-chain.
+
+== The Solana Config Program
+
+Validators can publish their metadata, such as name, website, details, and icon,
+using the Solana Config program. This program allows validators to store and update
+their information directly on the blockchain.
+
+Solana Config program ID: `Config1111111111111111111111111111111111111`.
+
+You can find the source code for the Config program here: https://github.com/solana-program/config
+Documentation can be found at https://docs.rs/solana-config-program/latest/solana_config_program/[Rust Docs - Solana Config Program^].
+
+To get listed all the accounts of the program that are available on-chain
+you can use my https://github.com/ochaloup/solana-config-print[solana-config-print tool^],
+
+
+Validators use the Solana CLI for managing information stored on-chain via the Config program:
+
+[source,bash]
+----
+# listing all solana config program accounts
+solana validator-info -um get
+# validator to publish/update its info
+solana validator-info -um publish
+----
+
+=== Validator Info Structure
+
+Here's an example of querying validator information:
+
+[source,bash]
+----
+solana validator-info -um get 3LdoMyLZFRRoWcJ1VVzdRnWAMeJjsWJgQYmpoeYGkCGd
+
+Validator Identity: 3x9nibnhgBHWKMRiGnsXJELRBjviQpKyigfrXtKW27KJ
+  Info Address: 3LdoMyLZFRRoWcJ1VVzdRnWAMeJjsWJgQYmpoeYGkCGd
+  Details: Stake and support https://staking.kiwi
+  Keybase Username: krassovitski
+  Name: Staking kiwi validator
+  Website: https://solanastaking.kiwi/
+----
+
+The underlying account structure looks like this
+(when used the https://github.com/ochaloup/solana-config-print[solana-config-print tool^]):
+
+[source,json]
+----
+Account: 3LdoMyLZFRRoWcJ1VVzdRnWAMeJjsWJgQYmpoeYGkCGd
+  Keys (2):
+    [0] Va1idator1nfo111111111111111111111111111111 (signer: false)
+    [1] 3x9nibnhgBHWKMRiGnsXJELRBjviQpKyigfrXtKW27KJ (signer: true)
+  Config Data:
+    {
+      "details": "Stake and support https://staking.kiwi",
+      "keybaseUsername": "krassovitski",
+      "name": "Staking kiwi validator",
+      "website": "https://solanastaking.kiwi/"
+    }
+----
+
+== Validator Info in Solana Explorers
+
+It is recommended to use the `validator-info` subcommand of the Solana CLI
+to help explorer applications and other tools access the more detailed validator information
+than just the validator identity public key and vote account.
+
+According to https://www.validators.app/faq?locale=en&network=mainnet#score[validators.app FAQ^],
+they use a scoring system where published information added points in that schema
+and it is described as follows:
+
+```
+Published Information
+
+Stakeholders or delegators want to know who is running a node. The Published Information
+Score measures the contact information that the validator has posted to the blockchain
+using the `solana validator-info` feature.
+
+(2 points) means that the validator has published all four data elements
+           (Name, Avatar, Website URL, and Details).
+(1 point)  means that the validator has published two or three parts.
+(0 points) means that the validator has published only one, or zero, pieces of contact data.
+```
+
+== How Explorers Display Validators' Icons
+
+When I looked into how validators are displayed on explorers like
+https://www.validators.app/[validators.app^] or https://solanabeach.io/validators[Solana Beach^],
+the way icons are shown
+seems to be consistent across them.
+
+There is a differentiator - the validator may publish
+`keybaseUsername` in their validator-info data or simply provide an `iconUrl`
+(as a direct link to an image).
+
+=== Keybase Integration Approach
+
+When `keybase`` is defined, explorers fetch the icon from https://keybase.io[keybase.io].
+
+For example, a validator with Keybase username `krassovitski`
+can be found at https://keybase.io/krassovitski[keybase.io/krassovitski^].
+
+Such validator's validator-info data looks like this:
+
+[source,bash]
+----
+Validator Identity: HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh
+  Info Address: SBD5DJUmJeBNqgnqxsdvJGzKZGbheY4ZmL9e3tGyiSY
+  Details: Decentralization genetics - in every block!
+  Icon Url: https://ipfs.filebase.io/ipfs/QmYEXXCYbNL37DYKaisX65vXWjuEUZNaemf6jURfApiLsC
+  Name: 🧬 HelixNode jitoMEV 0% fee 🧬
+  Website: https://staking.kiwi/app/HLXktVmNFeELB5uL5nrpP4WL7jyi3TMyekxASVjDhZ1t
+----
+
+Anza currently discourages setting up Keybase for new validators.
+See https://docs.anza.xyz/operations/guides/validator-info[Anza documentation on validator-info^] for more details.
+
+===  Direct Icon URL Approach
+
+There are validators that don't publish a Keybase username but are still shown with icons
+on explorers. For example, the https://www.validators.app/validators/HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh?locale=en&network=mainnet[HelixNode validator^]:
+
+[source,bash]
+----
+Validator Identity: HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh
+  Info Address: SBD5DJUmJeBNqgnqxsdvJGzKZGbheY4ZmL9e3tGyiSY
+  Details: Decentralization genetics - in every block!
+  Icon Url: https://ipfs.filebase.io/ipfs/QmYEXXCYbNL37DYKaisX65vXWjuEUZNaemf6jURfApiLsC
+  Name: 🧬 HelixNode jitoMEV 0% fee 🧬
+  Website: https://staking.kiwi/app/HLXktVmNFeELB5uL5nrpP4WL7jyi3TMyekxASVjDhZ1t
+----
+
+In this case, the icon is directly served from the URL specified in the `iconUrl` field.
+
+== Summary
+
+From what I found, I believe validators fall into three categories:
+
+. *Validators with Keybase defined* - This approach primarily links to keybase.io as a store
+of additional information about the validator. This method is no longer recommended by Anza.
+
+. *Validators with direct iconUrl* - When Keybase is not defined, validator explorers display
+the image directly from the `iconUrl` field. This appears to be the current recommended approach.
+
+. *Validators without validator-info data* - Some validators on the chain do not provide
+any validator-info data at all.
