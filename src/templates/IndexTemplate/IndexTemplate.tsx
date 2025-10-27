@@ -18,18 +18,13 @@ interface Props {
 }
 
 const IndexTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
-  const { title: siteTitle, subtitle: siteSubtitle } = useSiteMetadata();
-
   const { pagination } = pageContext;
-  const { currentPage, hasNextPage, hasPrevPage, prevPagePath, nextPagePath } =
-    pagination;
+  const { hasNextPage, hasPrevPage, prevPagePath, nextPagePath } = pagination;
 
   const { edges } = data.allAsciidoc;
-  const pageTitle =
-    currentPage > 0 ? `Posts - Page ${currentPage} - ${siteTitle}` : siteTitle;
 
   return (
-    <Layout title={pageTitle} description={siteSubtitle}>
+    <Layout>
       <Sidebar isIndex />
       <Page>
         <Feed edges={edges} />
@@ -41,6 +36,35 @@ const IndexTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
         />
       </Page>
     </Layout>
+  );
+};
+
+export const Head: React.FC<Props> = ({ pageContext }) => {
+  const {
+    title: siteTitle,
+    subtitle: siteSubtitle,
+    author,
+    url,
+  } = useSiteMetadata();
+  const { pagination } = pageContext;
+  const { currentPage } = pagination;
+
+  const pageTitle =
+    currentPage > 0 ? `Posts - Page ${currentPage} - ${siteTitle}` : siteTitle;
+  const metaImageUrl = url + author.photo;
+
+  return (
+    <>
+      <html lang="en" />
+      <title>{pageTitle}</title>
+      <meta name="description" content={siteSubtitle} />
+      <meta property="og:site_name" content={pageTitle} />
+      <meta property="og:image" content={metaImageUrl} />
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:title" content={pageTitle} />
+      <meta name="twitter:description" content={siteSubtitle} />
+      <meta name="twitter:image" content={metaImageUrl} />
+    </>
   );
 };
 

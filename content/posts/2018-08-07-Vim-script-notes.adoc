@@ -424,7 +424,7 @@ and `map` applies some function on each value of the list.
 
 ==== Dictionaries
 
-======  Basics
+=====  Basics
 
 ```vim
 let seen = {}   " Haven't seen anything yet
@@ -432,7 +432,7 @@ let daytonum = { 'Sun':0, 'Mon':1, 'Tue':2, 'Wed':3, 'Thu':4, 'Fri':5, 'Sat':6 }
 let day = daytonum['Sun']
 ```
 
-====== For loop
+===== For loop
 
 ```vim
 for [next_key, next_val] in items(dict)
@@ -441,7 +441,7 @@ for [next_key, next_val] in items(dict)
 endfor
 ```
 
-====== Remove
+===== Remove
 
 ```vim
 remove(dictionary, 'key')

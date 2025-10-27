@@ -162,7 +162,6 @@ export default {
     },
     "gatsby-plugin-image",
     "gatsby-plugin-catch-links",
-    "gatsby-plugin-react-helmet",
     "gatsby-plugin-optimize-svgs",
     {
       resolve: "gatsby-plugin-sass",

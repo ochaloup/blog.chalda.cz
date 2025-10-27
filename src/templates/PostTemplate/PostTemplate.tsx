@@ -14,22 +14,37 @@ interface Props {
 }
 
 const PostTemplate: React.FC<Props> = ({ data }: Props) => {
-  const { title: siteTitle, subtitle: siteSubtitle } = useSiteMetadata();
-  const { pageAttributes, document } = data.asciidoc;
-  const { description = "", socialimage } = pageAttributes;
-  const { title } = document;
-  const metaDescription = description || siteSubtitle;
   const tags =
     data.asciidoc.pageAttributes?.tags?.split(",").map((t) => t.trim()) || [];
 
   return (
-    <Layout
-      title={`${title} - ${siteTitle}`}
-      description={metaDescription}
-      socialimage={socialimage}
-    >
+    <Layout>
       <Post post={data.asciidoc} tags={tags} />
     </Layout>
+  );
+};
+
+export const Head: React.FC<Props> = ({ data }) => {
+  const { title: siteTitle, subtitle: siteSubtitle, url } = useSiteMetadata();
+  const { pageAttributes, document } = data.asciidoc;
+  const { description = "", socialimage } = pageAttributes;
+  const { title } = document;
+  const metaDescription = description || siteSubtitle;
+  const metaImage = socialimage || "/photo.jpg";
+  const metaImageUrl = url + metaImage;
+
+  return (
+    <>
+      <html lang="en" />
+      <title>{`${title} - ${siteTitle}`}</title>
+      <meta name="description" content={metaDescription} />
+      <meta property="og:site_name" content={title} />
+      <meta property="og:image" content={metaImageUrl} />
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={metaDescription} />
+      <meta name="twitter:image" content={metaImageUrl} />
+    </>
   );
 };
 

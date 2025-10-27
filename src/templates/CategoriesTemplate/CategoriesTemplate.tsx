@@ -9,11 +9,10 @@ import { useCategoriesList, useSiteMetadata } from "@/hooks";
 import { toKebabCase } from "@/utils";
 
 const CategoriesTemplate: React.FC = () => {
-  const { title, subtitle } = useSiteMetadata();
   const categories = useCategoriesList();
 
   return (
-    <Layout title={`Categories - ${title}`} description={subtitle}>
+    <Layout>
       <Sidebar />
       <Page title="Categories">
         <ul>
@@ -27,6 +26,25 @@ const CategoriesTemplate: React.FC = () => {
         </ul>
       </Page>
     </Layout>
+  );
+};
+
+export const Head: React.FC = () => {
+  const { title, subtitle, author, url } = useSiteMetadata();
+  const metaImageUrl = url + author.photo;
+
+  return (
+    <>
+      <html lang="en" />
+      <title>{`Categories - ${title}`}</title>
+      <meta name="description" content={subtitle} />
+      <meta property="og:site_name" content={`Categories - ${title}`} />
+      <meta property="og:image" content={metaImageUrl} />
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:title" content={`Categories - ${title}`} />
+      <meta name="twitter:description" content={subtitle} />
+      <meta name="twitter:image" content={metaImageUrl} />
+    </>
   );
 };
 

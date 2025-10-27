@@ -18,11 +18,8 @@ interface Props {
 }
 
 const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
-  const { title: siteTitle, subtitle: siteSubtitle } = useSiteMetadata();
-
   const { group, pagination, limit, offset } = pageContext;
-  const { currentPage, prevPagePath, nextPagePath, hasPrevPage, hasNextPage } =
-    pagination;
+  const { prevPagePath, nextPagePath, hasPrevPage, hasNextPage } = pagination;
 
   const { edges } = data.allAsciidoc;
 
@@ -39,13 +36,8 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
   // Apply manual pagination since GraphQL can't filter comma-separated tags
   const paginatedEdges = filteredEdges.slice(offset, offset + limit);
 
-  const pageTitle =
-    currentPage > 0
-      ? `${group} - Page ${currentPage} - ${siteTitle}`
-      : `${group} - ${siteTitle}`;
-
   return (
-    <Layout title={pageTitle} description={siteSubtitle}>
+    <Layout>
       <Sidebar />
       <Page title={group}>
         <Feed edges={paginatedEdges} />
@@ -57,6 +49,37 @@ const TagTemplate: React.FC<Props> = ({ data, pageContext }: Props) => {
         />
       </Page>
     </Layout>
+  );
+};
+
+export const Head: React.FC<Props> = ({ pageContext }) => {
+  const {
+    title: siteTitle,
+    subtitle: siteSubtitle,
+    author,
+    url,
+  } = useSiteMetadata();
+  const { group, pagination } = pageContext;
+  const { currentPage } = pagination;
+
+  const pageTitle =
+    currentPage > 0
+      ? `${group} - Page ${currentPage} - ${siteTitle}`
+      : `${group} - ${siteTitle}`;
+  const metaImageUrl = url + author.photo;
+
+  return (
+    <>
+      <html lang="en" />
+      <title>{pageTitle}</title>
+      <meta name="description" content={siteSubtitle} />
+      <meta property="og:site_name" content={pageTitle} />
+      <meta property="og:image" content={metaImageUrl} />
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:title" content={pageTitle} />
+      <meta name="twitter:description" content={siteSubtitle} />
+      <meta name="twitter:image" content={metaImageUrl} />
+    </>
   );
 };
 
