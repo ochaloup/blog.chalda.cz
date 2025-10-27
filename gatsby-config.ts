@@ -11,8 +11,9 @@ export default {
     title: config.title,
     author: config.author,
     subtitle: config.subtitle,
+    description: config.description,
     copyright: config.copyright,
-    postsLimit: config.postsLimit,
+    feedLimit: config.feedLimit,
     disqusShortname: config.disqusShortname,
   },
   plugins: [
@@ -156,14 +157,20 @@ export default {
     {
       resolve: "@sentry/gatsby",
       options: {
-        dsn: process.env.SENTRY_DSN,
-        tracesSampleRate: 1,
+        enableClientWebpackPlugin: false,
       },
     },
     "gatsby-plugin-image",
     "gatsby-plugin-catch-links",
     "gatsby-plugin-react-helmet",
     "gatsby-plugin-optimize-svgs",
-    "gatsby-plugin-sass",
+    {
+      resolve: "gatsby-plugin-sass",
+      options: {
+        sassOptions: {
+          api: "modern-compiler",
+        },
+      },
+    },
   ],
 };

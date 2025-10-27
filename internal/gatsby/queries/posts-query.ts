@@ -26,4 +26,4 @@ const postsQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   return result?.data?.allAsciidoc;
 };
 
-export default postsQuery;
+export { postsQuery };

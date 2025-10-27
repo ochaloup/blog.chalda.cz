@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Helmet from "react-helmet";
 
-import { useSiteMetadata } from "@/hooks";
+import { useSiteMetadata, useTheme } from "@/hooks";
 
 import * as styles from "./Layout.module.scss";
 
@@ -19,8 +19,13 @@ const Layout: React.FC<Props> = ({
   socialimage = "",
 }: Props) => {
   const { author, url } = useSiteMetadata();
+  const [{ mode }] = useTheme();
   const metaImage = socialimage || author.photo;
   const metaImageUrl = url + metaImage;
+
+  useEffect(() => {
+    document.documentElement.className = mode;
+  }, [mode]);
 
   return (
     <div className={styles.layout}>

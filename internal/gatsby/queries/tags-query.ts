@@ -31,4 +31,4 @@ const tagsQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   return groupTag(result?.data?.allAsciidoc?.edges || []);
 };
 
-export default tagsQuery;
+export { tagsQuery };

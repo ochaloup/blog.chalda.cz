@@ -19,4 +19,4 @@ const templates = Object.freeze({
   postTemplate: path.resolve("./src/templates/PostTemplate/PostTemplate.tsx"),
 });
 
-export default templates;
+export { templates };

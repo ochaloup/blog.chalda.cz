@@ -29,4 +29,4 @@ const pagesQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   return result?.data?.allAsciidoc?.edges ?? [];
 };
 
-export default pagesQuery;
+export { pagesQuery };

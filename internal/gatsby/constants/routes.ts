@@ -7,4 +7,4 @@ const routes = Object.freeze({
   indexRoute: "/",
 });
 
-export default routes;
+export { routes };

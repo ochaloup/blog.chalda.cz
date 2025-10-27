@@ -29,4 +29,4 @@ const categoriesQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   return result?.data?.allAsciidoc?.group ?? [];
 };
 
-export default categoriesQuery;
+export { categoriesQuery };

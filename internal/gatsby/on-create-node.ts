@@ -1,9 +1,10 @@
-import { GatsbyNode } from "gatsby";
+import { type Node, type GatsbyNode } from "gatsby";
 import { createFilePath } from "gatsby-source-filesystem";
 
-import * as constants from "./constants";
-import * as types from "./types";
-import * as utils from "./utils";
+import { routes } from "./constants/routes";
+import { concat } from "./utils/concat";
+import { type Edge } from "./types/edge";
+import { toKebabCase } from "./utils/to-kebab-case";
 
 const onCreateNode: GatsbyNode["onCreateNode"] = ({
   node,
@@ -13,15 +14,15 @@ const onCreateNode: GatsbyNode["onCreateNode"] = ({
   const { createNodeField } = actions;
 
   if (node.internal.type === "Asciidoc") {
-    const { pageAttributes, parent }: types.Edge["node"] = node;
+    const { pageAttributes, parent } = node as Node & Edge["node"];
     const { tags, category, slug } = pageAttributes || {};
 
     if (slug) {
       const dirname = parent && getNode(parent)?.relativeDirectory;
       const value =
         typeof dirname === "string"
-          ? utils.concat("/", dirname, "/", slug)
-          : utils.concat("/", slug);
+          ? concat("/", dirname, "/", slug)
+          : concat("/", slug);
 
       createNodeField({ node, name: "slug", value });
     } else {
@@ -32,24 +33,14 @@ const onCreateNode: GatsbyNode["onCreateNode"] = ({
     if (tags) {
       const splitTags = tags.split(",").map((t) => t.trim());
       const value = splitTags.map((tag) =>
-        utils.concat(
-          constants.routes.tagRoute,
-          "/",
-          utils.toKebabCase(tag),
-          "/",
-        ),
+        concat(routes.tagRoute, "/", toKebabCase(tag), "/"),
       );
 
       createNodeField({ node, name: "tagSlugs", value });
     }
 
     if (category) {
-      const value = utils.concat(
-        constants.routes.categoryRoute,
-        "/",
-        utils.toKebabCase(category),
-        "/",
-      );
+      const value = concat(routes.categoryRoute, "/", toKebabCase(category));
 
       createNodeField({ node, name: "categorySlug", value });
     }

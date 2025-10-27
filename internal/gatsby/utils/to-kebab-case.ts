@@ -7,4 +7,4 @@ const toKebabCase = (str: string = ""): string =>
     .split("_")
     .join("-");
 
-export default toKebabCase;
+export { toKebabCase };

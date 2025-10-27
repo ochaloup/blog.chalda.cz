@@ -3,7 +3,7 @@ import { CreatePagesArgs } from "gatsby";
 interface MetadataQueryResult {
   site: {
     siteMetadata: {
-      postsLimit?: number;
+      feedLimit?: number;
     };
   };
 }
@@ -13,7 +13,7 @@ const metadataQuery = async (graphql: CreatePagesArgs["graphql"]) => {
     query SiteMetaData {
       site {
         siteMetadata {
-          postsLimit
+          feedLimit
         }
       }
     }
@@ -22,4 +22,4 @@ const metadataQuery = async (graphql: CreatePagesArgs["graphql"]) => {
   return result?.data?.site.siteMetadata ?? {};
 };
 
-export default metadataQuery;
+export { metadataQuery };

@@ -2,11 +2,12 @@
   "title": "Blog by chalda",
   "url": "https://blog.chalda.cz",
   "subtitle": "Developer notes.",
+  "description": "Developer notes on programming, DevOps, and software engineering.",
   "copyright": "",
   "googleAnalyticsId": "UA-91848308-1",
   "googleManagerTag": "GTM-5NQ9VLB",
   "disqusShortname": "",
-  "postsLimit": 6,
+  "feedLimit": 6,
   "pathPrefix": "/",
   "menu": [
     {

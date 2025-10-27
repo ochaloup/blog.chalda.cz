@@ -1,8 +1,14 @@
-import { GatsbyNode } from "gatsby";
+import { type GatsbyNode } from "gatsby";
 
-import * as constants from "./constants";
-import * as queries from "./queries";
-import * as utils from "./utils";
+import { routes } from "./constants/routes";
+import { templates } from "./constants/templates";
+import { tagsQuery } from "./queries/tags-query";
+import { pagesQuery } from "./queries/pages-query";
+import { postsQuery } from "./queries/posts-query";
+import { metadataQuery } from "./queries/metadata-query";
+import { categoriesQuery } from "./queries/categories-query";
+import { toKebabCase } from "./utils/to-kebab-case";
+import { concat } from "./utils/concat";
 
 type CreateWithPagination = (parameters: {
   limit: number;
@@ -20,32 +26,32 @@ const createPages: GatsbyNode["createPages"] = async ({ graphql, actions }) => {
   const { createPage } = actions;
 
   createPage({
-    path: constants.routes.notFoundRoute,
-    component: constants.templates.notFoundTemplate,
+    path: routes.notFoundRoute,
+    component: templates.notFoundTemplate,
     context: {},
   });
 
   createPage({
-    path: constants.routes.tagsListRoute,
-    component: constants.templates.tagsTemplate,
+    path: routes.tagsListRoute,
+    component: templates.tagsTemplate,
     context: {},
   });
 
   createPage({
-    path: constants.routes.categoriesListRoute,
-    component: constants.templates.categoriesTemplate,
+    path: routes.categoriesListRoute,
+    component: templates.categoriesTemplate,
     context: {},
   });
 
-  const pages = await queries.pagesQuery(graphql);
+  const pages = await pagesQuery(graphql);
 
   pages.forEach((edge) => {
     const { node } = edge;
 
     if (node?.pageAttributes?.template === "page" && node?.fields?.slug) {
       createPage({
-        path: node.fields.slug,
-        component: constants.templates.pageTemplate,
+        path: node?.pageAttributes?.slug || node.fields.slug,
+        component: templates.pageTemplate,
         context: { slug: node.fields.slug },
       });
     } else if (
@@ -53,8 +59,8 @@ const createPages: GatsbyNode["createPages"] = async ({ graphql, actions }) => {
       node?.fields?.slug
     ) {
       createPage({
-        path: node.fields.slug,
-        component: constants.templates.postTemplate,
+        path: node?.pageAttributes?.slug || node.fields.slug,
+        component: templates.postTemplate,
         context: { slug: node.fields.slug },
       });
     }
@@ -77,33 +83,32 @@ const createPages: GatsbyNode["createPages"] = async ({ graphql, actions }) => {
         offset: page * limit,
         pagination: {
           currentPage: page,
-          prevPagePath:
-            page <= 1 ? path : getPaginationPath(path, utils.decrement(page)),
-          nextPagePath: getPaginationPath(path, utils.increment(page)),
-          hasNextPage: page !== utils.decrement(total),
+          prevPagePath: page <= 1 ? path : getPaginationPath(path, page - 1),
+          nextPagePath: getPaginationPath(path, page + 1),
+          hasNextPage: page !== total - 1,
           hasPrevPage: page !== 0,
         },
       },
     });
   };
 
-  const categories = await queries.categoriesQuery(graphql);
-  const metadata = await queries.metadataQuery(graphql);
-  const postsLimit = metadata?.postsLimit ?? 1;
+  const categories = await categoriesQuery(graphql);
+  const metadata = await metadataQuery(graphql);
+  const postsLimit = metadata?.feedLimit ?? 1;
 
   categories.forEach((category) => {
     const total = Math.ceil(category.totalCount / postsLimit);
-    const path = utils.concat(
-      constants.routes.categoryRoute,
+    const path = concat(
+      routes.categoryRoute,
       "/",
-      utils.toKebabCase(category.fieldValue),
+      toKebabCase(category.fieldValue),
     );
 
     for (let page = 0; page < total; page += 1) {
       createWithPagination({
         limit: postsLimit,
         group: category.fieldValue,
-        template: constants.templates.categoryTemplate,
+        template: templates.categoryTemplate,
         total,
         page,
         path,
@@ -111,22 +116,17 @@ const createPages: GatsbyNode["createPages"] = async ({ graphql, actions }) => {
     }
   });
 
-  const tags = await queries.tagsQuery(graphql);
+  const tags = await tagsQuery(graphql);
 
   tags.forEach((tag) => {
-    const path = utils.concat(
-      constants.routes.tagRoute,
-      "/",
-      utils.toKebabCase(tag.fieldValue),
-    );
-
+    const path = concat(routes.tagRoute, "/", toKebabCase(tag.fieldValue));
     const total = Math.ceil(tag.totalCount / postsLimit);
 
     for (let page = 0; page < total; page += 1) {
       createWithPagination({
         limit: postsLimit,
         group: tag.fieldValue,
-        template: constants.templates.tagTemplate,
+        template: templates.tagTemplate,
         total,
         page,
         path,
@@ -134,9 +134,9 @@ const createPages: GatsbyNode["createPages"] = async ({ graphql, actions }) => {
     }
   });
 
-  const path = constants.routes.indexRoute;
-  const template = constants.templates.indexTemplate;
-  const posts = await queries.postsQuery(graphql);
+  const path = routes.indexRoute;
+  const template = templates.indexTemplate;
+  const posts = await postsQuery(graphql);
   const total = Math.ceil((posts?.edges?.length ?? 0) / postsLimit);
 
   for (let page = 0; page < total; page += 1) {
