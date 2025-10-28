@@ -12,36 +12,65 @@ chalda <ondrej.chaloupka@proton.me>
 
 image::articles/validator-info.png[]
 
-In this short write-up, let's discuss how validators publish their information on-chain.
+In this short write-up, let's discuss how validators publish metadata about themselves.
+
+I was mainly curious about how validators' icons are displayed
+on popular Solana explorers like https://www.validators.app/[validators.app^] or https://solanabeach.io/validators[Solana Beach^].
 
 == The Solana Config Program
 
-Validators can publish their metadata, such as name, website, details, and icon,
-using the Solana Config program. This program allows validators to store and update
-their information directly on the blockchain.
+Validators can publish their metadata, such as name, website, details, and icon on-chain.
+That's where the dat a can be accessed by explorers and other tools.
+
+For purpose of storing this data there is created https://github.com/solana-program/config[the Solana Config program^]
+( https://docs.rs/solana-config-program/latest/solana_config_program/[Rust Docs)^] )
 
 Solana Config program ID: `Config1111111111111111111111111111111111111`.
 
-You can find the source code for the Config program here: https://github.com/solana-program/config
-Documentation can be found at https://docs.rs/solana-config-program/latest/solana_config_program/[Rust Docs - Solana Config Program^].
+== Solana CLI validator-info Command
 
-To get listed all the accounts of the program that are available on-chain
-you can use my https://github.com/ochaloup/solana-config-print[solana-config-print tool^],
-
-
-Validators use the Solana CLI for managing information stored on-chain via the Config program:
+Validators use the Solana CLI for managing information stored on-chain via the `validator-info` command:
 
 [source,bash]
 ----
 # listing all solana config program accounts
 solana validator-info -um get
-# validator to publish/update its info
-solana validator-info -um publish
 ----
 
-=== Validator Info Structure
+When you want to publish or update your validator information,
+you use the `solana validator-info -um publish` command.
+This is a place limiting what are keys you can set in the validator info data.
+At the current time those are:
 
-Here's an example of querying validator information:
+[source, bash]
+----
+solana validator-info -um publish --help
+
+-d, --details <DETAILS>                               Validator description
+-i, --icon-url <URL>                                  Validator icon URL
+-w, --website <URL>                                   Validator website url
+-p, --info-pubkey <PUBKEY>                            The pubkey of the Validator info account to update
+
+ARGS:
+    <NAME>    Validator name
+----
+
+[NOTE]
+====
+In past there was also `--keybase-username` option.
+
+Anza currently discourages the Keybase username to be setup by validators.
+See https://docs.anza.xyz/operations/guides/validator-info[Anza documentation on validator-info^] for more details.
+====
+
+
+If you are interested to list all accounts of the Solana Config program,
+you can use my https://github.com/ochaloup/solana-config-print[solana-config-print tool^],
+
+=== Query of Validator Info
+
+Here's an example of querying validator information
+(it is a bit strange one need to provide the info account public key and not the validator identity public key but):
 
 [source,bash]
 ----
@@ -69,15 +98,16 @@ Account: 3LdoMyLZFRRoWcJ1VVzdRnWAMeJjsWJgQYmpoeYGkCGd
       "details": "Stake and support https://staking.kiwi",
       "keybaseUsername": "krassovitski",
       "name": "Staking kiwi validator",
-      "website": "https://solanastaking.kiwi/"
+      "website": "https://solanastaking.kiwi/",
+      "iconUrl": "<path to icon if set>"
     }
 ----
 
 == Validator Info in Solana Explorers
 
 It is recommended to use the `validator-info` subcommand of the Solana CLI
-to help explorer applications and other tools access the more detailed validator information
-than just the validator identity public key and vote account.
+to help explorer applications to fetch more information about validators
+than only the validator identity public key and vote account.
 
 According to https://www.validators.app/faq?locale=en&network=mainnet#score[validators.app FAQ^],
 they use a scoring system where published information added points in that schema
@@ -100,24 +130,24 @@ using the `solana validator-info` feature.
 
 When I looked into how validators are displayed on explorers like
 https://www.validators.app/[validators.app^] or https://solanabeach.io/validators[Solana Beach^],
-the way icons are shown
-seems to be consistent across them.
+the way icons are shown seems to be consistent across them.
 
-There is a differentiator - the validator may publish
+There is a differentiator &ndash; the validator may publish
 `keybaseUsername` in their validator-info data or simply provide an `iconUrl`
 (as a direct link to an image).
 
-=== Keybase Integration Approach
-
-When `keybase`` is defined, explorers fetch the icon from https://keybase.io[keybase.io].
+When `keybaseUsername` is defined, explorers fetch the icon from https://keybase.io[keybase.io].
 
 For example, a validator with Keybase username `krassovitski`
 can be found at https://keybase.io/krassovitski[keybase.io/krassovitski^].
 
-Such validator's validator-info data looks like this:
+When the `iconUrl` is defined, explorers fetch the icon directly from that URL.
+Such an example is https://www.validators.app/validators/HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh?locale=en&network=mainnet[HelixNode validator^]:
 
 [source,bash]
 ----
+solana validator-info -um get SBD5DJUmJeBNqgnqxsdvJGzKZGbheY4ZmL9e3tGyiSY
+
 Validator Identity: HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh
   Info Address: SBD5DJUmJeBNqgnqxsdvJGzKZGbheY4ZmL9e3tGyiSY
   Details: Decentralization genetics - in every block!
@@ -125,30 +155,10 @@ Validator Identity: HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh
   Name: 🧬 HelixNode jitoMEV 0% fee 🧬
   Website: https://staking.kiwi/app/HLXktVmNFeELB5uL5nrpP4WL7jyi3TMyekxASVjDhZ1t
 ----
-
-Anza currently discourages setting up Keybase for new validators.
-See https://docs.anza.xyz/operations/guides/validator-info[Anza documentation on validator-info^] for more details.
-
-===  Direct Icon URL Approach
-
-There are validators that don't publish a Keybase username but are still shown with icons
-on explorers. For example, the https://www.validators.app/validators/HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh?locale=en&network=mainnet[HelixNode validator^]:
-
-[source,bash]
-----
-Validator Identity: HLXxkmjb47spcmbbKi3UCfZ2qmFY29t8MN562AEmh2Qh
-  Info Address: SBD5DJUmJeBNqgnqxsdvJGzKZGbheY4ZmL9e3tGyiSY
-  Details: Decentralization genetics - in every block!
-  Icon Url: https://ipfs.filebase.io/ipfs/QmYEXXCYbNL37DYKaisX65vXWjuEUZNaemf6jURfApiLsC
-  Name: 🧬 HelixNode jitoMEV 0% fee 🧬
-  Website: https://staking.kiwi/app/HLXktVmNFeELB5uL5nrpP4WL7jyi3TMyekxASVjDhZ1t
-----
-
-In this case, the icon is directly served from the URL specified in the `iconUrl` field.
 
 == Summary
 
-From what I found, I believe validators fall into three categories:
+From what I found, validators fall into three categories:
 
 . *Validators with Keybase defined* - This approach primarily links to keybase.io as a store
 of additional information about the validator. This method is no longer recommended by Anza.
