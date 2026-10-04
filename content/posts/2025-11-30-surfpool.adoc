@@ -1,0 +1,88 @@
+= Surfpool: Solana Test Validator on steroids
+chalda <ondrej.chaloupka@proton.me>
+1.0, 2025-11-30
+
+:page-template: post
+:page-draft: false
+:page-slug: surfpool
+:page-category: solana
+:page-tags: Solana, Validator
+:page-description: Base experiences around using Surfpool.
+:page-socialImage: /images/articles/TODO
+
+image::articles/TODO[]
+
+Start
+
+
+Use arg `--offline` to not connect to mainnet.  
+
+GH actions: https://github.com/samui-build/samui-wallet/actions/runs/19218551453/workflow
+
+https://github.com/txtx/surfpool
+
+https://docs.txtx.sh/addons/svm/actions#setup-surfnet
+https://docs.surfpool.run/rpc/cheatcodes#surfnet-setaccount
+https://www.youtube.com/playlist?list=PL0FMgRjJMRzO1FdunpMS-aUS4GNkgyr3T
+https://github.com/txtx/onion-dao-tutorial/tree/400ef78b61b557486e55d81119686c4eda4946f6
+
+https://discord.com/channels/1191452849310273627/1191452849310273630/1435874049162084436
+variable "program" {
+    description = "Validator bonds."
+    value = svm::get_program_from_anchor_project("validator_bonds")
+}
+caction "setup" "svm::setup_surfnet" {
+    set_program_authority {
+        program_id = variable.program.program_id
+        authority = signer.authority.public_key
+    }
+}
+
+
+
+export RPC_ENDPOINT="http://localhost:8899"
+export PUBKEY="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+# https://docs.surfpool.run/rpc/cheatcodes#surfnet-setaccount
+export DATA_HEX="The new account data, as a hex encoded string"
+export PROGRAM_ID=$(solana address)
+
+
+curl -X POST "$RPC_ENDPOINT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "surfnet_setAccount",
+    "params": [
+      "'"$PUBKEY"'",
+      {
+        "lamports": 1000000000,
+        "data": "'"$DATA_HEX"'",
+        "executable": false,
+        "rent_epoch": 0,
+        "owner": "'"$PROGRAM_ID"'"
+      }
+    ]
+  }'
+
+RPC_ENDPOINT="http://localhost:8899"
+PUBKEY=3o5xatJmHzJ1UwTyTUxkXGGxqTZeaqozfZvXgDCsAj7m
+DATA_HEX=87447492054b7f8f0dbaa0c06d6ec8e0fd6ce40b576ec5354c74093c89ac5e7cbbd57d1c04adf2e5f8512371ed9fe152da6ebe7e435f29d056c9002b5e2bd683c5606bc24a807843a246bfae16271d8825c60cd65f1b1247ebe25d4e699acaf7fe62255adf24f0cd000000017b0000000000000001c901000000000000ff
+PROGRAM_ID=vBoNdEvzMrSai7is21XgVYik65mqtaKXuSdMBJ1xkW4
+curl -X POST "$RPC_ENDPOINT" \
+-H "Content-Type: application/json" \
+-d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "surfnet_setAccount",
+  "params": [
+    "'"$PUBKEY"'",
+    {
+        "lamports": 1000000000,
+        "data": "'"$DATA_HEX"'",
+        "executable": false,
+        "rent_epoch": 0,
+        "owner": "'"$PROGRAM_ID"'"
+    }
+  ]
+}'

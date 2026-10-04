@@ -12,7 +12,7 @@ chalda <ondrej.chaloupka@proton.me>
 
 image::articles/hardware-wallet-article.png[]
 
-Using hardware wallets for securely signing blockchain transaction is a defacto standard.
+Using hardware wallets for securely signing blockchain transaction is a de facto standard.
 On Solana when one creates a web application there are multiple solution of wallet connection tools
 and Solana tooling provides good link:https://solana.com/developers/cookbook/wallets/connect-wallet-react[integration to React^] and link:https://solana.com/developers/guides/wallets/add-solana-wallet-adapter-to-nextjs[Nextjs base apps^].
 But such a library for Node.js command line tools is not, to my knowledge, available.
@@ -25,7 +25,7 @@ This article is about this.
 Let's start with hardware wallet address schema. Before I started to play with the Typescript
 signature tooling I fought to understand the meaning. This brief description is not aimed
 to provide link:https://vault12.com/learn/crypto-security-basics/what-is-bip39/[an in-detail explanation of the topic]
-naiter more link:https://www.abiraja.com/blog/from-seed-phrase-to-solana-address[in-depth explanation].
+neither more link:https://www.abiraja.com/blog/from-seed-phrase-to-solana-address[in-depth explanation].
 But rather to describe the context needed to work with the wallet in the code.
 
 The term link:https://github.com/bitcoin/bips/tree/master[BIP stands for "bitcoin improvement proposal"^]
@@ -44,12 +44,12 @@ So the BIP-39 describes how to construct the seed phrase.
 Then the link:https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#master-key-generation[BIP-32^]
 defines a method to derive set of private/public keys from the single seed phrase.
 That way one can control multiple accounts
-withing the single seed phrase. The derived public keys have got a nice
+within the single seed phrase. The derived public keys have got a nice
 property that they cannot be tracked within each other. From the perspective
 of the outside spectator the public keys derived from one seed have nothing in common.
 
 The last link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#abstract[BIP-44^]
-hierarchical schema used to deterministically generate the private keys (BIP-39) from the seed phrase (BIP-32).
+defines the hierarchical schema used to deterministically derive the keys (BIP-32) from the seed phrase (BIP-39).
 This hierarchy is expressed as link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#path-levels[a path]
 like
 
@@ -76,6 +76,16 @@ and constant `1` for internal chain (also known as change addresses).
 For Solana, I believe, we consider only external chain constant of value `0`
 (the constant `0` for the external chain can be used to receive payments).
 
+=== The apostrophe, ed25519 and SLIP-10
+
+The apostrophe in `44'` marks a _hardened_ index.
+Bitcoin uses secp256k1 keys where a non-hardened child public key can be computed from the parent public key alone.
+Solana uses ed25519 keys and the link:https://github.com/satoshilabs/slips/blob/master/slip-0010.md[SLIP-10^]
+derivation for ed25519 knows only hardened indexes.
+That means every level of a Solana path is hardened, whether one writes the apostrophe or not.
+The Ledger Solana app silently hardens each index, the Agave CLI does the same for `key=0/0`
+and sends Trezor the hardened indexes.
+Writing `44'/501'/0'/0'` is the honest notation.
 
 == Account discovery
 
@@ -90,12 +100,12 @@ For our Solana purpose the first key to be used with a new seed phrase is at pat
 
 [source]
 ----
-m/44'/501'/0'/0
+m/44'/501'/0'/0'
 ----
 
 When the wallet wants to discover if addresses "managed" by seed phrase of the hardware wallet
-own some funds it scans the hierarchy by defined
-With that the link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account-discovery[account discovery procedure in BIP-44^]
+own some funds it scans the hierarchy by
+the link:https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account-discovery[account discovery procedure in BIP-44^]
 and checks if the derived address has got some funds (for Solana account based approach)
 or has got some transaction history (for Bitcoin UTXO based approach).
 The BIP-44 defines the wallet should scan the accounts until reaching
@@ -114,20 +124,28 @@ With that the wallet will search at second for an existing funds at addressed de
 If you are used to work with link:https://docs.solanalabs.com/cli/[Solana CLI]
 you can use the CLI to work with link:https://www.ledger.com/coin/wallet/solana[Ledger]
 and to get Solana public key addresses at particular derived path.
-When you connect your Ledger device use `solana-keygen pubkey`.
-The Solana CLI Ledger schema is `usb://<MANUFACTURER>[/<WALLET_ID>][?key=<DERIVATION_PATH>]`.
+Since the Agave release 4.0 the CLI supports link:https://trezor.io[Trezor] as well.
+When you connect your device use `solana-keygen pubkey`.
+The Solana CLI schema is `usb://<MANUFACTURER>[/<WALLET_ID>][?key=<DERIVATION_PATH>]`.
 
 [source,sh]
 ----
 # printing wallet id of the connected device
 solana-keygen pubkey usb://ledger
 
-# printing pubkey at the path m/44'/501'/0'/0 of the connected device
+# printing pubkey at the path m/44'/501'/0'/0' of the connected device
 solana-keygen pubkey usb://ledger?key=0/0
 
 # searches for devices with defined wallet id for pubkey at the particular path
 solana-keygen pubkey usb://ledger/<wallet-id>?key=0
+
+# the same for Trezor
+solana-keygen pubkey usb://trezor?key=0/0
 ----
+
+The `<WALLET_ID>` is not the key you sign with. It is the public key at the base path `m/44'/501'`
+and it only says which of the connected devices to use.
+The key to sign with is always defined by the `key` part.
 
 [NOTE]
 ====
@@ -137,6 +155,176 @@ solana-keygen pubkey usb://ledger/<wallet-id>?key=0
   if your Ledger wallet is connected to your computer and it is unlocked (opened)
 ====
 
+== The TypeScript client
 
-NOTES: https://medium.com/hryer-dev/how-wallet-works-on-evm-709fd5c5eace
-       https://www.abiraja.com/blog/from-seed-phrase-to-solana-address
+The library I ended up with is
+link:https://www.npmjs.com/package/@marinade.finance/solana-hw-wallet[`@marinade.finance/solana-hw-wallet`^]
+(source at link:https://github.com/marinade-finance/ledger-utils[GitHub^]).
+It takes the same `usb://` url as the Solana CLI and returns a `Wallet`
+that is compatible with the Anchor provider wallet.
+A CLI then accepts a keypair file path or a hardware wallet url in the same `--keypair` argument.
+
+[source,ts]
+----
+import { parseHardwareWallet } from '@marinade.finance/solana-hw-wallet'
+
+const wallet =
+  (await parseHardwareWallet(keypairArg, logger)) ??
+  new KeypairWallet(loadKeypairFile(keypairArg))
+
+await wallet.signTransaction(transaction)
+----
+
+The vendor libraries are optional peer dependencies and are loaded with a dynamic `import()`
+only when the url asks for them.
+A Trezor user does not have to compile the native USB HID module that Ledger needs,
+and a Ledger user does not download the Trezor connect with all its blockchain integrations.
+
+The url wallet id was the place where my first version differed from the Solana CLI.
+I took the pubkey in the url as the key to sign with and searched the device for its derivation path.
+That is handy, but `usb://ledger/<wallet-id>?key=0/0` copied from `solana-keygen` then found the wallet id
+at `m/44'/501'` and signed with that key instead of the requested `0'/0'` one.
+The client now accepts both meanings: the pubkey matches either the base path (wallet id)
+or the requested derivation path, and when the `key` is set explicitly the search never replaces it.
+The account search runs only when the url carries a pubkey without the `key`,
+and it scans `m/44'/501'/a'/c'` with `a` and `c` up to the BIP-44 gap limit of 20.
+
+== Ledger
+
+Ledger provides link:https://www.npmjs.com/package/@ledgerhq/hw-app-solana[`@ledgerhq/hw-app-solana`^]
+that talks to the Solana app on the device,
+and link:https://www.npmjs.com/package/@ledgerhq/hw-transport-node-hid-noevents[`@ledgerhq/hw-transport-node-hid-noevents`^]
+that is the USB HID transport for Node.js.
+
+[source,ts]
+----
+import Solana from '@ledgerhq/hw-app-solana'
+import TransportNodeHid, { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents'
+
+const [device] = getDevices()
+const solana = new Solana(await TransportNodeHid.open(device.path))
+const { address } = await solana.getAddress("44'/501'/0'/0'")
+const { signature } = await solana.signTransaction(
+  "44'/501'/0'/0'",
+  transaction.serializeMessage(),
+)
+transaction.addSignature(new PublicKey(address), signature)
+----
+
+The device signs the serialized _message_, not the whole transaction.
+That works the same for a legacy `Transaction` and for a `VersionedTransaction` with address lookup tables.
+Most of the work is about errors. The device answers with a status word and the library maps
+the common ones to a sentence a user can act on:
+`0x5515` the device is locked, `0x6e01` or `0x6d02` the Solana app is not opened,
+`0x6985` the user rejected the transaction on the device.
+When the transaction is not one the app can parse, the app asks for blind signing
+and the user has to allow it in the Solana app settings.
+
+== Trezor
+
+Trezor provides link:https://www.npmjs.com/package/@trezor/connect[`@trezor/connect`^].
+In version 10 it runs fully in the Node.js process, it talks to the device over the Trezor Bridge
+when one is running, otherwise directly over USB.
+The Solana API is close to Ledger. The path is sent as an array of hardened indexes and the message as hex.
+
+[source,ts]
+----
+import TrezorConnect from '@trezor/connect'
+
+await TrezorConnect.init({
+  manifest: { appName: 'my-cli', appUrl: 'https://example.com', email: 'dev@example.com' },
+  pendingTransportEvent: true,
+})
+const response = await TrezorConnect.solanaSignTransaction({
+  path: "m/44'/501'/0'/0'",
+  serializedTx: transaction.serializeMessage().toString('hex'),
+})
+if (!response.success) throw new Error(response.error.message)
+transaction.addSignature(publicKey, Buffer.from(response.payload.signature, 'hex'))
+----
+
+A CLI meets a few things a web application does not:
+
+* `@trezor/connect` 10 is an ES module only. A CommonJS library can still load it, Node.js 20.19 and 22.12 support `require()` of ES modules.
+* The device events are delivered _after_ the `init` promise resolves.
+  To know which devices are connected, one waits for the `transport-start` event, which comes after the initial `device-connect` events.
+* Connect keeps the event loop busy (USB hotplug, transport polling). A CLI that does not call `process.exit()` never ends.
+  The client closes connect after one second without any wallet call and opens it again on the next one.
+  On reopening it checks the device still derives the same public key, so a swapped device cannot sign in place of the original one.
+* Trezor Safe 7 pairs with the host over THP. The user types the code shown on the device into the terminal.
+  A passphrase is always entered on the device.
+
+== Off-chain messages
+
+Signing a text, e.g. to prove an ownership of an address, is defined by the
+link:https://github.com/solana-labs/solana/blob/master/docs/src/proposals/off-chain-message-signing.md[Solana off-chain message^] format.
+The message is prefixed by `0xff` and `solana offchain`, so it can never be a valid transaction.
+Ledger signs the format version 0 that contains an application domain and the list of signers.
+Trezor signs only the version 1 that has no application domain.
+A signature made by one format does not verify with the other one.
+The verification needs to know which device made the signature.
+One more catch of the version 0: the 1232 bytes limit of the short formats is for the whole message including the header,
+so with one signer the text can have at most 1147 bytes.
+
+== Testing without a device
+
+Testing a hardware wallet client usually means somebody pressing buttons.
+I found three layers that do not need a person.
+
+The first is the key derivation itself. Trezor publishes the expected keys and signatures
+in its link:https://github.com/trezor/trezor-suite/tree/develop/packages/connect-core/e2e/__fixtures__[e2e test fixtures^]
+for the mnemonic `all all all all all all all all all all all all`.
+BIP-39 seed and SLIP-10 ed25519 derivation are a few lines with Node.js `crypto`:
+
+[source,ts]
+----
+import { createHmac, pbkdf2Sync } from 'crypto'
+
+const seed = pbkdf2Sync(mnemonic, 'mnemonic', 2048, 64, 'sha512')
+let digest = createHmac('sha512', 'ed25519 seed').update(seed).digest()
+for (const index of [44, 501, 0, 0]) {
+  const data = Buffer.alloc(37)
+  digest.copy(data, 1, 0, 32)
+  data.writeUInt32BE((index | 0x80000000) >>> 0, 33)
+  digest = createHmac('sha512', digest.subarray(32)).update(data).digest()
+}
+Keypair.fromSeed(digest.subarray(0, 32)).publicKey
+// 14CCvQzQzHCVgZM3j9soPnXuJXh1RmCfwLVUcdfbZVBS, the fixture value for m/44'/501'/0'/0'
+----
+
+With the same keys as the real devices, the second layer is a simulated device.
+For Ledger it is a class extending the `Transport` of `@ledgerhq/hw-transport` that answers the APDU commands of the Solana app:
+it returns the derived public key, collects the chunks of a long message and signs it.
+It can answer with any status word too, which is how the error mapping gets tested.
+For Trezor it is a stand-in for the `TrezorConnect` object.
+The ed25519 signatures are deterministic, so the test compares the signature byte by byte
+with the one from Trezor fixtures, not just that it verifies.
+
+The third layer is the firmware emulator. Trezor publishes the
+link:https://github.com/trezor/trezor-user-env[trezor-user-env^] container
+with emulators of its devices and with a websocket API to set them up and press their buttons.
+
+[source,sh]
+----
+docker run -d --network host -e SDL_VIDEODRIVER=dummy -e XDG_RUNTIME_DIR=/var/tmp \
+  ghcr.io/trezor/trezor-user-env
+----
+
+The test starts a Trezor Safe 5 emulator, loads the `all` mnemonic, starts the bridge,
+and presses "yes" on each button request. Then the client signs as with a real device.
+The emulator showed one bug the simulated device did not.
+My stand-in of connect delivered the device events right in `init` and the real one delivers them later.
+A fake is as good as its model of the real thing.
+
+For Ledger there is the link:https://github.com/LedgerHQ/speculos[Speculos^] emulator as well.
+It needs the Solana app binary to be built or downloaded, so I stayed with the simulated device there.
+
+== Summary
+
+The vendor libraries do the hard part of talking to the device.
+What is left to the client is small but easy to get wrong:
+follow the Solana CLI url semantics so the urls work in both tools,
+treat every path index as hardened,
+know which off-chain message format each device signs,
+and make the CLI exit when the work is done.
+And the `all all all` mnemonic with the Trezor fixtures makes it testable without touching a device.
