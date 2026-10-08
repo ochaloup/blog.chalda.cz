@@ -3,7 +3,7 @@ chalda <ondrej.chaloupka@proton.me>
 1.0, 2025-11-30
 
 :page-template: post
-:page-draft: false
+:page-draft: true
 :page-slug: surfpool
 :page-category: solana
 :page-tags: Solana, Validator
